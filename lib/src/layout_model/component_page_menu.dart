@@ -10,7 +10,6 @@ import 'form_slider_button.dart';
 import 'form_text_field.dart';
 import 'menu.dart';
 import 'component_table.dart';
-import 'page.dart';
 
 import 'component_group.dart';
 import 'form_radio.dart';
@@ -22,9 +21,7 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
   @override
   List<ContextMenuEntry> getContextMenu(
       void Function(LayoutModelEvent event)? onChanged) {
-    var pageCount = controller.layoutModel.root.items
-        .where((element) => element.runtimeType == ComponentPage)
-        .length;
+    // Removed unused variable pageCount
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem.submenu(
