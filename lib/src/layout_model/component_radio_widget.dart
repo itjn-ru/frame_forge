@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'canvas/layout_model_provider.dart';
 import 'component.dart';
 import 'component_widget.dart';
-import 'style_element.dart';
 
 
 class ComponentRadioWidget extends ComponentWidget {
@@ -16,10 +14,6 @@ class ComponentRadioWidget extends ComponentWidget {
     if (text.isEmpty) {
       text = component['text'] ?? '';
     }
-        final controller = LayoutModelControllerProvider.of(context);
-    final layoutModel = controller.layoutModel;
-    var style = layoutModel.getStyleElementById(component['style'].id) ??
-        StyleElement('стиль');
 
     return Container(
       alignment: component['alignment'],
