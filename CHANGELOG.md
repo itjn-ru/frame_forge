@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2] - 2025-09-05
+### Documentation
+- Enhanced API documentation coverage with comprehensive dartdoc comments
+- Improved public API documentation for better pub.dev compliance
+- Added detailed class descriptions and parameter documentation
+
+### Technical
+- Fixed vector_math dependency constraint to be more flexible
+- Code formatting improvements across all files
+
 ## [1.0.1] - 2025-09-05
 - Multi-language documentation (English and Russian)
 - MIT license

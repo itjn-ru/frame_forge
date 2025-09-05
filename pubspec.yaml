@@ -15,7 +15,7 @@ dependencies:
   keymap: ^0.0.92
   file_picker: ^10.3.2
   uuid: ^4.4.0
-  vector_math: 2.1.4
+  vector_math: ^2.1.4
   xml: ^6.5.0
   web: ^1.0.0
   
