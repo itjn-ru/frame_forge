@@ -3,7 +3,7 @@
  
 ## Motivation
 Без изменения кода, загрузки в store изменять UI и обмен данными с сервером приложения клиента.   
-![admin-layout-photo](./docs/images/admin-layout-photo.png)
+![admin-layout-photo](./doc/images/admin-layout-photo.png)
 
 ## Установка
 
