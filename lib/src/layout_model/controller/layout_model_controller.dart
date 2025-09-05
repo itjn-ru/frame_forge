@@ -2,9 +2,12 @@
 import 'package:frame_forge/src/layout_model/property.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:typed_data';
 
 import '../item.dart';
 import '../layout_model.dart';
+import 'file_picker/file_picker_service.dart';
+import 'file_picker/file_picker_factory.dart';
 import 'clipboard.dart';
 import 'event_bus.dart';
 import 'events.dart';
@@ -158,5 +161,18 @@ class LayoutModelController {
         isHandled: true,
       ),
     );
+  }
+
+  /// File picker service instance (lazy initialized)
+  FilePickerService? _filePickerService;
+  
+  FilePickerService get filePickerService {
+    _filePickerService ??= createFilePickerService();
+    return _filePickerService!;
+  }
+
+  /// Picks an image file and returns the bytes
+  Future<Uint8List?> pickUploadFiles() async {
+    return await filePickerService.pickImageFile();
   }
 }

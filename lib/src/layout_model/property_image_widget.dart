@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'property.dart';
 import 'property_widget.dart';
+import 'controller/layout_model_controller.dart';
 
 class PropertyImageWidget extends PropertyWidget {
   const PropertyImageWidget(super.controller, super.propertyKey, {super.key});
@@ -12,34 +11,38 @@ class PropertyImageWidget extends PropertyWidget {
   @override
   Widget build(BuildContext context) {
     final property = controller.layoutModel.curItem.properties[propertyKey]!;
-    return  ShowImageProperty(property: property);
+    return ShowImageProperty(
+      property: property,
+      controller: controller,
+    );
   }
 }
 
 class ShowImageProperty extends StatefulWidget {
-  const ShowImageProperty({super.key, required this.property});
-final Property property;
+  const ShowImageProperty({super.key, required this.property, required this.controller});
+  final Property property;
+  final LayoutModelController controller;
+  
   @override
   State<ShowImageProperty> createState() => _ShowImagePropertyState();
 }
 
 class _ShowImagePropertyState extends State<ShowImageProperty> {
   Future<Uint8List>? images;
+  
   @override
   initState() {
     super.initState();
   }
+  
   Future<Uint8List> pickUploadFiles() async {
-    List<PlatformFile> files=[];
-    final FilePickerResult? result = await FilePicker.platform
-        .pickFiles(type: FileType.image);
-    if (result != null) {
-      files = result.files;
+    final bytes = await widget.controller.pickUploadFiles();
+    if (bytes == null) {
+      throw Exception('No file selected or file picking not supported on this platform');
     }
-    widget.property.value=files.first.bytes!;
-    final asdas=base64.encode(files.first.bytes!);
-    base64.decode(asdas);
-    return files.first.bytes!;
+    
+    widget.property.value = bytes;
+    return bytes;
   }
 
   @override
