@@ -10,20 +10,7 @@ import 'process_element.dart';
 class ProcessPageMenu extends ComponentAndSourceMenu {
   ProcessPageMenu(super.controller, super.target, {super.onChanged});
 
-  @override
-  List<PopupMenuEntry<Item>> getComponentMenu(void Function(Item)? onChanged) {
-    return [
-      PopupMenuItem(
-        child: const Text("Добавить процесс"),
-        onTap: () {
-          var item = ProcessElement("процесс");
-          controller.layoutModel.addItem(target, item);
-          onChanged!(item);
-        },
-      )
-    ];
-  }
-
+  
   @override
   List<ContextMenuEntry> getContextMenu(
       void Function(LayoutModelEvent event)? onChanged) {

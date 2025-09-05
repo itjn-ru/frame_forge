@@ -7,7 +7,6 @@ import 'form_checkbox.dart';
 import 'form_text_field.dart';
 import 'menu.dart';
 import 'component_table.dart';
-import 'page.dart';
 
 import 'form_hidden_field.dart';
 import 'form_radio.dart';
@@ -20,9 +19,7 @@ class FormExpandbleListMenu extends ComponentAndSourceMenu {
   @override
   List<ContextMenuEntry> getContextMenu(
       void Function(LayoutModelEvent event)? onChanged) {
-    var pageCount = controller.layoutModel.root.items
-        .where((element) => element.runtimeType == ComponentPage)
-        .length;
+    // Removed unused pageCount variable
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem.submenu(

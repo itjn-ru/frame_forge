@@ -111,7 +111,7 @@ mixin FromMapToMap {
                   double.tryParse(value.toString()),
                   type: double),
               'stylefontSize' => Property(
-                  'размер шрифта', double.tryParse(value.toString() ?? '9'),
+                  'размер шрифта', double.tryParse(value.toString())??'9',
                   type: double),
               'isItalic' =>
                 Property('Курсив', value == 'true' ? true : false, type: bool),

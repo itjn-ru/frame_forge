@@ -32,7 +32,6 @@ class ProcessItemsState extends State<ProcessItems>
 
   Widget _buildItem(Item item, String? processType, double width) {
     Widget child;
-    final curItem = widget.controller.layoutModel.curItem;
     if (item.items.isNotEmpty) {
       final children = <Widget>[];
 

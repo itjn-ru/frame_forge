@@ -388,13 +388,13 @@ List<Item> _readItems(XmlElement? xmlItems) {
   return items;
 }
 
-Map<String, dynamic> _readItem(XmlElement xmlElement) {
-  Map<String, dynamic> json = {};
+// Map<String, dynamic> _readItem(XmlElement xmlElement) {
+//   Map<String, dynamic> json = {};
 
-  json = {
-    'properties': _readProperties(xmlElement.getElement("properties")),
-    'items': _readItems(xmlElement.getElement("items"))
-  };
+//   json = {
+//     'properties': _readProperties(xmlElement.getElement("properties")),
+//     'items': _readItems(xmlElement.getElement("items"))
+//   };
 
-  return json;
-}
+//   return json;
+// }

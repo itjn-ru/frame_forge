@@ -7,7 +7,6 @@ import 'source_table.dart';
 class SourceTableMenu extends ComponentAndSourceMenu {
   SourceTableMenu(super.controller, super.target, {super.onChanged});
 
-  @override
   List<PopupMenuEntry<Item>> getComponentMenu(void Function(Item?)? onChanged) {
     if (controller.layoutModel.curItem is LayoutSource) {
       return [

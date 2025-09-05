@@ -9,7 +9,6 @@ import 'item.dart';
 class ComponentTableMenu extends ComponentAndSourceMenu {
   ComponentTableMenu(super.controller, super.target, {super.onChanged});
 
-  @override
   List<PopupMenuEntry<Item>> getComponentMenu(void Function(Item?)? onChanged) {
     if (target is LayoutComponent) {
       return [

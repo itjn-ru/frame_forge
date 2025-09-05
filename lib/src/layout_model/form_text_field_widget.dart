@@ -208,9 +208,9 @@ class _CounterWidgetState extends State<CounterWidget> {
   Widget build(BuildContext context) {
     style = StyleElement('стиль');
 
-    final double fontSizeText =
-        Theme.of(context).textTheme.titleSmall?.fontSize ??
-        style['fontSize'].toDouble();
+    // final double fontSizeText =
+    //     Theme.of(context).textTheme.titleSmall?.fontSize ??
+    //     style['fontSize'].toDouble();
     final double fontSizeButton =
         Theme.of(context).textTheme.titleMedium?.fontSize ??
         style['fontSize'].toDouble();

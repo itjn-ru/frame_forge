@@ -15,7 +15,8 @@ class ComponentTableWidget extends ComponentWidget {
     Map<int, TableColumnWidth> columnWidths = {};
     int columnWidthIndex = 0;
 
-    var headers = component.items.whereType<ComponentTableHeader>();
+    // Headers are available but not currently used in this implementation
+    // var headers = component.items.whereType<ComponentTableHeader>();
 
     var columns = component.items.whereType<ComponentTableColumn>();
 

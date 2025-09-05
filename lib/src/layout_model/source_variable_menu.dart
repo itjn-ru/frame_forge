@@ -5,7 +5,6 @@ import 'item.dart';
 class SourceVariableMenu extends ComponentAndSourceMenu {
   SourceVariableMenu(super.controller, super.target, {super.onChanged});
 
-  @override
   List<PopupMenuEntry<Item>> getComponentMenu(void Function(Item)? onChanged) {
     return [
       PopupMenuItem(

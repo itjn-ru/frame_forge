@@ -31,7 +31,7 @@ class LayoutModel with FromMapToMap {
 
   Item? _curComponentItem;
   Item? _curSourceItem;
-  late Item _curStyleItem;
+  // _curStyleItem removed as it was unused
   final List<ScreenSizeEnum> screenSizes;
 
   ComponentAndSourcePage get getCurPage => getPageByItem(curItem);
