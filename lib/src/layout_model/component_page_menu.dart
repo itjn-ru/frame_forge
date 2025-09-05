@@ -22,9 +22,7 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
   @override
   List<ContextMenuEntry> getContextMenu(
       void Function(LayoutModelEvent event)? onChanged) {
-    var pageCount = controller.layoutModel.root.items
-        .where((element) => element.runtimeType == ComponentPage)
-        .length;
+    // Removed unused variable pageCount
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem.submenu(
