@@ -3,29 +3,27 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.md)
 [![ru](https://img.shields.io/badge/lang-ru-blue.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.ru.md)
 
-## Description
-
-A Flutter package for creating dynamic UI layouts with a visual editor.
-
+## Описание
+Для создания xml редактора UI элементов. 
+ 
 ## Motivation
-
-Change UI and data exchange with the client application server without code changes or app store updates.
+Без изменения кода, загрузки в store изменять UI и обмен данными с сервером приложения клиента.   
 ![admin-layout-photo](./doc/images/admin-layout-photo.png)
 
-## Installation
+## Установка
 
-Add dependency to your `pubspec.yaml`:
+Добавьте зависимость в ваш `pubspec.yaml`:
 
 ```yaml
 dependencies:
   frame_forge: ^1.0.0
 ```
 
-## Usage
+## Использование
 
-### Create DSL Model
-- Add required screen sizes for LayoutModel.
-- Create controller
+### Создать DSL модель
+- Добавить нужные размеры экранов для LayoutModel.
+- Создать контроллер
 
 ```dart
   final LayoutModel layoutModel = LayoutModel(
@@ -36,11 +34,11 @@ dependencies:
       LayoutModelController(
         layoutModel: layoutModel,
         projectSaver: (map) async {
-          // Configure project saving here
+          // Здесь можно настроить сохранение проекта
           return true;
         },
         projectLoader: (isSaved) async {
-          /// Load model from file
+          /// Загрузка модели из файла
           final FilePickerResult? result = await FilePicker.platform.pickFiles();
           if (result == null) return null;
           final PlatformFile file = result.files.first;
@@ -49,9 +47,9 @@ dependencies:
       );
 ```
 
-### Main Components
+### Основные компоненты
 
-Output layout components:
+Вывод компонентов макета:
 ```dart
 Column(
   children: [
@@ -60,7 +58,7 @@ Column(
 ),
 ```
 
-Output layout data sources/variables:
+Вывод источников-переменных макета:
 ```dart
 Column(
   children: [
@@ -73,7 +71,7 @@ Column(
 ),
 ```
 
-Output layout styles:
+Вывод стилей макета:
 ```dart
 Column(
   children: [
@@ -86,7 +84,7 @@ Column(
 ),
 ```
 
-Output layout processes:
+Вывод процессов макета:
 ```dart
 Column(
   children: [
@@ -99,8 +97,8 @@ Column(
 ),
 ```
 
-Output preview - how the page looks
-Make sure to specify screen size from [enum ScreenSizeEnum]
+Вывод вьюшки, как страница выглядит
+Обязательно указать размер экрана из [enum ScreenSizeEnum]
 ```dart
 LayoutBuilder(
     builder: (context, constraints) {

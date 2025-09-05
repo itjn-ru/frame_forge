@@ -10,8 +10,25 @@ import 'event_bus.dart';
 import 'events.dart';
 import 'project.dart';
 
+/// Controller for managing layout model operations and state.
+///
+/// The [LayoutModelController] handles all interactions with the layout model,
+/// including selection, clipboard operations, project management, and event handling.
+/// It serves as the central coordinator between the UI and the data model.
+///
+/// Example usage:
+/// ```dart
+/// final controller = LayoutModelController(
+///   layoutModel: myLayoutModel,
+///   projectSaver: (map) async => saveToFile(map),
+///   projectLoader: (isSaved) async => loadFromFile(),
+/// );
+/// ```
 class LayoutModelController {
+  /// The layout model being controlled.
   LayoutModel layoutModel;
+  
+  /// Event bus for handling layout model events.
   final LayoutModelEventBus eventBus;
 
   final ValueNotifier<Set<String?>> changedItems = ValueNotifier({});
@@ -26,6 +43,14 @@ class LayoutModelController {
   /// Вместо хранения текущего item, можно использовать id
   late final ValueNotifier<String?> selectedIdNotifier;
 
+  /// Creates a [LayoutModelController] with the specified [layoutModel].
+  ///
+  /// The [eventBus] parameter is optional and defaults to a new [LayoutModelEventBus].
+  /// 
+  /// Optional callbacks can be provided for project management:
+  /// - [projectSaver]: Function to save project data
+  /// - [projectLoader]: Function to load project data  
+  /// - [projectCreator]: Function to create new projects
   LayoutModelController({
     required this.layoutModel,
     LayoutModelEventBus? eventBus,
@@ -44,6 +69,10 @@ class LayoutModelController {
     );
   }
 
+  /// Selects an item by its [itemId].
+  ///
+  /// Updates the selected item, properties notifier, and emits a [SelectionEvent].
+  /// If [itemId] is null, no item will be selected.
   void select(String? itemId) {
     selectedIdNotifier.value = itemId;
 

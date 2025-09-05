@@ -151,7 +151,12 @@ final String? itemId;
 }
 
 
+/// Event fired when a new item is added to the layout.
+/// 
+/// This event is undoable and can be used to trigger UI updates
+/// when components are added to the layout model.
 final class AddItemEvent extends LayoutModelEvent {
+  /// Creates an [AddItemEvent] with the specified [id].
   const AddItemEvent({
     required super.id,
     super.isHandled,
@@ -203,8 +208,15 @@ final class PanEnd extends LayoutModelEvent {
   const PanEnd({required super.id});
 }
 
+/// Event fired when an item in the layout is modified.
+/// 
+/// Contains the [itemId] of the changed item to identify which
+/// component was modified. Used to trigger specific UI updates.
 final class ChangeItem extends LayoutModelEvent {
+  /// The ID of the item that was changed.
   final String? itemId;
+  
+  /// Creates a [ChangeItem] event for the specified [itemId].
   const ChangeItem({required super.id, required this.itemId});
 }
 

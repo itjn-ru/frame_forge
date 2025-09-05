@@ -19,13 +19,29 @@ import 'component_text_widget.dart';
 import 'form_hidden_field_widget.dart';
 import 'form_text_field_widget.dart';
 
+/// Base widget for rendering layout components.
+///
+/// [ComponentWidget] is the foundation for all visual components in the layout.
+/// It provides a factory method to create appropriate widget types based on
+/// the component's runtime type.
+///
+/// Example usage:
+/// ```dart
+/// ComponentWidget.create(myComponent)
+/// ```
 class ComponentWidget extends StatelessWidget {
+  /// The layout component to render.
   final LayoutComponent component;
 
+  /// Creates a [ComponentWidget] for the given [component].
   const ComponentWidget(
       {super.key,
       required this.component});
 
+  /// Factory method to create the appropriate widget for a [component].
+  ///
+  /// Automatically selects the correct widget implementation based on
+  /// the component's runtime type (FormRadio, ComponentGroup, etc.).
   factory ComponentWidget.create(LayoutComponent component,
      ) {
     switch (component.runtimeType) {

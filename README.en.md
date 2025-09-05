@@ -1,7 +1,7 @@
 # Frame Forge
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.md)
-[![ru](https://img.shields.io/badge/lang-ru-blue.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.ru.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.en.md)
+[![ru](https://img.shields.io/badge/lang-ru-blue.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.md)
 
 ## Description
 
@@ -10,7 +10,7 @@ A Flutter package for creating dynamic UI layouts with a visual editor.
 ## Motivation
 
 Change UI and data exchange with the client application server without code changes or app store updates.
-![admin-layout-photo](./doc/images/admin-layout-photo.png)
+![admin-layout-photo](./docs/images/admin-layout-photo.png)
 
 ## Installation
 
@@ -18,7 +18,10 @@ Add dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  frame_forge: ^1.0.0
+  frame_forge:
+    git:
+      url: https://github.com/itjn-ru/layout_editor
+      ref: frame_forge
 ```
 
 ## Usage

@@ -13,6 +13,18 @@ import 'style.dart';
 import 'style_element.dart';
 import 'component_and_source.dart';
 
+/// Core model for managing dynamic UI layouts.
+///
+/// [LayoutModel] represents the entire layout structure including components,
+/// styles, data sources, and processes. It supports multiple screen sizes
+/// and provides methods for managing the layout hierarchy.
+///
+/// Example:
+/// ```dart
+/// final model = LayoutModel(
+///   screenSizes: [ScreenSizeEnum.mobile, ScreenSizeEnum.desktop],
+/// );
+/// ```
 class LayoutModel with FromMapToMap {
   late Root root;
   late ComponentAndSourcePage curPage;
