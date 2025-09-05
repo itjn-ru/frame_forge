@@ -12,10 +12,7 @@ Offset? getOffsetFromGlobalKey(GlobalKey key) {
 }
 
 /// Извлекает глобальный offset виджета относительно другого виджета.
-Offset? getOffsetFromGlobalKeyRelativeTo(
-  GlobalKey key,
-  GlobalKey relativeTo,
-) {
+Offset? getOffsetFromGlobalKeyRelativeTo(GlobalKey key, GlobalKey relativeTo) {
   final renderObject = key.currentContext?.findRenderObject();
   final relativeRenderObject = relativeTo.currentContext?.findRenderObject();
   if (renderObject is RenderBox && relativeRenderObject is RenderBox) {
@@ -55,22 +52,13 @@ Rect? getEditorBoundsInScreen(GlobalKey key) {
   final size = getSizeFromGlobalKey(key);
   final offset = getOffsetFromGlobalKey(key);
   if (size != null && offset != null) {
-    return Rect.fromLTWH(
-      offset.dx,
-      offset.dy,
-      size.width,
-      size.height,
-    );
+    return Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height);
   }
   return null;
 }
 
 /// Преобразует положение экрана в положение canvas.
-Offset? screenToWorld(
-  Offset screenPosition,
-  Offset offset,
-  double zoom,
-) {
+Offset? screenToWorld(Offset screenPosition, Offset offset, double zoom) {
   // Получить доступ к границам виджета редактора на экране
   final nodeEditorBounds = getEditorBoundsInScreen(kNodeEditorWidgetKey);
   if (nodeEditorBounds == null) return null;
@@ -90,7 +78,8 @@ Offset? screenToWorld(
   // Вычислить положение canvas, соответствующее положению экрана
   final canvasX =
       viewport.left + (adjustedScreenPosition.dx / size.width) * viewport.width;
-  final canvasY = viewport.top +
+  final canvasY =
+      viewport.top +
       (adjustedScreenPosition.dy / size.height) * viewport.height;
 
   return Offset(canvasX, canvasY);
@@ -99,7 +88,7 @@ Offset? screenToWorld(
 RelativeRect buttonMenuPosition(BuildContext context, PointerDownEvent event) {
   //final RenderBox bar = context.findRenderObject() as RenderBox;
   final RenderBox overlay =
-  Overlay.of(context).context.findRenderObject() as RenderBox;
+      Overlay.of(context).context.findRenderObject() as RenderBox;
   const Offset offset = Offset.zero;
   final RelativeRect rect = RelativeRect.fromRect(
     Rect.fromPoints(event.localPosition, event.position),

@@ -33,4 +33,5 @@ class PrivateAnimation<T> extends Animation<T> {
   @override
   T get value => _parent.value;
 }
+
 // coverage:ignore-end

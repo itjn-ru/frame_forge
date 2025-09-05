@@ -9,12 +9,12 @@ class SourceVariableWidget extends SourceWidget {
     var cellText = source['name'] ?? '';
 
     return Text(
-          cellText,
-          //style: TextStyle(
-          //fontSize: column["fontSize"],
-          //fontWeight: column["fontWeight"],
-          //)
-        );
+      cellText,
+      //style: TextStyle(
+      //fontSize: column["fontSize"],
+      //fontWeight: column["fontWeight"],
+      //)
+    );
 
     /*var columns = source.items.whereType<SourceTableColumn>();
 

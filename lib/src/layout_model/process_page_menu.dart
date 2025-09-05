@@ -10,10 +10,10 @@ import 'process_element.dart';
 class ProcessPageMenu extends ComponentAndSourceMenu {
   ProcessPageMenu(super.controller, super.target, {super.onChanged});
 
-  
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem.submenu(
@@ -25,7 +25,7 @@ class ProcessPageMenu extends ComponentAndSourceMenu {
             icon: Icons.widgets,
             onSelected: () {
               var item = ProcessGroup("Параллельный процесс");
-              item.properties['processType']?.value='параллельно';
+              item.properties['processType']?.value = 'параллельно';
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
@@ -35,7 +35,7 @@ class ProcessPageMenu extends ComponentAndSourceMenu {
             icon: Icons.widgets,
             onSelected: () {
               var item = ProcessGroup("Последовательный процесс");
-              item.properties['processType']?.value='последовательно';
+              item.properties['processType']?.value = 'последовательно';
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },

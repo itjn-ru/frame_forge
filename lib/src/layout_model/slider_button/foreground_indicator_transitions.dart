@@ -1,4 +1,3 @@
-
 abstract class ForegroundIndicatorTransition {
   const ForegroundIndicatorTransition._();
 
@@ -7,11 +6,11 @@ abstract class ForegroundIndicatorTransition {
   /// [rollingRadius] is the radius which will be used for calculating the rotation.
   /// If set to [null], a reasonable value is calculated from [indicatorSize] and [height].
   const factory ForegroundIndicatorTransition.rolling({double? rollingRadius}) =
-  _RollingForegroundIndicatorTransition;
+      _RollingForegroundIndicatorTransition;
 
   /// Fades between the different icons.
   const factory ForegroundIndicatorTransition.fading() =
-  _FadingForegroundIndicatorTransition;
+      _FadingForegroundIndicatorTransition;
 }
 
 class _RollingForegroundIndicatorTransition

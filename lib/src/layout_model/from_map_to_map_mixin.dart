@@ -42,23 +42,23 @@ mixin FromMapToMap {
         const (Uint8List) => base64.encode(property.value),
         const (CustomBorderStyle) => property.value.toMap(),
         const (Offset) => {
-            'left': property.value.dx.toString(),
-            'top': property.value.dy.toString()
-          },
+          'left': property.value.dx.toString(),
+          'top': property.value.dy.toString(),
+        },
         const (Size) => {
-            'width': property.value.width.toString(),
-            'height': property.value.height.toString()
-          },
+          'width': property.value.width.toString(),
+          'height': property.value.height.toString(),
+        },
         const (Color) => property.value.value.toRadixString(16).toUpperCase(),
         const (Style) => {
-            'id': property.value.id.toString(),
-            'name': property.value.name.toString()
-          },
+          'id': property.value.id.toString(),
+          'name': property.value.name.toString(),
+        },
         const (FontWeight) => property.value.value.toString(),
         const (TextStyle) => {
-            'fontSize': property.value.fontSize,
-            'fontWeight': property.value.fontWeight.value
-          },
+          'fontSize': property.value.fontSize,
+          'fontWeight': property.value.fontWeight.value,
+        },
         const (Alignment) => {'x': property.value.x, 'y': property.value.y},
         _ => property.value.toString(),
       };
@@ -74,7 +74,7 @@ mixin FromMapToMap {
       list.add({
         'type': item.type,
         'properties': propertiesToMap(item),
-        'items': itemsToMap(item)
+        'items': itemsToMap(item),
       });
     }
 
@@ -82,79 +82,113 @@ mixin FromMapToMap {
   }
 
   Map<String, Property> propertiesFromMap(Map map) {
-    final Map<String, Property> properties = map.map(
-      (key, value) {
-        return MapEntry(
-            key,
-            switch (key) {
-              'margin' => Property('отступ',
-                  value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
-                  type: CustomMargin),
-              'padding' => Property('отступ',
-                  value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
-                  type: List<int>),
-              'borderRadius' => Property(
-                  'закругление', CustomBorderRadius.fromJson(value),
-                  type: CustomBorderRadius),
-              'processType' =>
-                Property('тип процесса', value ?? 'параллельно', type: String),
-              'statusId' => Property('Status Id', value, type: String),
-              'title' => Property('title', value, type: String),
-              'creatorTitle' => Property('Creator Title', value, type: String),
-              'Uint8List' =>
-                // Property('картинка', Uint8List.fromList(value.codeUnits), type: Uint8List ),
-                Property('картинка', base64.decode(value), type: Uint8List),
-              'horizontalAlignment' => Property('горизонтальное выравнивание',
-                  double.tryParse(value.toString()),
-                  type: double),
-              'verticalAlignment' => Property('вертикальное выравнивание',
-                  double.tryParse(value.toString()),
-                  type: double),
-              'stylefontSize' => Property(
-                  'размер шрифта', double.tryParse(value.toString())??'9',
-                  type: double),
-              'isItalic' =>
-                Property('Курсив', value == 'true' ? true : false, type: bool),
-              'topBorder' => Property(
-                  'Верхняя граница',
-                  value.runtimeType == CustomBorderStyle
-                      ? value
-                      : CustomBorderStyle.fromMap(value),
-                  type: CustomBorderStyle),
-              'leftBorder' => Property(
-                  'Левая граница',
-                  value.runtimeType == CustomBorderStyle
-                      ? value
-                      : CustomBorderStyle.fromMap(value),
-                  type: CustomBorderStyle),
-              'rightBorder' => Property(
-                  'Правая граница',
-                  value.runtimeType == CustomBorderStyle
-                      ? value
-                      : CustomBorderStyle.fromMap(value),
-                  type: CustomBorderStyle),
-              'bottomBorder' => Property(
-                  'Нижняя граница',
-                  value.runtimeType == CustomBorderStyle
-                      ? value
-                      : CustomBorderStyle.fromMap(value),
-                  type: CustomBorderStyle),
-              'colspan' => Property(
-                  'объединение строк', int.tryParse(value.toString()) ?? 0,
-                  type: int),
-              'rowspan' => Property(
-                  'объединение колонок', int.tryParse(value.toString()) ?? 0,
-                  type: int),
-              'width' => Property('ширина', double.tryParse(value.toString()),
-                  type: double),
-              'height' => Property('высота', double.tryParse(value.toString()),
-                  type: double),
-              'radius' => Property('радиус', double.tryParse(value.toString()),
-                  type: double),
-              'fontWeight' => Property("насыщенность шрифта",
-                  FontWeight.values[((int.tryParse(value) ?? 400) ~/ 100) - 1],
-                  type: FontWeight),
-/*
+    final Map<String, Property> properties = map.map((key, value) {
+      return MapEntry(key, switch (key) {
+        'margin' => Property(
+          'отступ',
+          value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
+          type: CustomMargin,
+        ),
+        'padding' => Property(
+          'отступ',
+          value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
+          type: List<int>,
+        ),
+        'borderRadius' => Property(
+          'закругление',
+          CustomBorderRadius.fromJson(value),
+          type: CustomBorderRadius,
+        ),
+        'processType' => Property(
+          'тип процесса',
+          value ?? 'параллельно',
+          type: String,
+        ),
+        'statusId' => Property('Status Id', value, type: String),
+        'title' => Property('title', value, type: String),
+        'creatorTitle' => Property('Creator Title', value, type: String),
+        'Uint8List' =>
+          // Property('картинка', Uint8List.fromList(value.codeUnits), type: Uint8List ),
+          Property('картинка', base64.decode(value), type: Uint8List),
+        'horizontalAlignment' => Property(
+          'горизонтальное выравнивание',
+          double.tryParse(value.toString()),
+          type: double,
+        ),
+        'verticalAlignment' => Property(
+          'вертикальное выравнивание',
+          double.tryParse(value.toString()),
+          type: double,
+        ),
+        'stylefontSize' => Property(
+          'размер шрифта',
+          double.tryParse(value.toString()) ?? '9',
+          type: double,
+        ),
+        'isItalic' => Property(
+          'Курсив',
+          value == 'true' ? true : false,
+          type: bool,
+        ),
+        'topBorder' => Property(
+          'Верхняя граница',
+          value.runtimeType == CustomBorderStyle
+              ? value
+              : CustomBorderStyle.fromMap(value),
+          type: CustomBorderStyle,
+        ),
+        'leftBorder' => Property(
+          'Левая граница',
+          value.runtimeType == CustomBorderStyle
+              ? value
+              : CustomBorderStyle.fromMap(value),
+          type: CustomBorderStyle,
+        ),
+        'rightBorder' => Property(
+          'Правая граница',
+          value.runtimeType == CustomBorderStyle
+              ? value
+              : CustomBorderStyle.fromMap(value),
+          type: CustomBorderStyle,
+        ),
+        'bottomBorder' => Property(
+          'Нижняя граница',
+          value.runtimeType == CustomBorderStyle
+              ? value
+              : CustomBorderStyle.fromMap(value),
+          type: CustomBorderStyle,
+        ),
+        'colspan' => Property(
+          'объединение строк',
+          int.tryParse(value.toString()) ?? 0,
+          type: int,
+        ),
+        'rowspan' => Property(
+          'объединение колонок',
+          int.tryParse(value.toString()) ?? 0,
+          type: int,
+        ),
+        'width' => Property(
+          'ширина',
+          double.tryParse(value.toString()),
+          type: double,
+        ),
+        'height' => Property(
+          'высота',
+          double.tryParse(value.toString()),
+          type: double,
+        ),
+        'radius' => Property(
+          'радиус',
+          double.tryParse(value.toString()),
+          type: double,
+        ),
+        'fontWeight' => Property(
+          "насыщенность шрифта",
+          FontWeight.values[((int.tryParse(value) ?? 400) ~/ 100) - 1],
+          type: FontWeight,
+        ),
+        /*
               'rowMergeStart' =>
                   Property('начало объединения строк', int.tryParse(value)??-1, type: int),
               'rowMergeSpan' =>
@@ -164,57 +198,69 @@ mixin FromMapToMap {
               'columnMergeSpan' =>
                   Property('кол-во объединения колонок', int.tryParse(value)??-1, type: int),
 */
-              'position' => Property(
-                  'положение',
-                  Offset(double.tryParse(value['left'].toString()) ?? 0,
-                      double.tryParse(value['top'].toString()) ?? 0),
-                  type: Offset),
-              'size' => Property(
-                  'размер',
-                  Size(double.tryParse(value['width'].toString()) ?? 0,
-                      double.tryParse(value['height'].toString()) ?? 0),
-                  type: Size),
-              'id' => Property('идентификатор', value, type: String),
-              'color' => Property(
-                  'цвет', Color(int.tryParse(value.toString(), radix: 16) ?? 0),
-                  type: Color),
-              'backgroundColor' => Property('цвет фона',
-                  Color(int.tryParse(value.toString(), radix: 16) ?? 0),
-                  type: Color),
-              'style' => Property(
-                  'стиль',
-                  Style(
-                      value['id'] ?? UuidNil, value['name'] ?? 'базовый стиль'),
-                  type: Style),
-              'textStyle' => Property(
-                  'стиль текста',
-                  TextStyle(
-                    fontSize:
-                        double.tryParse(value['fontSize'].toString()) ?? 0,
-                    fontWeight: switch (
-                        int.tryParse(value['fontWeight'].toString()) ?? 0) {
-                      100 => FontWeight.w100,
-                      200 => FontWeight.w200,
-                      300 => FontWeight.w300,
-                      4400 => FontWeight.w300,
-                      500 => FontWeight.w500,
-                      600 => FontWeight.w600,
-                      700 => FontWeight.w700,
-                      800 => FontWeight.w800,
-                      900 => FontWeight.w900,
-                      _ => FontWeight.normal
-                    },
-                  ),
-                  type: TextStyle),
-              'alignment' => Property(
-                  'выравнивание',
-                  Alignment(double.tryParse(value['x'].toString()) ?? 0,
-                      double.tryParse(value['y'].toString()) ?? 0),
-                  type: Alignment),
-              _ => Property(key, value)
-            });
-      },
-    );
+        'position' => Property(
+          'положение',
+          Offset(
+            double.tryParse(value['left'].toString()) ?? 0,
+            double.tryParse(value['top'].toString()) ?? 0,
+          ),
+          type: Offset,
+        ),
+        'size' => Property(
+          'размер',
+          Size(
+            double.tryParse(value['width'].toString()) ?? 0,
+            double.tryParse(value['height'].toString()) ?? 0,
+          ),
+          type: Size,
+        ),
+        'id' => Property('идентификатор', value, type: String),
+        'color' => Property(
+          'цвет',
+          Color(int.tryParse(value.toString(), radix: 16) ?? 0),
+          type: Color,
+        ),
+        'backgroundColor' => Property(
+          'цвет фона',
+          Color(int.tryParse(value.toString(), radix: 16) ?? 0),
+          type: Color,
+        ),
+        'style' => Property(
+          'стиль',
+          Style(value['id'] ?? UuidNil, value['name'] ?? 'базовый стиль'),
+          type: Style,
+        ),
+        'textStyle' => Property(
+          'стиль текста',
+          TextStyle(
+            fontSize: double.tryParse(value['fontSize'].toString()) ?? 0,
+            fontWeight: switch (int.tryParse(value['fontWeight'].toString()) ??
+                0) {
+              100 => FontWeight.w100,
+              200 => FontWeight.w200,
+              300 => FontWeight.w300,
+              4400 => FontWeight.w300,
+              500 => FontWeight.w500,
+              600 => FontWeight.w600,
+              700 => FontWeight.w700,
+              800 => FontWeight.w800,
+              900 => FontWeight.w900,
+              _ => FontWeight.normal,
+            },
+          ),
+          type: TextStyle,
+        ),
+        'alignment' => Property(
+          'выравнивание',
+          Alignment(
+            double.tryParse(value['x'].toString()) ?? 0,
+            double.tryParse(value['y'].toString()) ?? 0,
+          ),
+          type: Alignment,
+        ),
+        _ => Property(key, value),
+      });
+    });
     return properties;
   }
 

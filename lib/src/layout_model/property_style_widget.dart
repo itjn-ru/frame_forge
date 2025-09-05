@@ -13,30 +13,34 @@ class PropertyStyleWidget extends PropertyWidget {
 
     var styles = controller.layoutModel.styles;
 
-    if(!styles.contains(property?.value)) {
+    if (!styles.contains(property?.value)) {
       property?.value = Style.basic;
     }
 
-    return Row(children: [
+    return Row(
+      children: [
+        Expanded(
+          child: DropdownButton<Style>(
+            value: property?.value,
+            isExpanded: true,
+            items: styles
+                .map<DropdownMenuItem<Style>>(
+                  (style) =>
+                      DropdownMenuItem(value: style, child: Text(style.name)),
+                )
+                .toList(),
+            onChanged: (Style? value) {
+              property?.value = value ?? Style.basic;
+              controller.eventBus.emit(
+                ChangeItem(
+                  id: const Uuid().v4(),
+                  itemId: controller.getCurrentItem()?.id,
+                ),
+              );
+            },
+          ),
 
-      Expanded(
-        child: DropdownButton<Style>(
-          value: property?.value,
-          isExpanded: true,
-          items: styles
-              .map<DropdownMenuItem<Style>>(
-                  (style) => DropdownMenuItem(
-                value: style,
-                child: Text(style.name),
-              ))
-              .toList(),
-          onChanged: (Style? value) {
-            property?.value = value ?? Style.basic;
-            controller.eventBus.emit(ChangeItem(id: const Uuid().v4(), itemId: controller.getCurrentItem()?.id));
-          },
-        ),
-
-        /*TextField(
+          /*TextField(
           controller: controllerDy,
           onChanged: (value) {
             property.value = TextStyle(
@@ -56,7 +60,8 @@ class PropertyStyleWidget extends PropertyWidget {
             );
           },
         ),*/
-      ),
-    ]);
+        ),
+      ],
+    );
   }
 }

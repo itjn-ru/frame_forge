@@ -3,8 +3,7 @@ import 'component_widget.dart';
 import 'hidden_field_file.dart';
 
 class FormHiddenFieldWidget extends ComponentWidget {
-  const FormHiddenFieldWidget(
-      {required super.component, super.key});
+  const FormHiddenFieldWidget({required super.component, super.key});
 
   @override
   Widget buildWidget(BuildContext context) {

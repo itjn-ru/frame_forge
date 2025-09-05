@@ -34,56 +34,40 @@ class ComponentWidget extends StatelessWidget {
   final LayoutComponent component;
 
   /// Creates a [ComponentWidget] for the given [component].
-  const ComponentWidget(
-      {super.key,
-      required this.component});
+  const ComponentWidget({super.key, required this.component});
 
   /// Factory method to create the appropriate widget for a [component].
   ///
   /// Automatically selects the correct widget implementation based on
   /// the component's runtime type (FormRadio, ComponentGroup, etc.).
-  factory ComponentWidget.create(LayoutComponent component,
-     ) {
+  factory ComponentWidget.create(LayoutComponent component) {
     switch (component.runtimeType) {
       case const (FormHiddenField):
-        return FormHiddenFieldWidget(
-            component: component
-            );
+        return FormHiddenFieldWidget(component: component);
       case const (FormRadio):
-        return ComponentRadioWidget(
-            component: component);
+        return ComponentRadioWidget(component: component);
       case const (ComponentGroup):
-        return ComponentGroupWidget(
-            component: component);
+        return ComponentGroupWidget(component: component);
       case const (ComponentText):
-        return ComponentTextWidget(
-            component: component);
+        return ComponentTextWidget(component: component);
       case const (ComponentTable):
-        return ComponentTableWidget(
-            component: component);
+        return ComponentTableWidget(component: component);
       case const (FormTextField):
-        return FormTextFieldWidget(
-            component: component);
+        return FormTextFieldWidget(component: component);
       case const (FormImage):
-        return FormImageWidget(
-            component: component);
+        return FormImageWidget(component: component);
       case const (FormCheckbox):
-        return FormCheckboxWidget(
-            component: component);
+        return FormCheckboxWidget(component: component);
       case const (FormExpandbleList):
-        return FormExpandbleListWidget(
-            component: component);
+        return FormExpandbleListWidget(component: component);
       default:
-        return ComponentWidget(
-            component: component);
+        return ComponentWidget(component: component);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: buildWidget(context),
-    );
+    return Container(child: buildWidget(context));
   }
 
   Widget buildWidget(BuildContext context) {

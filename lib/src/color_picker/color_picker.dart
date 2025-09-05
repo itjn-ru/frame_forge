@@ -28,7 +28,6 @@ const List<Color> _defaultColors = [
   Colors.white,
 ];
 
-
 class BlockPicker extends StatefulWidget {
   const BlockPicker({
     super.key,
@@ -42,7 +41,7 @@ class BlockPicker extends StatefulWidget {
   final ValueChanged<Color> onColorChanged;
   final List<Color> availableColors;
   final bool useInShowDialog;
-  
+
   @override
   State<StatefulWidget> createState() => _BlockPickerState();
 }
@@ -89,9 +88,10 @@ class _BlockPickerState extends State<BlockPicker> {
                       color: color,
                       boxShadow: [
                         BoxShadow(
-                            color: color.withAlpha(80),
-                            offset: const Offset(1, 2),
-                            blurRadius: 5)
+                          color: color.withAlpha(80),
+                          offset: const Offset(1, 2),
+                          blurRadius: 5,
+                        ),
                       ],
                     ),
                     child: Material(
@@ -112,9 +112,7 @@ class _BlockPickerState extends State<BlockPicker> {
               SizedBox.fromSize(
                 size: const Size(60, 60),
                 child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: _currentColor,
-                  ),
+                  decoration: BoxDecoration(color: _currentColor),
                 ),
               ),
             ],
@@ -134,7 +132,10 @@ class _BlockPickerState extends State<BlockPicker> {
                         padding: EdgeInsets.zero,
                         icon: const Icon(Icons.check),
                         onPressed: () => setState(() {
-                          _currentColor=Color(int.tryParse(controller.text.trim(), radix: 16)??0);
+                          _currentColor = Color(
+                            int.tryParse(controller.text.trim(), radix: 16) ??
+                                0,
+                          );
                         }),
                       ),
                       border: const OutlineInputBorder(
@@ -148,21 +149,22 @@ class _BlockPickerState extends State<BlockPicker> {
             ),
           ),
           ElevatedButton(
-              onPressed: _currentColor != null
-                  ? () => widget.onColorChanged(_currentColor!)
-                  : null,
-              child: const Text('Выбрать')),
+            onPressed: _currentColor != null
+                ? () => widget.onColorChanged(_currentColor!)
+                : null,
+            child: const Text('Выбрать'),
+          ),
         ],
       ),
     );
   }
 
   bool useWhiteForeground(Color backgroundColor, {double bias = 0.0}) {
-  int v = sqrt(pow(backgroundColor.r, 2) * 0.299 +
+    int v = sqrt(
+      pow(backgroundColor.r, 2) * 0.299 +
           pow(backgroundColor.g, 2) * 0.587 +
-          pow(backgroundColor.b, 2) * 0.114)
-      .round();
-  return v < 130 + bias ? true : false;
-}
-
+          pow(backgroundColor.b, 2) * 0.114,
+    ).round();
+    return v < 130 + bias ? true : false;
+  }
 }

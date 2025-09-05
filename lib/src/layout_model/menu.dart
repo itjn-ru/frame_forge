@@ -46,17 +46,37 @@ import 'form_radio_menu.dart';
 import 'form_text_field.dart';
 import 'form_text_field_menu.dart';
 
-
+/// Context menu provider for layout components and data sources.
+///
+/// [ComponentAndSourceMenu] generates appropriate context menus for different
+/// types of layout elements, providing operations like add, delete, and modify
+/// based on the target element type.
 class ComponentAndSourceMenu {
+  /// The controller managing the layout model state.
   final LayoutModelController controller;
+
+  /// The target item for which the menu is being created.
   final Item target;
+
+  /// Optional callback invoked when the target item is changed.
   final void Function(Item?)? onChanged;
 
+  /// Creates a new context menu for the specified [target] item.
   const ComponentAndSourceMenu(this.controller, this.target, {this.onChanged});
 
+  /// Factory constructor that creates the appropriate menu type based on the [target].
+  ///
+  /// Returns a specialized menu implementation (like [ComponentPageMenu],
+  /// [ComponentGroupMenu], etc.) depending on the target's runtime type.
+  ///
+  /// - [onChanged]: Optional callback for item changes
+  /// - [onDeleted]: Optional callback for item deletion
   factory ComponentAndSourceMenu.create(
-      LayoutModelController controller, Item target,
-      {void Function(Item?)? onChanged, Function(Item?)? onDeleted}) {
+    LayoutModelController controller,
+    Item target, {
+    void Function(Item?)? onChanged,
+    Function(Item?)? onDeleted,
+  }) {
     if (target is Root) {
       return ComponentRootMenu(controller, target, onChanged: onChanged);
     } else if (target is ComponentPage) {
@@ -103,37 +123,43 @@ class ComponentAndSourceMenu {
         case const (SourceTable):
           return SourceTableMenu(controller, target, onChanged: onChanged);
         case const (FormExpandbleList):
-          return FormExpandbleListMenu(controller, target,
-              onChanged: onChanged);
-        default:
-          return ComponentAndSourceMenu(controller, target,
-              onChanged: onChanged);
-      }
-    } else {
-      var component = controller.layoutModel.getComponentByItem(target);
-
-      if (/*layoutModel.curC*/ component == null) {
-        return ComponentAndSourceMenu(controller, target, onChanged: onChanged);
-      }
-
-      switch (/*layoutModel.curC*/ component.runtimeType) {
-        case const (ComponentTable):
-          return ComponentTableMenu(
+          return FormExpandbleListMenu(
             controller,
             target,
             onChanged: onChanged,
           );
+        default:
+          return ComponentAndSourceMenu(
+            controller,
+            target,
+            onChanged: onChanged,
+          );
+      }
+    } else {
+      var component = controller.layoutModel.getComponentByItem(target);
+
+      if ( /*layoutModel.curC*/ component == null) {
+        return ComponentAndSourceMenu(controller, target, onChanged: onChanged);
+      }
+
+      switch ( /*layoutModel.curC*/ component.runtimeType) {
+        case const (ComponentTable):
+          return ComponentTableMenu(controller, target, onChanged: onChanged);
         case const (SourceTable):
           return SourceTableMenu(controller, target, onChanged: onChanged);
         default:
-          return ComponentAndSourceMenu(controller, target,
-              onChanged: onChanged);
+          return ComponentAndSourceMenu(
+            controller,
+            target,
+            onChanged: onChanged,
+          );
       }
     }
   }
 
   List<ContextMenuEntry> getContextMenu(
-      Function(LayoutModelEvent event)? onChanged) {
+    Function(LayoutModelEvent event)? onChanged,
+  ) {
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem(

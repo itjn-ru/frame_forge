@@ -13,7 +13,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:frame_forge/frame_forge.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
@@ -45,7 +44,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>{
+class _MyHomePageState extends State<MyHomePage> {
   ScreenSizeEnum screenSize = ScreenSizeEnum.mobile;
   final LayoutModel layoutModel = LayoutModel(
     screenSizes: [ScreenSizeEnum.mobile, ScreenSizeEnum.desktop],
@@ -100,8 +99,7 @@ class _MyHomePageState extends State<MyHomePage>{
           TemplateAppbarExportButton(_layoutModelController),
         ],
       ),
-      body: 
-      Row(
+      body: Row(
         children: [
           Flexible(
             flex: 2,

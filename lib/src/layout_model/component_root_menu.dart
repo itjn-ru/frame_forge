@@ -4,13 +4,13 @@ import 'controller/events.dart';
 import 'menu.dart';
 import 'page.dart';
 
-
 class ComponentRootMenu extends ComponentAndSourceMenu {
   ComponentRootMenu(super.controller, super.target, {super.onChanged});
 
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem(

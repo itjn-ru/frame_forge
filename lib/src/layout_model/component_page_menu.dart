@@ -17,10 +17,10 @@ import 'form_radio.dart';
 class ComponentPageMenu extends ComponentAndSourceMenu {
   ComponentPageMenu(super.controller, super.target, {super.onChanged});
 
-  
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     // Removed unused variable pageCount
     return [
       const MenuHeader(text: "Редактирование"),
@@ -37,7 +37,7 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
-           MenuItem(
+          MenuItem(
             label: 'Добавить список',
             icon: Icons.widgets,
             onSelected: () {
@@ -109,7 +109,7 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
-           MenuItem(
+          MenuItem(
             label: 'Добавить раскрывающийся список',
             icon: Icons.list_rounded,
             onSelected: () {

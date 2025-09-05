@@ -5,8 +5,7 @@ import 'component_widget.dart';
 import 'style_element.dart';
 
 class ComponentTextWidget extends ComponentWidget {
-  const ComponentTextWidget(
-      {required super.component, super.key});
+  const ComponentTextWidget({required super.component, super.key});
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -23,7 +22,8 @@ class ComponentTextWidget extends ComponentWidget {
     text += component["source"] ?? "";
     final controller = LayoutModelControllerProvider.of(context);
     final layoutModel = controller.layoutModel;
-    var style = layoutModel.getStyleElementById(component['style'].id) ??
+    var style =
+        layoutModel.getStyleElementById(component['style'].id) ??
         StyleElement("стиль");
     final border = style['borderRadius'];
     final TextStyle textStyle = TextStyle(
@@ -32,22 +32,25 @@ class ComponentTextWidget extends ComponentWidget {
       fontWeight: style['fontWeight'],
     );
     final padding = style['padding'] ?? [0, 0, 0, 0];
-    return LayoutBuilder(builder: (context, constraints) {
-      final scale = screenSize.width / constraints.maxWidth;
-      return Container(
-        decoration: BoxDecoration(
-          color: style['backgroundColor'],
-          borderRadius: border?.borderRadius(scale),
-        ),
-        padding: EdgeInsets.fromLTRB(padding[0] / scale, padding[1] / scale,
-            padding[2] / scale, padding[3] / scale),
-        alignment: component['alignment'],
-        child: Text(
-          text,
-          style: textStyle,
-        ),
-      );
-    });
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = screenSize.width / constraints.maxWidth;
+        return Container(
+          decoration: BoxDecoration(
+            color: style['backgroundColor'],
+            borderRadius: border?.borderRadius(scale),
+          ),
+          padding: EdgeInsets.fromLTRB(
+            padding[0] / scale,
+            padding[1] / scale,
+            padding[2] / scale,
+            padding[3] / scale,
+          ),
+          alignment: component['alignment'],
+          child: Text(text, style: textStyle),
+        );
+      },
+    );
   }
 }
 
@@ -68,7 +71,7 @@ class ComponentTextWidget extends ComponentWidget {
 //     //   if (event is ChangeItem && event.itemId == component.id) {
 //     //         text = component["text"] ?? component["source"] ?? "";
 //     //     text += component["source"] ?? "";
-        
+
 //     //   }
 //     // });
 //     String text = component["text"] ?? component["source"] ?? "";

@@ -14,10 +14,10 @@ import 'form_slider_button.dart';
 class ComponentGroupMenu extends ComponentAndSourceMenu {
   ComponentGroupMenu(super.controller, super.target, {super.onChanged});
 
-  
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     // Removed unused variable pageCount
     return [
       const MenuHeader(text: "Редактирование"),

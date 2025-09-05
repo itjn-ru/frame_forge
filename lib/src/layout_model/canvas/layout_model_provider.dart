@@ -12,8 +12,12 @@ class LayoutModelControllerProvider extends InheritedWidget {
   });
 
   static LayoutModelController of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<LayoutModelControllerProvider>();
-    assert(provider != null, 'No LayoutModelControllerProvider found in context');
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<LayoutModelControllerProvider>();
+    assert(
+      provider != null,
+      'No LayoutModelControllerProvider found in context',
+    );
     return provider!.controller;
   }
 

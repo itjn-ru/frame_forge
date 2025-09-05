@@ -19,13 +19,7 @@ class MaketPagePropertiesColumn extends StatelessWidget {
               child: Text('cвойства'),
             ),
           ),
-          Expanded(
-            child: ListView(
-              children: [
-                Properties(controller),
-              ],
-            ),
-          ),
+          Expanded(child: ListView(children: [Properties(controller)])),
         ],
       ),
     );

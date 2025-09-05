@@ -34,8 +34,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
           onTap: () {
             controller.layoutModel.deleteItem(target);
 
-//            controller.layoutModel.curPage.items.remove(controller.layoutModel.curItem);
-//            controller.layoutModel.curItem = controller.layoutModel.curPage;
+            //            controller.layoutModel.curPage.items.remove(controller.layoutModel.curItem);
+            //            controller.layoutModel.curItem = controller.layoutModel.curPage;
 
             onChanged!(target);
           },
@@ -46,7 +46,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
         case const (ComponentTableColumn):
           return [
             PopupMenuItem(
-              onTap: controller.layoutModel
+              onTap:
+                  controller.layoutModel
                           .getComponentByItem(target)!
                           .items
                           .whereType<ComponentTableColumn>()
@@ -71,7 +72,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               },
             ),
             PopupMenuItem(
-              onTap: controller.layoutModel
+              onTap:
+                  controller.layoutModel
                       .getComponentByItem(target)!
                       .items
                       .whereType<ComponentTableRowGroup>()
@@ -93,10 +95,10 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               .items
               .whereType<ComponentTableRowGroup>()
               .forEach((rowGroup) {
-            if (rowGroup.items.where((row) => row == target).isNotEmpty) {
-              foundGroup = rowGroup;
-            }
-          });
+                if (rowGroup.items.where((row) => row == target).isNotEmpty) {
+                  foundGroup = rowGroup;
+                }
+              });
 
           if (foundGroup == null) {
             return [];
@@ -122,7 +124,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
 
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     if (target is LayoutComponent) {
       return [
         const MenuHeader(text: "Редактирование"),
@@ -189,7 +192,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
             MenuItem(
               label: 'Удалить колонку',
               icon: Icons.delete,
-              onSelected: controller.layoutModel
+              onSelected:
+                  controller.layoutModel
                           .getComponentByItem(target)!
                           .items
                           .whereType<ComponentTableColumn>()
@@ -218,7 +222,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
             MenuItem(
               label: 'Удалить группу строк',
               icon: Icons.delete,
-              onSelected: controller.layoutModel
+              onSelected:
+                  controller.layoutModel
                       .getComponentByItem(target)!
                       .items
                       .whereType<ComponentTableRowGroup>()
@@ -238,10 +243,10 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               .items
               .whereType<ComponentTableRowGroup>()
               .forEach((rowGroup) {
-            if (rowGroup.items.where((row) => row == target).isNotEmpty) {
-              foundGroup = rowGroup;
-            }
-          });
+                if (rowGroup.items.where((row) => row == target).isNotEmpty) {
+                  foundGroup = rowGroup;
+                }
+              });
 
           if (foundGroup == null) {
             return [];
@@ -253,11 +258,11 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               icon: Icons.delete,
               onSelected:
                   foundGroup!.items.whereType<ComponentTableRow>().length > 1
-                      ? () {
-                          controller.layoutModel.deleteItem(target);
-                          onChanged!(RemoveItemEvent(id: target.id));
-                        }
-                      : null,
+                  ? () {
+                      controller.layoutModel.deleteItem(target);
+                      onChanged!(RemoveItemEvent(id: target.id));
+                    }
+                  : null,
             ),
           ];
       }

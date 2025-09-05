@@ -36,10 +36,8 @@ class _ConditionalOpacity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ConditionalWrapper(
-      wrapper: (context, child) => Opacity(
-        opacity: opacity,
-        child: builder(context),
-      ),
+      wrapper: (context, child) =>
+          Opacity(opacity: opacity, child: builder(context)),
       condition: opacity > 0.0,
       child: const SizedBox(),
     );

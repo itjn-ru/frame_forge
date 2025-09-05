@@ -10,10 +10,10 @@ class StyleElementMenu extends ComponentAndSourceMenu {
       PopupMenuItem(
         child: const Text("Удалить стиль"),
         onTap: () {
-  controller.layoutModel.deleteItem(target);
+          controller.layoutModel.deleteItem(target);
           onChanged!(target);
         },
-      )
+      ),
     ];
   }
 }

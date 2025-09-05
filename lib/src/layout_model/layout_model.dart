@@ -32,36 +32,70 @@ class LayoutModel with FromMapToMap {
   Item? _curComponentItem;
   Item? _curSourceItem;
   // _curStyleItem removed as it was unused
+  /// Supported screen sizes for responsive design
+  ///
+  /// Defines which screen size configurations are supported by this model.
   final List<ScreenSizeEnum> screenSizes;
 
+  /// Gets the current page based on the current item
+  ///
+  /// Returns a [ComponentAndSourcePage] that contains the current item.
   ComponentAndSourcePage get getCurPage => getPageByItem(curItem);
 
+  /// The type of the currently active page
+  ///
+  /// Used to track which type of page is currently being viewed/edited.
   late Type curPageType;
 
+  /// Gets the current active item
+  ///
+  /// Returns the item that is currently selected or being edited
+  /// for the current page type.
   Item get curItem {
     return curItemOnPage[curPageType]!;
   }
 
+  /// Gets the current component item
+  ///
+  /// Returns the currently selected component item or a default
+  /// ComponentPage if none is set.
   Item get curComponentItem {
     return _curComponentItem ?? ComponentPage('страница');
   }
 
+  /// Sets the current component item
+  ///
+  /// [value] The component item to set as current
   set curComponentItem(Item value) {
     _curComponentItem = value;
   }
 
+  /// Gets the current source item
+  ///
+  /// Returns the currently selected source item or a default
+  /// SourcePage if none is set.
   Item get curSourceItem {
     return _curSourceItem ?? SourcePage('страница данных');
   }
 
+  /// Sets the current source item
+  ///
+  /// [value] The source item to set as current
   set curSourceItem(Item value) {
     _curSourceItem = value;
   }
 
+  /// Gets the processes page
+  ///
+  /// Returns the first [ProcessPage] found in the root items.
   ProcessPage get processes {
     return root.items.whereType<ProcessPage>().first;
   }
 
+  /// Gets all available styles
+  ///
+  /// Returns a list of [Style] objects extracted from the style page.
+  /// Each style contains an ID and display name.
   List<Style> get styles {
     final styleList = <Style>[];
 
@@ -75,6 +109,11 @@ class LayoutModel with FromMapToMap {
     return styleList;
   }
 
+  /// Gets a style element by its ID
+  ///
+  /// [id] The unique identifier of the style element
+  ///
+  /// Returns the [StyleElement] with the specified ID, or null if not found.
   StyleElement? getStyleElementById(String id) {
     final stylePage = root.items.whereType<StylePage>().first;
 
@@ -83,10 +122,21 @@ class LayoutModel with FromMapToMap {
     return list.where((element) => element['id'] == id).firstOrNull;
   }
 
+  /// Maps items to their containing pages
   final Map<Item, ComponentAndSourcePage> _itemsOnPage = {};
+
+  /// Maps items to their layout components
   final Map<Item, LayoutComponentAndSource> _itemsOnComponent = {};
+
+  /// Maps page types to their current items
   final Map<Type, Item> curItemOnPage = {};
 
+  /// Gets the layout component containing the specified item
+  ///
+  /// [item] The item to find the component for
+  ///
+  /// Returns the [LayoutComponentAndSource] containing the item,
+  /// or null if the item is not in a component.
   LayoutComponentAndSource? getComponentByItem(Item item) {
     if (item is LayoutComponentAndSource) {
       return item;
@@ -95,6 +145,12 @@ class LayoutModel with FromMapToMap {
     return _itemsOnComponent[item];
   }
 
+  /// Gets the page containing the specified item
+  ///
+  /// [item] The item to find the page for
+  ///
+  /// Returns the [ComponentAndSourcePage] containing the item.
+  /// For root items, returns the first component page.
   ComponentAndSourcePage getPageByItem(Item item) {
     if (item is Root) {
       return item.items.whereType<ComponentPage>().first;
@@ -111,6 +167,10 @@ class LayoutModel with FromMapToMap {
     init();
   }
 
+  /// Initializes the layout model with default structure
+  ///
+  /// Creates the root item and default pages (component, source, style, process).
+  /// Sets up basic style elements and establishes page relationships.
   void init() {
     root = Root('макет');
 
@@ -133,13 +193,23 @@ class LayoutModel with FromMapToMap {
     curItemOnPage[ProcessPage] = processPage;
 
     final StyleElement basicElement = StyleElement('базовый стиль');
-    basicElement.properties['id'] =
-        Property('идентификатор', UuidNil, type: String);
+    basicElement.properties['id'] = Property(
+      'идентификатор',
+      UuidNil,
+      type: String,
+    );
     stylePage.items.add(basicElement);
     //curItemOnPage[StylePage] = basicElement;
     _setPageForItem(stylePage, basicElement);
   }
 
+  /// Loads model data from a map structure
+  ///
+  /// [map] The map containing the layout model data to load
+  ///
+  /// Deserializes a layout model from a map structure, typically loaded
+  /// from JSON or other serialized format. Ensures all required pages
+  /// exist and sets up proper page relationships.
   void fromMap(Map map) {
     root = Root(map['properties']['name']);
 
@@ -172,7 +242,7 @@ class LayoutModel with FromMapToMap {
       final stylePage = root.items.whereType<StylePage>().first;
       curItemOnPage[StylePage] = stylePage;
     }
-   
+
     if (root.items.whereType<ProcessPage>().isEmpty) {
       final processPage = ProcessPage('процессы');
       root.items.add(processPage);
@@ -190,8 +260,11 @@ class LayoutModel with FromMapToMap {
         .where((element) => element['id'] == UuidNil)
         .isEmpty) {
       final StyleElement basicElement = StyleElement('базовый стиль');
-      basicElement.properties['id'] =
-          Property('идентификатор', UuidNil, type: String);
+      basicElement.properties['id'] = Property(
+        'идентификатор',
+        UuidNil,
+        type: String,
+      );
       stylePage.items.insert(0, basicElement);
       //curItemOnPage[StylePage] = basicElement;
       _setPageForItem(stylePage, basicElement);
@@ -202,7 +275,7 @@ class LayoutModel with FromMapToMap {
   /// Мапа для складирования properties для проверки на уникальность
   final Set<String> usedIds = {};
 
-// Функция для проверки и замены id
+  // Функция для проверки и замены id
   void ensureUniqueIds(Map<String, dynamic> properties) {
     properties.forEach((key, value) {
       if (key == 'id' && value is Property && value.value is String) {
@@ -271,15 +344,16 @@ class LayoutModel with FromMapToMap {
 
     map['layout'] = {
       'properties': propertiesToMap(root),
-      'items': itemsToMap(root)
+      'items': itemsToMap(root),
     };
     return map['layout'];
   }
 
   void addItem(Item parent, Item item, {int? index}) {
     if (item is ComponentPage) {
-      var indexLastPage = root.items
-          .lastIndexWhere((element) => element.runtimeType == ComponentPage);
+      var indexLastPage = root.items.lastIndexWhere(
+        (element) => element.runtimeType == ComponentPage,
+      );
       root.items.insert(index ?? ++indexLastPage, item);
     } else if (item is LayoutComponentAndSource) {
       //_curItem.items.add(item);
@@ -313,8 +387,9 @@ class LayoutModel with FromMapToMap {
         return;
       }
 
-      var indexLastItem = parent.items
-          .lastIndexWhere((element) => element.runtimeType == item.runtimeType);
+      var indexLastItem = parent.items.lastIndexWhere(
+        (element) => element.runtimeType == item.runtimeType,
+      );
       parent.items.insert(index ?? ++indexLastItem, item);
 
       switch (item.runtimeType) {
@@ -322,13 +397,13 @@ class LayoutModel with FromMapToMap {
           component.items
               .where((element) => element.runtimeType == ComponentTableRowGroup)
               .forEach((rowGroup) {
-            for (final row in rowGroup.items) {
-              final cell = ComponentTableCell('ячейка');
-              row.items.add(cell);
+                for (final row in rowGroup.items) {
+                  final cell = ComponentTableCell('ячейка');
+                  row.items.add(cell);
 
-              //_setComponentForItem(component, cell);
-            }
-          });
+                  //_setComponentForItem(component, cell);
+                }
+              });
 
         case const (ComponentTableRowGroup):
           final row = ComponentTableRow('строка');
@@ -338,18 +413,18 @@ class LayoutModel with FromMapToMap {
           component.items
               .where((element) => element.runtimeType == ComponentTableColumn)
               .forEach((rowGroup) {
-            final cell = ComponentTableCell('ячейка');
+                final cell = ComponentTableCell('ячейка');
 
-            row.items.add(cell);
-          });
+                row.items.add(cell);
+              });
         case const (ComponentTableRow):
           component.items
               .where((element) => element.runtimeType == ComponentTableColumn)
               .forEach((rowGroup) {
-            final cell = ComponentTableCell('ячейка');
+                final cell = ComponentTableCell('ячейка');
 
-            item.items.add(cell);
-          });
+                item.items.add(cell);
+              });
 
         default:
       }

@@ -22,10 +22,7 @@ final class MenuHeader extends ContextMenuEntry {
   final String text;
   final bool disableUppercase;
 
-  const MenuHeader({
-    required this.text,
-    this.disableUppercase = false,
-  });
+  const MenuHeader({required this.text, this.disableUppercase = false});
 
   @override
   Widget builder(BuildContext context, ContextMenuState menuState) {
@@ -36,8 +33,8 @@ final class MenuHeader extends ContextMenuEntry {
         child: Text(
           disableUppercase ? text : text.toUpperCase(),
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).disabledColor.withAlpha(80),
-              ),
+            color: Theme.of(context).disabledColor.withAlpha(80),
+          ),
         ),
       ),
     );

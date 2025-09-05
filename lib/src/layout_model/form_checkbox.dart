@@ -2,7 +2,6 @@ import 'component.dart';
 import 'property.dart';
 import 'style.dart';
 
-
 class FormCheckbox extends LayoutComponent {
   FormCheckbox(name) : super("checkbox", name) {
     properties["text"] = Property("текст", "");
@@ -10,7 +9,4 @@ class FormCheckbox extends LayoutComponent {
     properties["caption"] = Property("подпись", "");
     properties["style"] = Property("стиль", Style.basic, type: Style);
   }
-
-
-
 }

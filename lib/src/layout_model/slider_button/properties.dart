@@ -127,19 +127,13 @@ class LocalToggleProperties<T> {
   /// This value indicates if [values] does contain [value].
   bool get isValueListed => index >= 0;
 
-  const LocalToggleProperties({
-    required this.value,
-    required this.index,
-  });
+  const LocalToggleProperties({required this.value, required this.index});
 }
 
 class StyledToggleProperties<T> extends LocalToggleProperties<T> {
   //TODO: Add style to this class
 
-  const StyledToggleProperties({
-    required super.value,
-    required super.index,
-  });
+  const StyledToggleProperties({required super.value, required super.index});
 }
 
 class AnimatedToggleProperties<T> extends StyledToggleProperties<T> {
@@ -163,9 +157,10 @@ class AnimatedToggleProperties<T> extends StyledToggleProperties<T> {
 
   AnimatedToggleProperties<T> copyWith({T? value, int? index}) {
     return AnimatedToggleProperties(
-        value: value ?? this.value,
-        index: index ?? this.index,
-        animationValue: animationValue);
+      value: value ?? this.value,
+      index: index ?? this.index,
+      animationValue: animationValue,
+    );
   }
 }
 
@@ -180,10 +175,10 @@ class RollingProperties<T> extends StyledToggleProperties<T> {
     required bool foreground,
     required LocalToggleProperties<T> properties,
   }) : this(
-    foreground: foreground,
-    value: properties.value,
-    index: properties.index,
-  );
+         foreground: foreground,
+         value: properties.value,
+         index: properties.index,
+       );
 
   const RollingProperties({
     required this.foreground,
@@ -201,9 +196,7 @@ class SeparatorProperties<T> {
   /// The position of the separator relative to the indices of the values.
   double get position => index + 0.5;
 
-  const SeparatorProperties({
-    required this.index,
-  });
+  const SeparatorProperties({required this.index});
 }
 
 class TapProperties<T> {
@@ -220,10 +213,7 @@ class TapProperties<T> {
   /// when the switch constructor is called.
   final List<T> values;
 
-  const TapProperties({
-    required this.tapped,
-    required this.values,
-  });
+  const TapProperties({required this.tapped, required this.values});
 }
 
 class TogglePosition<T> {
@@ -251,11 +241,11 @@ class TogglePosition<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is PositionListenerInfo &&
-              runtimeType == other.runtimeType &&
-              value == other.mode &&
-              index == other.index &&
-              position == other.position;
+      other is PositionListenerInfo &&
+          runtimeType == other.runtimeType &&
+          value == other.mode &&
+          index == other.index &&
+          position == other.position;
 
   @override
   int get hashCode => value.hashCode ^ index.hashCode ^ position.hashCode;
@@ -269,11 +259,11 @@ class TapInfo<T> extends TogglePosition<T> {
   });
 
   TapInfo.fromPosition(TogglePosition<T> position)
-      : this(
-    value: position.value,
-    index: position.index,
-    position: position.position,
-  );
+    : this(
+        value: position.value,
+        index: position.index,
+        position: position.position,
+      );
 }
 
 class PositionListenerInfo<T> extends TogglePosition<T> {
@@ -286,24 +276,23 @@ class PositionListenerInfo<T> extends TogglePosition<T> {
     required this.mode,
   });
 
-  PositionListenerInfo.fromPosition(
-      TogglePosition<T> position, ToggleMode mode)
-      : this(
-    value: position.value,
-    index: position.index,
-    position: position.position,
-    mode: mode,
-  );
+  PositionListenerInfo.fromPosition(TogglePosition<T> position, ToggleMode mode)
+    : this(
+        value: position.value,
+        index: position.index,
+        position: position.position,
+        mode: mode,
+      );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is PositionListenerInfo &&
-              runtimeType == other.runtimeType &&
-              value == other.value &&
-              index == other.index &&
-              position == other.position &&
-              mode == other.mode;
+      other is PositionListenerInfo &&
+          runtimeType == other.runtimeType &&
+          value == other.value &&
+          index == other.index &&
+          position == other.position &&
+          mode == other.mode;
 
   @override
   int get hashCode =>

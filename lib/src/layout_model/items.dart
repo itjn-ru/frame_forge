@@ -8,10 +8,24 @@ import 'root.dart';
 
 import 'menu.dart';
 
+/// A widget that displays a hierarchical tree of layout items
+///
+/// This widget renders the items in a layout model as an interactive tree view,
+/// allowing users to navigate and select different layout components.
+/// It integrates with the layout model controller to handle selection state
+/// and updates.
 class Items extends StatefulWidget {
+  /// The root item to display
   final Item _item;
- final LayoutModelController controller;
-  const Items(this._item,  this.controller, {super.key});
+
+  /// The controller managing the layout model state
+  final LayoutModelController controller;
+
+  /// Creates an Items widget
+  ///
+  /// [_item] The root item to display in the tree
+  /// [controller] The layout model controller
+  const Items(this._item, this.controller, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -26,66 +40,61 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
     return LayoutModelControllerProvider(
       controller: widget.controller,
       child: ValueListenableBuilder<String?>(
-      valueListenable: widget.controller.selectedIdNotifier,
-      builder: (context, selectedId, _) {
-          return _buildItem(widget._item,selectedId);
-        }
-      ));
+        valueListenable: widget.controller.selectedIdNotifier,
+        builder: (context, selectedId, _) {
+          return _buildItem(widget._item, selectedId);
+        },
+      ),
+    );
   }
 
-  Widget _buildItem(Item item,String? selectedId) {
+  Widget _buildItem(Item item, String? selectedId) {
     Widget child;
 
     if (item.items.isNotEmpty) {
       final children = <Widget>[];
-      children.add(
-        ItemWidget(item),
-      );
+      children.add(ItemWidget(item));
       late final List<Item> items;
       if (item is Root) {
-        
-         items = item.items.whereType<ComponentPage>().toList();
-        
+        items = item.items.whereType<ComponentPage>().toList();
       } else {
         items = item.items;
       }
 
       children
-        ..addAll(List.generate(
-          items.length,
-          (index) => Padding(
+        ..addAll(
+          List.generate(
+            items.length,
+            (index) => Padding(
               padding: index == items.length - 1
                   ? const EdgeInsets.only(left: 5, right: 5)
                   : const EdgeInsets.only(left: 5, right: 5, bottom: 5),
-              child: _buildItem(items[index],selectedId)),
-        ))
-        ..add(Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            children: [
-              Expanded(
-                  child: Text(
-                item['name'],
-                softWrap: true,
-              )),
-            ],
+              child: _buildItem(items[index], selectedId),
+            ),
           ),
-        ));
+        )
+        ..add(
+          Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [Expanded(child: Text(item['name'], softWrap: true))],
+            ),
+          ),
+        );
 
       child = ListView(shrinkWrap: true, children: children);
     } else {
-      child = ItemWidget(item,);
+      child = ItemWidget(item);
     }
 
     final curPageType = switch (widget._item.runtimeType) {
       const (SourcePage) => SourcePage,
       const (StylePage) => StylePage,
       const (ProcessPage) => ProcessPage,
-      _ => ComponentPage
+      _ => ComponentPage,
     };
 
     // final curItem = widget.controller.layoutModel.curItemOnPage[curPageType];
-
 
     return InkWell(
       child: Container(
@@ -95,8 +104,8 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
           color: item.id == selectedId
               ? Colors.amber
               : item is ComponentAndSourcePage
-                  ? Colors.grey
-                  : Colors.white,
+              ? Colors.grey
+              : Colors.white,
           border: Border.all(),
         ),
         child: child,
@@ -112,7 +121,7 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
         // setState(() {
         //   widget.controller.layoutModel.curItem = item;
         // });
-        widget.controller.select( item.id);
+        widget.controller.select(item.id);
       },
     );
   }
@@ -123,7 +132,7 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
 
 class ItemWidget extends StatefulWidget {
   final Item item;
-  const ItemWidget(this.item,{super.key});
+  const ItemWidget(this.item, {super.key});
 
   @override
   State<StatefulWidget> createState() => ItemWidgetState();
@@ -134,7 +143,7 @@ class ItemWidgetState extends State<ItemWidget> {
   bool dragging = false;
   Offset? position;
 
-late final controller = LayoutModelControllerProvider.of(context);
+  late final controller = LayoutModelControllerProvider.of(context);
 
   @override
   Widget build(BuildContext context) {
@@ -155,8 +164,7 @@ late final controller = LayoutModelControllerProvider.of(context);
           setState(() {});
         },
         onSecondaryTap: () {
-          final menu =
-              ComponentAndSourceMenu.create(controller, widget.item);
+          final menu = ComponentAndSourceMenu.create(controller, widget.item);
 
           final menuItems = menu.getContextMenu(
             (event) => controller.eventBus.emit(event),
@@ -170,7 +178,7 @@ late final controller = LayoutModelControllerProvider.of(context);
             return;
           }
           // controller.layoutModel.curItem = widget.item;
-          controller.select( widget.item.id);
+          controller.select(widget.item.id);
           setState(() {});
         },
         child: Container(

@@ -10,10 +10,10 @@ class FormCheckboxMenu extends ComponentAndSourceMenu {
       PopupMenuItem(
         child: const Text("Удалить флажок"),
         onTap: () {
-  controller.layoutModel.deleteItem(target);
+          controller.layoutModel.deleteItem(target);
           onChanged!(target);
         },
-      )
+      ),
     ];
   }
 }

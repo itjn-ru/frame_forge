@@ -15,10 +15,10 @@ import 'form_slider_button.dart';
 class FormExpandbleListMenu extends ComponentAndSourceMenu {
   FormExpandbleListMenu(super.controller, super.target, {super.onChanged});
 
-  
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     // Removed unused pageCount variable
     return [
       const MenuHeader(text: "Редактирование"),

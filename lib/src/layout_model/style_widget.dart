@@ -3,7 +3,6 @@ import 'style.dart';
 import 'style_element.dart';
 import 'style_element_widget.dart';
 
-
 class StyleWidget extends StatelessWidget {
   final LayoutStyle style;
 
@@ -21,13 +20,10 @@ class StyleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: buildWidget(context),
-    );
+    return Container(child: buildWidget(context));
   }
 
   Widget buildWidget(BuildContext context) {
     return Text(style.type);
   }
-  
 }

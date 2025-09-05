@@ -64,36 +64,34 @@ class Properties extends StatelessWidget {
         }
 
         return ValueListenableBuilder<Map<String, dynamic>>(
-            valueListenable: controller.propertiesNotifier,
-            builder: (context, properties, _) {
-              final keys = properties.keys.toList();
+          valueListenable: controller.propertiesNotifier,
+          builder: (context, properties, _) {
+            final keys = properties.keys.toList();
 
-              return Table(
-                columnWidths: const {
-                  0: FixedColumnWidth(50),
-                  1: FixedColumnWidth(100),
-                },
-                children: List.generate(
-                  keys.length,
-                  (index) {
-                    final key = keys[index];
-                    final prop = properties[key];
+            return Table(
+              columnWidths: const {
+                0: FixedColumnWidth(50),
+                1: FixedColumnWidth(100),
+              },
+              children: List.generate(keys.length, (index) {
+                final key = keys[index];
+                final prop = properties[key];
 
-                    return TableRow(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: Colors.black, width: 1),
-                        ),
-                      ),
-                      children: [
-                        Text("${prop?.title ?? ""}:"),
-                        PropertyWidget.create(controller, key),
-                      ],
-                    );
-                  },
-                ),
-              );
-            });
+                return TableRow(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.black, width: 1),
+                    ),
+                  ),
+                  children: [
+                    Text("${prop?.title ?? ""}:"),
+                    PropertyWidget.create(controller, key),
+                  ],
+                );
+              }),
+            );
+          },
+        );
       },
     );
   }

@@ -13,7 +13,7 @@ class FormHiddenFieldMenu extends ComponentAndSourceMenu {
           controller.layoutModel.deleteItem(target);
           onChanged!(target);
         },
-      )
+      ),
     ];
   }
 }

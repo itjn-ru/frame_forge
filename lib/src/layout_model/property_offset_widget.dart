@@ -16,8 +16,9 @@ class PropertyOffsetWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property =
-        controller.getItemById(controller.selectedId)?.properties[propertyKey];
+    final property = controller
+        .getItemById(controller.selectedId)
+        ?.properties[propertyKey];
     final Offset offset = property?.value ?? Offset.zero;
 
     final controllerDx = TextEditingController(text: offset.dx.toString());

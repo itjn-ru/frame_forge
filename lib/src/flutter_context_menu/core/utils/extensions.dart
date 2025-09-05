@@ -5,8 +5,11 @@ extension BuildContextExtensions on BuildContext {
     final widgetRenderBox = findRenderObject() as RenderBox?;
     if (widgetRenderBox == null) return null;
     final RenderBox overlay =
-    Overlay.of(this).context.findRenderObject() as RenderBox;
-    final widgetPosition = widgetRenderBox.localToGlobal(Offset.zero,ancestor: overlay);
+        Overlay.of(this).context.findRenderObject() as RenderBox;
+    final widgetPosition = widgetRenderBox.localToGlobal(
+      Offset.zero,
+      ancestor: overlay,
+    );
     final widgetSize = widgetRenderBox.size;
     return widgetPosition & widgetSize;
   }

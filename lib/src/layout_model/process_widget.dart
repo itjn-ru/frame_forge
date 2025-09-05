@@ -21,13 +21,10 @@ class ProcessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: buildWidget(context),
-    );
+    return Container(child: buildWidget(context));
   }
 
   Widget buildWidget(BuildContext context) {
     return Text(process.type);
   }
-
 }

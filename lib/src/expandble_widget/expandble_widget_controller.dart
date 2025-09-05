@@ -18,8 +18,10 @@ class ExpandableControllerImpl implements ExpandableController {
   double? _expandedHeight;
 
   // controllers for broadcasting changes
-  final StreamController<bool> _stateController = StreamController<bool>.broadcast();
-  final StreamController<double?> _heightController = StreamController<double?>.broadcast();
+  final StreamController<bool> _stateController =
+      StreamController<bool>.broadcast();
+  final StreamController<double?> _heightController =
+      StreamController<double?>.broadcast();
 
   @override
   bool get isExpanded => _isExpanded;

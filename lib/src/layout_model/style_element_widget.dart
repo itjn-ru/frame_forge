@@ -9,19 +9,20 @@ class StyleElementWidget extends StyleWidget {
     var cellText = style["name"] ?? "";
 
     return Container(
-        //height: row.height,
-        //decoration: BoxDecoration(
-        //  border: Border.all(),
-        //  color: column["color"],
-        //),
-        //alignment: column["alignment"],
-        child: Text(
-      cellText,
-      style: TextStyle(
-      fontSize: style["fontSize"],
-      fontWeight: style["fontWeight"],
-      )
-    ));
+      //height: row.height,
+      //decoration: BoxDecoration(
+      //  border: Border.all(),
+      //  color: column["color"],
+      //),
+      //alignment: column["alignment"],
+      child: Text(
+        cellText,
+        style: TextStyle(
+          fontSize: style["fontSize"],
+          fontWeight: style["fontWeight"],
+        ),
+      ),
+    );
 
     /*var columns = source.items.whereType<SourceTableColumn>();
 

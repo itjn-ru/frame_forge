@@ -5,7 +5,6 @@ import 'source_table_widget.dart';
 import 'source_variable.dart';
 import 'source_variable_widget.dart';
 
-
 class SourceWidget extends StatelessWidget {
   final LayoutSource source;
 
@@ -13,9 +12,9 @@ class SourceWidget extends StatelessWidget {
 
   factory SourceWidget.create(LayoutSource source) {
     switch (source.runtimeType) {
-      case SourceVariable:
+      case SourceVariable _:
         return SourceVariableWidget(source as SourceVariable);
-      case SourceTable:
+      case SourceTable _:
         return SourceTableWidget(source as SourceTable);
 
       default:
@@ -25,9 +24,7 @@ class SourceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: buildWidget(context),
-    );
+    return Container(child: buildWidget(context));
   }
 
   Widget buildWidget(BuildContext context) {

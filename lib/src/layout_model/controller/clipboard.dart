@@ -68,7 +68,7 @@ class LayoutModelClipboard with FromMapToMap {
     try {
       final base64Data = utf8.decode(base64Decode(clipboardData.text!));
       final Map<String, dynamic> itemJson =
-      jsonDecode(base64Data) as Map<String, dynamic>;
+          jsonDecode(base64Data) as Map<String, dynamic>;
       newItem = Item('item', 'item').fromMap(itemJson);
     } catch (e) {
       showNodeEditorSnackbar(
@@ -91,10 +91,7 @@ class LayoutModelClipboard with FromMapToMap {
       controller.layoutModel.addItemToParent(page, parent, pasteItem);
     }
     eventBus.emit(
-      PasteSelectionEvent(
-        id: const Uuid().v4(),
-        clipboardData.text!,
-      ),
+      PasteSelectionEvent(id: const Uuid().v4(), clipboardData.text!),
     );
   }
 
@@ -107,11 +104,6 @@ class LayoutModelClipboard with FromMapToMap {
 
     controller.layoutModel.deleteCurrentItem();
 
-    eventBus.emit(
-      CutSelectionEvent(
-        id: const Uuid().v4(),
-        clipboardContent,
-      ),
-    );
+    eventBus.emit(CutSelectionEvent(id: const Uuid().v4(), clipboardContent));
   }
 }

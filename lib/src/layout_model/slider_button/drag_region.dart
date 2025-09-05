@@ -39,7 +39,8 @@ class HoverRegionState extends State<HoverRegion> {
         child: MouseRegion(
           opaque: false,
           hitTestBehavior: HitTestBehavior.translucent,
-          cursor: widget.cursor ??
+          cursor:
+              widget.cursor ??
               (_hovering ? widget.hoverCursor : widget.defaultCursor),
           onExit: (e) => _setHovering(false),
           child: widget.child,

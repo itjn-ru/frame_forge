@@ -52,24 +52,26 @@ class MarginStyleWidget extends StatefulWidget {
   final LayoutModelController controller;
   final String propertyKey;
   final int index;
-  const MarginStyleWidget(
-      {required this.controller,
-      required this.propertyKey,
-      required this.index,
-      super.key});
+  const MarginStyleWidget({
+    required this.controller,
+    required this.propertyKey,
+    required this.index,
+    super.key,
+  });
 
   @override
   State<MarginStyleWidget> createState() => _MarginStyleWidgetState();
 }
 
 class _MarginStyleWidgetState extends State<MarginStyleWidget> {
-  late final property =
-      widget.controller.getCurrentItem()?.properties[widget.propertyKey]!;
+  late final property = widget.controller
+      .getCurrentItem()
+      ?.properties[widget.propertyKey]!;
   var controller = TextEditingController();
 
   @override
   void initState() {
-    controller.text = property?.value[widget.index].toString()??'0';
+    controller.text = property?.value[widget.index].toString() ?? '0';
     super.initState();
   }
 
@@ -95,6 +97,11 @@ class _MarginStyleWidgetState extends State<MarginStyleWidget> {
   }
 
   onChanged() {
-    widget.controller.eventBus.emit(ChangeItem(id: const Uuid().v4(), itemId: widget.controller.layoutModel.curItem.id));
+    widget.controller.eventBus.emit(
+      ChangeItem(
+        id: const Uuid().v4(),
+        itemId: widget.controller.layoutModel.curItem.id,
+      ),
+    );
   }
 }

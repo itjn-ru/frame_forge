@@ -10,8 +10,12 @@ class ComponentsAndSources extends StatelessWidget {
   final BoxConstraints constraints;
   final LayoutModelController controller;
   final ScreenSizeEnum screenSize;
-  const ComponentsAndSources(this.constraints,
-      {super.key, required this.controller, required this.screenSize});
+  const ComponentsAndSources(
+    this.constraints, {
+    super.key,
+    required this.controller,
+    required this.screenSize,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,31 +23,33 @@ class ComponentsAndSources extends StatelessWidget {
       screenSize: screenSize,
       child: LayoutModelControllerProvider(
         controller: controller,
-        child: Builder(builder: (context) {
-          final ComponentAndSourcePage curPage =
-              controller.layoutModel.getCurPage;
-          if (curPage is StylePage) {
-            return Column(
-              children: List.generate(
-                curPage.items.length, //widget._items.length,
-                (index) =>
-                    StyleWidget.create(curPage.items[index] as LayoutStyle),
-              ),
-            );
-          } else if (curPage is ComponentPage) {
-            return curPage.items.isNotEmpty
-                ? MainCanvas(constraints: constraints)
-                : Container();
-          } 
-          else {
-            return ProcessItems(
-              controller.layoutModel.root.items.whereType<ProcessPage>().first,
-              controller,
-            );
-          }
-        }),
+        child: Builder(
+          builder: (context) {
+            final ComponentAndSourcePage curPage =
+                controller.layoutModel.getCurPage;
+            if (curPage is StylePage) {
+              return Column(
+                children: List.generate(
+                  curPage.items.length, //widget._items.length,
+                  (index) =>
+                      StyleWidget.create(curPage.items[index] as LayoutStyle),
+                ),
+              );
+            } else if (curPage is ComponentPage) {
+              return curPage.items.isNotEmpty
+                  ? MainCanvas(constraints: constraints)
+                  : Container();
+            } else {
+              return ProcessItems(
+                controller.layoutModel.root.items
+                    .whereType<ProcessPage>()
+                    .first,
+                controller,
+              );
+            }
+          },
+        ),
       ),
     );
   }
 }
-

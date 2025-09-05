@@ -1,4 +1,3 @@
-
 import 'package:frame_forge/src/layout_model/property.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -30,13 +29,14 @@ import 'project.dart';
 class LayoutModelController {
   /// The layout model being controlled.
   LayoutModel layoutModel;
-  
+
   /// Event bus for handling layout model events.
   final LayoutModelEventBus eventBus;
 
   final ValueNotifier<Set<String?>> changedItems = ValueNotifier({});
-  final ValueNotifier<Map<String, Property>> propertiesNotifier =
-      ValueNotifier({});
+  final ValueNotifier<Map<String, Property>> propertiesNotifier = ValueNotifier(
+    {},
+  );
 
   late final LayoutModelClipboard clipboard;
   late final LayoutModelEditorProject project;
@@ -49,10 +49,10 @@ class LayoutModelController {
   /// Creates a [LayoutModelController] with the specified [layoutModel].
   ///
   /// The [eventBus] parameter is optional and defaults to a new [LayoutModelEventBus].
-  /// 
+  ///
   /// Optional callbacks can be provided for project management:
   /// - [projectSaver]: Function to save project data
-  /// - [projectLoader]: Function to load project data  
+  /// - [projectLoader]: Function to load project data
   /// - [projectCreator]: Function to create new projects
   LayoutModelController({
     required this.layoutModel,
@@ -98,10 +98,7 @@ class LayoutModelController {
   }
 
   void updateProperty(String key, Property value) {
-    propertiesNotifier.value = {
-      ...propertiesNotifier.value,
-      key: value,
-    };
+    propertiesNotifier.value = {...propertiesNotifier.value, key: value};
   }
 
   void markItemAsHandled(String itemId) {
@@ -165,7 +162,7 @@ class LayoutModelController {
 
   /// File picker service instance (lazy initialized)
   FilePickerService? _filePickerService;
-  
+
   FilePickerService get filePickerService {
     _filePickerService ??= createFilePickerService();
     return _filePickerService!;

@@ -11,15 +11,11 @@ class CustomMargin {
   int bottom() => margin[3];
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'margin': margin,
-    };
+    return <String, dynamic>{'margin': margin};
   }
 
   factory CustomMargin.fromMap(Map<String, dynamic> map) {
-    return CustomMargin(List<int>.from(
-      (map['margin'] as List<int>),
-    ));
+    return CustomMargin(List<int>.from((map['margin'] as List<int>)));
   }
 
   String toJson() => json.encode(toMap());

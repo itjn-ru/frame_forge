@@ -10,10 +10,10 @@ class FormRadioMenu extends ComponentAndSourceMenu {
       PopupMenuItem(
         child: const Text("Удалить радиокнопку"),
         onTap: () {
-  controller.layoutModel.deleteItem(target);
+          controller.layoutModel.deleteItem(target);
           onChanged!(target);
         },
-      )
+      ),
     ];
   }
 }

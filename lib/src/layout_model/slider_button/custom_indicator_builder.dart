@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -9,28 +8,43 @@ import 'cursor.dart';
 import 'drag_region.dart';
 import 'properties.dart';
 
-typedef CustomIconBuilder<T> = Widget Function(BuildContext context,
-    LocalToggleProperties<T> local, DetailedGlobalToggleProperties<T> global);
+typedef CustomIconBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      LocalToggleProperties<T> local,
+      DetailedGlobalToggleProperties<T> global,
+    );
 
 /// Custom builder for the indicator of the switch.
-typedef CustomIndicatorBuilder<T> = Widget Function(
-    BuildContext context, DetailedGlobalToggleProperties<T> global);
+typedef CustomIndicatorBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      DetailedGlobalToggleProperties<T> global,
+    );
 
 /// Custom builder for the wrapper of the switch.
-typedef CustomWrapperBuilder<T> = Widget Function(
-    BuildContext context, GlobalToggleProperties<T> global, Widget child);
+typedef CustomWrapperBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      GlobalToggleProperties<T> global,
+      Widget child,
+    );
 
 /// Custom builder for the [spacing] section between the icons.
-typedef CustomSeparatorBuilder<T> = Widget Function(BuildContext context,
-    SeparatorProperties<T> local, DetailedGlobalToggleProperties<T> global);
+typedef CustomSeparatorBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      SeparatorProperties<T> local,
+      DetailedGlobalToggleProperties<T> global,
+    );
 
 /// Custom builder for the appearing animation of the indicator.
 ///
 /// If [value] is [0.0], the indicator is completely disappeared.
 ///
 /// If [value] is [1.0], the indicator is fully appeared.
-typedef IndicatorAppearingBuilder = Widget Function(
-    BuildContext context, double value, Widget indicator);
+typedef IndicatorAppearingBuilder =
+    Widget Function(BuildContext context, double value, Widget indicator);
 
 typedef ChangeCallback<T> = FutureOr<void> Function(T value);
 
@@ -48,7 +62,10 @@ const defaultIndicatorAppearingAnimationDuration = Duration(milliseconds: 400);
 const defaultIndicatorAppearingAnimationCurve = Curves.easeOutBack;
 
 Widget defaultIndicatorAppearingBuilder(
-    BuildContext context, double value, Widget indicator) {
+  BuildContext context,
+  double value,
+  Widget indicator,
+) {
   return Transform.scale(scale: value, child: indicator);
 }
 
@@ -236,10 +253,14 @@ class CustomAnimatedToggleSwitch<T extends Object?> extends StatefulWidget {
     this.allowUnlistedValues = false,
     this.active = true,
     this.positionListener,
-  })  : assert(foregroundIndicatorBuilder != null ||
-      backgroundIndicatorBuilder != null),
-        assert(separatorBuilder == null ||
-            (spacing > 0 && iconArrangement == IconArrangement.row));
+  }) : assert(
+         foregroundIndicatorBuilder != null ||
+             backgroundIndicatorBuilder != null,
+       ),
+       assert(
+         separatorBuilder == null ||
+             (spacing > 0 && iconArrangement == IconArrangement.row),
+       );
 
   @override
   State<CustomAnimatedToggleSwitch<T>> createState() =>
@@ -247,7 +268,8 @@ class CustomAnimatedToggleSwitch<T extends Object?> extends StatefulWidget {
 }
 
 class CustomAnimatedToggleSwitchState<T>
-    extends State<CustomAnimatedToggleSwitch<T>> with TickerProviderStateMixin {
+    extends State<CustomAnimatedToggleSwitch<T>>
+    with TickerProviderStateMixin {
   /// The [AnimationController] for the movement of the indicator.
   late final AnimationController _controller;
 
@@ -284,21 +306,22 @@ class CustomAnimatedToggleSwitchState<T>
     final isValueSelected = widget.values.contains(current);
     _currentIndex = widget.values.indexOf(current);
     _checkForUnlistedValue();
-    _animationInfo =
-        AnimationInfo(isValueSelected ? _currentIndex.toDouble() : 0.0)
-            .setLoading(widget.loading ?? false);
+    _animationInfo = AnimationInfo(
+      isValueSelected ? _currentIndex.toDouble() : 0.0,
+    ).setLoading(widget.loading ?? false);
     _controller =
-    AnimationController(vsync: this, duration: widget.animationDuration)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed &&
-            _animationInfo.toggleMode != ToggleMode.dragged) {
-          _setAnimationInfo(_animationInfo.ended());
-        }
-      });
+        AnimationController(vsync: this, duration: widget.animationDuration)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed &&
+                _animationInfo.toggleMode != ToggleMode.dragged) {
+              _setAnimationInfo(_animationInfo.ended());
+            }
+          });
 
-    _animation =
-    CurvedAnimation(parent: _controller, curve: widget.animationCurve)
-      ..addListener(_callPositionListener);
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: widget.animationCurve,
+    )..addListener(_callPositionListener);
 
     _appearingController = AnimationController(
       vsync: this,
@@ -325,14 +348,20 @@ class CustomAnimatedToggleSwitchState<T>
         !widget.values.contains(widget.current)) {
       try {
         throw ArgumentError(
-            'The values in AnimatedToggleSwitch have to contain current if allowUnlistedValues is false.\n'
-                'current: ${widget.current}\n'
-                'values: ${widget.values}\n'
-                'This error is only thrown in debug mode to minimize problems with the production app.');
+          'The values in AnimatedToggleSwitch have to contain current if allowUnlistedValues is false.\n'
+          'current: ${widget.current}\n'
+          'values: ${widget.values}\n'
+          'This error is only thrown in debug mode to minimize problems with the production app.',
+        );
       } catch (e, s) {
         if (kDebugMode) rethrow;
-        FlutterError.reportError(FlutterErrorDetails(
-            exception: e, stack: s, library: 'AnimatedToggleSwitch'));
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: e,
+            stack: s,
+            library: 'AnimatedToggleSwitch',
+          ),
+        );
       }
     }
   }
@@ -413,12 +442,15 @@ class CustomAnimatedToggleSwitchState<T>
   /// Returns the value position by the local position of the cursor.
   /// It is mainly intended as a helper function for the build method.
   double _doubleFromPosition(
-      double x, DetailedGlobalToggleProperties<T> properties) {
-    double result = (x.clamp(
-        properties.indicatorSize.width / 2,
-        properties.switchSize.width -
-            properties.indicatorSize.width / 2) -
-        properties.indicatorSize.width / 2) /
+    double x,
+    DetailedGlobalToggleProperties<T> properties,
+  ) {
+    double result =
+        (x.clamp(
+              properties.indicatorSize.width / 2,
+              properties.switchSize.width - properties.indicatorSize.width / 2,
+            ) -
+            properties.indicatorSize.width / 2) /
         (properties.indicatorSize.width + properties.spacing);
     if (properties.textDirection == TextDirection.rtl) {
       result = widget.values.length - 1 - result;
@@ -436,8 +468,9 @@ class CustomAnimatedToggleSwitchState<T>
   void _callPositionListener() {
     if (widget.positionListener == null) return;
     final value = PositionListenerInfo.fromPosition(
-        _togglePositionFromPositionValue(_positionValue),
-        _animationInfo.toggleMode);
+      _togglePositionFromPositionValue(_positionValue),
+      _animationInfo.toggleMode,
+    );
     if (_lastPositionListenerValue == value) return;
     _lastPositionListenerValue = value;
     widget.positionListener?.call(value);
@@ -457,7 +490,9 @@ class CustomAnimatedToggleSwitchState<T>
   /// Returns the [TogglePosition] by the local position of the cursor.
   /// It is mainly intended as a helper function for the build method.
   TogglePosition<T> _togglePositionFromRealPosition(
-      double x, DetailedGlobalToggleProperties<T> properties) {
+    double x,
+    DetailedGlobalToggleProperties<T> properties,
+  ) {
     return _togglePositionFromPositionValue(_doubleFromPosition(x, properties));
   }
 
@@ -466,17 +501,18 @@ class CustomAnimatedToggleSwitchState<T>
     double spacing = widget.spacing;
     final textDirection = _textDirectionOf(context);
     final loadingValue = _animationInfo.loading ? 1.0 : 0.0;
-    final privateIndicatorAppearingAnimation =
-    PrivateAnimation(_appearingAnimation);
+    final privateIndicatorAppearingAnimation = PrivateAnimation(
+      _appearingAnimation,
+    );
 
     final defaultCursor = !_isActive
         ? (_animationInfo.loading
-        ? widget.cursors.loadingCursor
-        : widget.cursors.inactiveCursor)
+              ? widget.cursors.loadingCursor
+              : widget.cursors.inactiveCursor)
         : (widget.cursors.defaultCursor ??
-        (widget.onTap == null
-            ? MouseCursor.defer
-            : SystemMouseCursors.click));
+              (widget.onTap == null
+                  ? MouseCursor.defer
+                  : SystemMouseCursors.click));
 
     return SizedBox(
       height: widget.height,
@@ -485,272 +521,295 @@ class CustomAnimatedToggleSwitchState<T>
         cursor: defaultCursor,
         child: GestureDetector(
           behavior: HitTestBehavior.deferToChild,
-          onTapUp: (_) => _onTap(TapProperties(
-            tapped: null,
-            values: widget.values,
-          )),
+          onTapUp: (_) =>
+              _onTap(TapProperties(tapped: null, values: widget.values)),
           child: TweenAnimationBuilder<double>(
             duration:
-            widget.loadingAnimationDuration ?? widget.animationDuration,
+                widget.loadingAnimationDuration ?? widget.animationDuration,
             curve: widget.loadingAnimationCurve ?? widget.animationCurve,
             tween: Tween(begin: loadingValue, end: loadingValue),
             builder: (context, loadingValue, child) => AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  double positionValue = _positionValue;
-                  GlobalToggleProperties<T> properties = GlobalToggleProperties(
-                    position: positionValue,
-                    current: widget.current,
-                    currentIndex: _currentIndex,
-                    previous:
-                    _animationInfo.start.toInt() == _animationInfo.start
-                        ? widget.values[_animationInfo.start.toInt()]
-                        : null,
-                    values: widget.values,
-                    previousPosition: _animationInfo.start,
-                    textDirection: textDirection,
-                    mode: _animationInfo.toggleMode,
-                    loadingAnimationValue: loadingValue,
-                    active: widget.active,
-                    indicatorAppearingAnimation:
-                    privateIndicatorAppearingAnimation,
-                  );
-                  Widget child = Padding(
-                    padding: widget.padding,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        double height = constraints.maxHeight;
-                        assert(
+              animation: _animation,
+              builder: (context, child) {
+                double positionValue = _positionValue;
+                GlobalToggleProperties<T> properties = GlobalToggleProperties(
+                  position: positionValue,
+                  current: widget.current,
+                  currentIndex: _currentIndex,
+                  previous: _animationInfo.start.toInt() == _animationInfo.start
+                      ? widget.values[_animationInfo.start.toInt()]
+                      : null,
+                  values: widget.values,
+                  previousPosition: _animationInfo.start,
+                  textDirection: textDirection,
+                  mode: _animationInfo.toggleMode,
+                  loadingAnimationValue: loadingValue,
+                  active: widget.active,
+                  indicatorAppearingAnimation:
+                      privateIndicatorAppearingAnimation,
+                );
+                Widget child = Padding(
+                  padding: widget.padding,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      double height = constraints.maxHeight;
+                      assert(
                         constraints.maxWidth.isFinite ||
                             (widget.indicatorSize.width.isFinite &&
                                 spacing.isFinite),
                         'With unbound width constraints '
-                            'the width of the indicator and the spacing '
-                            "can't be infinite");
-                        assert(
-                        widget.indicatorSize.width.isFinite ||
-                            spacing.isFinite,
+                        'the width of the indicator and the spacing '
+                        "can't be infinite",
+                      );
+                      assert(
+                        widget.indicatorSize.width.isFinite || spacing.isFinite,
                         'The width of the indicator '
-                            'or the spacing must be finite.');
+                        'or the spacing must be finite.',
+                      );
 
-                        // Recalculates the indicatorSize if its width or height is
-                        // infinite.
-                        Size indicatorSize = Size(
-                            widget.indicatorSize.width.isInfinite
-                                ? (constraints.maxWidth -
-                                spacing * (widget.values.length - 1)) /
-                                widget.values.length
-                                : widget.indicatorSize.width,
-                            widget.indicatorSize.height.isInfinite
-                                ? height
-                                : widget.indicatorSize.height);
+                      // Recalculates the indicatorSize if its width or height is
+                      // infinite.
+                      Size indicatorSize = Size(
+                        widget.indicatorSize.width.isInfinite
+                            ? (constraints.maxWidth -
+                                      spacing * (widget.values.length - 1)) /
+                                  widget.values.length
+                            : widget.indicatorSize.width,
+                        widget.indicatorSize.height.isInfinite
+                            ? height
+                            : widget.indicatorSize.height,
+                      );
 
-                        if (spacing.isInfinite) {
-                          spacing = (constraints.maxWidth -
-                              widget.indicatorSize.width *
-                                  widget.values.length) /
-                              (widget.values.length - 1);
-                        }
+                      if (spacing.isInfinite) {
+                        spacing =
+                            (constraints.maxWidth -
+                                widget.indicatorSize.width *
+                                    widget.values.length) /
+                            (widget.values.length - 1);
+                      }
 
-                        // Calculates the required width of the widget.
-                        double width =
-                            indicatorSize.width * widget.values.length +
-                                (widget.values.length - 1) * spacing;
+                      // Calculates the required width of the widget.
+                      double width =
+                          indicatorSize.width * widget.values.length +
+                          (widget.values.length - 1) * spacing;
 
-                        // Handles the case that the required width of the widget
-                        // cannot be used due to the given BoxConstraints.
-                        if (widget.fittingMode ==
-                            FittingMode.preventHorizontalOverlapping &&
-                            width > constraints.maxWidth) {
-                          double factor = constraints.maxWidth / width;
-                          spacing *= factor;
-                          width = constraints.maxWidth;
-                          indicatorSize = Size(
-                              indicatorSize.width.isInfinite
-                                  ? width / widget.values.length
-                                  : factor * indicatorSize.width,
-                              indicatorSize.height);
-                        } else if (constraints.minWidth > width) {
-                          spacing += (constraints.minWidth - width) /
-                              (widget.values.length - 1);
-                          width = constraints.minWidth;
-                        }
-
-                        // The additional width of the indicator's hitbox needed
-                        // to reach the minTouchTargetSize.
-                        double dragDif = indicatorSize.width <
-                            widget.minTouchTargetSize
-                            ? (widget.minTouchTargetSize - indicatorSize.width)
-                            : 0;
-
-                        // The local position of the indicator.
-                        double position =
-                            (indicatorSize.width + spacing) * positionValue +
-                                indicatorSize.width / 2;
-
-                        double leftPosition = textDirection == TextDirection.rtl
-                            ? width - position
-                            : position;
-
-                        bool isHoveringIndicator(Offset offset) {
-                          if (!_isActive || _isCurrentUnlisted) {
-                            return false;
-                          }
-                          double dx = textDirection == TextDirection.rtl
-                              ? width - offset.dx
-                              : offset.dx;
-                          return position -
-                              (indicatorSize.width + dragDif) / 2 <=
-                              dx &&
-                              dx <=
-                                  (position +
-                                      (indicatorSize.width + dragDif) / 2);
-                        }
-
-                        DetailedGlobalToggleProperties<T> properties =
-                        DetailedGlobalToggleProperties(
-                          spacing: spacing,
-                          position: positionValue,
-                          indicatorSize: indicatorSize,
-                          switchSize: Size(width, height),
-                          current: widget.current,
-                          currentIndex: _currentIndex,
-                          previous: _animationInfo.start.toInt() ==
-                              _animationInfo.start
-                              ? widget.values[_animationInfo.start.toInt()]
-                              : null,
-                          values: widget.values,
-                          previousPosition: _animationInfo.start,
-                          textDirection: textDirection,
-                          mode: _animationInfo.toggleMode,
-                          loadingAnimationValue: loadingValue,
-                          active: widget.active,
-                          indicatorAppearingAnimation:
-                          privateIndicatorAppearingAnimation,
+                      // Handles the case that the required width of the widget
+                      // cannot be used due to the given BoxConstraints.
+                      if (widget.fittingMode ==
+                              FittingMode.preventHorizontalOverlapping &&
+                          width > constraints.maxWidth) {
+                        double factor = constraints.maxWidth / width;
+                        spacing *= factor;
+                        width = constraints.maxWidth;
+                        indicatorSize = Size(
+                          indicatorSize.width.isInfinite
+                              ? width / widget.values.length
+                              : factor * indicatorSize.width,
+                          indicatorSize.height,
                         );
+                      } else if (constraints.minWidth > width) {
+                        spacing +=
+                            (constraints.minWidth - width) /
+                            (widget.values.length - 1);
+                        width = constraints.minWidth;
+                      }
 
-                        List<Widget> stack = <Widget>[
-                          if (widget.backgroundIndicatorBuilder != null)
-                            Indicator(
-                              key: const ValueKey(0),
-                              textDirection: textDirection,
-                              height: height,
-                              indicatorSize: indicatorSize,
-                              position: position,
-                              appearingAnimation: _appearingAnimation,
-                              appearingBuilder:
-                              widget.indicatorAppearingBuilder,
-                              child: widget.backgroundIndicatorBuilder!(
-                                  context, properties),
-                            ),
-                          if (widget.iconArrangement == IconArrangement.overlap)
-                            ..._buildBackgroundStack(context, properties)
-                          else
-                            ..._buildBackgroundRow(context, properties),
-                          if (widget.foregroundIndicatorBuilder != null)
-                            Indicator(
-                              key: const ValueKey(1),
-                              textDirection: textDirection,
-                              height: height,
-                              indicatorSize: indicatorSize,
-                              position: position,
-                              appearingAnimation: _appearingAnimation,
-                              appearingBuilder:
-                              widget.indicatorAppearingBuilder,
-                              child: widget.foregroundIndicatorBuilder!(
-                                  context, properties),
-                            ),
-                        ];
+                      // The additional width of the indicator's hitbox needed
+                      // to reach the minTouchTargetSize.
+                      double dragDif =
+                          indicatorSize.width < widget.minTouchTargetSize
+                          ? (widget.minTouchTargetSize - indicatorSize.width)
+                          : 0;
 
-                        return WidgetPart(
-                          left: loadingValue *
-                              (leftPosition - 0.5 * indicatorSize.width),
-                          width: indicatorSize.width +
-                              (1 - loadingValue) *
-                                  (width - indicatorSize.width),
-                          height: height,
-                          child: ConstrainedBox(
-                            constraints: constraints.loosen(),
-                            child: SizedBox(
-                              width: width,
-                              height: height,
-                              // manual check if cursor is above indicator
-                              // to make sure that GestureDetector and MouseRegion match.
-                              // TODO: one widget for DragRegion and GestureDetector to avoid redundancy
-                              child: HoverRegion(
-                                hoverCursor: widget.cursors.tapCursor,
-                                hoverCheck: (pos) =>
-                                widget.iconsTappable &&
-                                    _doubleFromPosition(pos.dx, properties)
-                                        .round() !=
-                                        _currentIndex,
-                                child: DragRegion(
-                                  dragging: _animationInfo.toggleMode ==
-                                      ToggleMode.dragged,
-                                  draggingCursor: widget.cursors.draggingCursor,
-                                  dragCursor: widget.cursors.dragCursor,
-                                  hoverCheck: isHoveringIndicator,
-                                  defaultCursor: defaultCursor,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    dragStartBehavior: DragStartBehavior.down,
-                                    onTapUp: (details) {
-                                      final togglePosition =
-                                      _togglePositionFromRealPosition(
+                      // The local position of the indicator.
+                      double position =
+                          (indicatorSize.width + spacing) * positionValue +
+                          indicatorSize.width / 2;
+
+                      double leftPosition = textDirection == TextDirection.rtl
+                          ? width - position
+                          : position;
+
+                      bool isHoveringIndicator(Offset offset) {
+                        if (!_isActive || _isCurrentUnlisted) {
+                          return false;
+                        }
+                        double dx = textDirection == TextDirection.rtl
+                            ? width - offset.dx
+                            : offset.dx;
+                        return position - (indicatorSize.width + dragDif) / 2 <=
+                                dx &&
+                            dx <=
+                                (position +
+                                    (indicatorSize.width + dragDif) / 2);
+                      }
+
+                      DetailedGlobalToggleProperties<T> properties =
+                          DetailedGlobalToggleProperties(
+                            spacing: spacing,
+                            position: positionValue,
+                            indicatorSize: indicatorSize,
+                            switchSize: Size(width, height),
+                            current: widget.current,
+                            currentIndex: _currentIndex,
+                            previous:
+                                _animationInfo.start.toInt() ==
+                                    _animationInfo.start
+                                ? widget.values[_animationInfo.start.toInt()]
+                                : null,
+                            values: widget.values,
+                            previousPosition: _animationInfo.start,
+                            textDirection: textDirection,
+                            mode: _animationInfo.toggleMode,
+                            loadingAnimationValue: loadingValue,
+                            active: widget.active,
+                            indicatorAppearingAnimation:
+                                privateIndicatorAppearingAnimation,
+                          );
+
+                      List<Widget> stack = <Widget>[
+                        if (widget.backgroundIndicatorBuilder != null)
+                          Indicator(
+                            key: const ValueKey(0),
+                            textDirection: textDirection,
+                            height: height,
+                            indicatorSize: indicatorSize,
+                            position: position,
+                            appearingAnimation: _appearingAnimation,
+                            appearingBuilder: widget.indicatorAppearingBuilder,
+                            child: widget.backgroundIndicatorBuilder!(
+                              context,
+                              properties,
+                            ),
+                          ),
+                        if (widget.iconArrangement == IconArrangement.overlap)
+                          ..._buildBackgroundStack(context, properties)
+                        else
+                          ..._buildBackgroundRow(context, properties),
+                        if (widget.foregroundIndicatorBuilder != null)
+                          Indicator(
+                            key: const ValueKey(1),
+                            textDirection: textDirection,
+                            height: height,
+                            indicatorSize: indicatorSize,
+                            position: position,
+                            appearingAnimation: _appearingAnimation,
+                            appearingBuilder: widget.indicatorAppearingBuilder,
+                            child: widget.foregroundIndicatorBuilder!(
+                              context,
+                              properties,
+                            ),
+                          ),
+                      ];
+
+                      return WidgetPart(
+                        left:
+                            loadingValue *
+                            (leftPosition - 0.5 * indicatorSize.width),
+                        width:
+                            indicatorSize.width +
+                            (1 - loadingValue) * (width - indicatorSize.width),
+                        height: height,
+                        child: ConstrainedBox(
+                          constraints: constraints.loosen(),
+                          child: SizedBox(
+                            width: width,
+                            height: height,
+                            // manual check if cursor is above indicator
+                            // to make sure that GestureDetector and MouseRegion match.
+                            // TODO: one widget for DragRegion and GestureDetector to avoid redundancy
+                            child: HoverRegion(
+                              hoverCursor: widget.cursors.tapCursor,
+                              hoverCheck: (pos) =>
+                                  widget.iconsTappable &&
+                                  _doubleFromPosition(
+                                        pos.dx,
+                                        properties,
+                                      ).round() !=
+                                      _currentIndex,
+                              child: DragRegion(
+                                dragging:
+                                    _animationInfo.toggleMode ==
+                                    ToggleMode.dragged,
+                                draggingCursor: widget.cursors.draggingCursor,
+                                dragCursor: widget.cursors.dragCursor,
+                                hoverCheck: isHoveringIndicator,
+                                defaultCursor: defaultCursor,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  dragStartBehavior: DragStartBehavior.down,
+                                  onTapUp: (details) {
+                                    final togglePosition =
+                                        _togglePositionFromRealPosition(
                                           details.localPosition.dx,
-                                          properties);
-                                      _onTap(TapProperties(
+                                          properties,
+                                        );
+                                    _onTap(
+                                      TapProperties(
                                         tapped: TapInfo.fromPosition(
-                                            togglePosition),
+                                          togglePosition,
+                                        ),
                                         values: widget.values,
-                                      ));
-                                      if (!widget.iconsTappable) return;
-                                      if (togglePosition.value ==
-                                          widget.current) {
-                                        return;
-                                      }
-                                      _onChanged(togglePosition.value);
-                                    },
-                                    onHorizontalDragStart: (details) {
-                                      if (!isHoveringIndicator(
-                                          details.localPosition)) {
-                                        return;
-                                      }
-                                      _onDragged(
-                                          _doubleFromPosition(
-                                              details.localPosition.dx,
-                                              properties),
-                                          positionValue);
-                                    },
-                                    onHorizontalDragUpdate: (details) {
-                                      _onDragUpdate(_doubleFromPosition(
-                                          details.localPosition.dx,
-                                          properties));
-                                    },
-                                    onHorizontalDragEnd: (details) {
-                                      _onDragEnd();
-                                    },
-                                    // DecoratedBox for gesture detection
-                                    child: DecoratedBox(
-                                        position: DecorationPosition.background,
-                                        decoration: const BoxDecoration(),
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          children: stack,
-                                        )),
+                                      ),
+                                    );
+                                    if (!widget.iconsTappable) return;
+                                    if (togglePosition.value ==
+                                        widget.current) {
+                                      return;
+                                    }
+                                    _onChanged(togglePosition.value);
+                                  },
+                                  onHorizontalDragStart: (details) {
+                                    if (!isHoveringIndicator(
+                                      details.localPosition,
+                                    )) {
+                                      return;
+                                    }
+                                    _onDragged(
+                                      _doubleFromPosition(
+                                        details.localPosition.dx,
+                                        properties,
+                                      ),
+                                      positionValue,
+                                    );
+                                  },
+                                  onHorizontalDragUpdate: (details) {
+                                    _onDragUpdate(
+                                      _doubleFromPosition(
+                                        details.localPosition.dx,
+                                        properties,
+                                      ),
+                                    );
+                                  },
+                                  onHorizontalDragEnd: (details) {
+                                    _onDragEnd();
+                                  },
+                                  // DecoratedBox for gesture detection
+                                  child: DecoratedBox(
+                                    position: DecorationPosition.background,
+                                    decoration: const BoxDecoration(),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      children: stack,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  );
-                  return widget.wrapperBuilder
-                      ?.call(context, properties, child) ??
-                      child;
-                }),
+                        ),
+                      );
+                    },
+                  ),
+                );
+                return widget.wrapperBuilder?.call(
+                      context,
+                      properties,
+                      child,
+                    ) ??
+                    child;
+              },
+            ),
           ),
         ),
       ),
@@ -759,7 +818,9 @@ class CustomAnimatedToggleSwitchState<T>
 
   /// The builder of the icons for [IconArrangement.overlap].
   List<Widget> _buildBackgroundStack(
-      BuildContext context, DetailedGlobalToggleProperties<T> properties) {
+    BuildContext context,
+    DetailedGlobalToggleProperties<T> properties,
+  ) {
     return [
       ...Iterable.generate(widget.values.length, (i) {
         double position =
@@ -767,8 +828,9 @@ class CustomAnimatedToggleSwitchState<T>
         return Positioned.directional(
           textDirection: _textDirectionOf(context),
           start: i == 0 ? position : position - properties.spacing,
-          width: (i == 0 || i == widget.values.length - 1 ? 1 : 2) *
-              properties.spacing +
+          width:
+              (i == 0 || i == widget.values.length - 1 ? 1 : 2) *
+                  properties.spacing +
               properties.indicatorSize.width,
           height: properties.indicatorSize.height,
           child: widget.iconBuilder(
@@ -780,19 +842,16 @@ class CustomAnimatedToggleSwitchState<T>
       }),
       // shows horizontal overlapping for FittingMode.none in debug mode
       Row(
-        children: [
-          SizedBox(
-            width: properties.switchSize.width,
-            height: 1.0,
-          ),
-        ],
+        children: [SizedBox(width: properties.switchSize.width, height: 1.0)],
       ),
     ];
   }
 
   /// The builder of the icons for [IconArrangement.row].
   List<Widget> _buildBackgroundRow(
-      BuildContext context, DetailedGlobalToggleProperties<T> properties) {
+    BuildContext context,
+    DetailedGlobalToggleProperties<T> properties,
+  ) {
     final length = properties.values.length;
     return [
       Row(
@@ -801,22 +860,26 @@ class CustomAnimatedToggleSwitchState<T>
         children: [
           for (int i = 0; i < length; i++) ...[
             SizedBox(
-                width: properties.indicatorSize.width,
-                height: properties.indicatorSize.height,
-                child: widget.iconBuilder(
-                  context,
-                  LocalToggleProperties(value: widget.values[i], index: i),
-                  properties,
-                )),
+              width: properties.indicatorSize.width,
+              height: properties.indicatorSize.height,
+              child: widget.iconBuilder(
+                context,
+                LocalToggleProperties(value: widget.values[i], index: i),
+                properties,
+              ),
+            ),
             if (i < length - 1 && widget.separatorBuilder != null)
               SizedBox(
                 width: properties.spacing,
                 child: Center(
                   child: widget.separatorBuilder!(
-                      context, SeparatorProperties(index: i), properties),
+                    context,
+                    SeparatorProperties(index: i),
+                    properties,
+                  ),
                 ),
               ),
-          ]
+          ],
         ],
       ),
     ];
@@ -827,8 +890,12 @@ class CustomAnimatedToggleSwitchState<T>
     if (_animationInfo.toggleMode == ToggleMode.dragged) return;
     if (_appearingController.value > 0.0) {
       if (index.toDouble() != _animationInfo.end) {
-        _setAnimationInfo(_animationInfo.toEnd(index.toDouble(),
-            current: current ?? _animationInfo.valueAt(_animation.value)));
+        _setAnimationInfo(
+          _animationInfo.toEnd(
+            index.toDouble(),
+            current: current ?? _animationInfo.valueAt(_animation.value),
+          ),
+        );
         _controller.duration = widget.animationDuration;
         _animation.curve = widget.animationCurve;
         _controller.forward(from: 0.0);
@@ -875,8 +942,8 @@ class CustomAnimatedToggleSwitchState<T>
   /// Returns the [TextDirection] of the widget.
   TextDirection _textDirectionOf(BuildContext context) =>
       widget.textDirection ??
-          Directionality.maybeOf(context) ??
-          TextDirection.ltr;
+      Directionality.maybeOf(context) ??
+      TextDirection.ltr;
 }
 
 /// The [Positioned] for an indicator. It is used as wrapper for
@@ -911,10 +978,11 @@ class Indicator extends StatelessWidget {
       width: indicatorSize.width,
       height: indicatorSize.height,
       child: AnimatedBuilder(
-          animation: appearingAnimation,
-          builder: (context, _) {
-            return appearingBuilder(context, appearingAnimation.value, child);
-          }),
+        animation: appearingAnimation,
+        builder: (context, _) {
+          return appearingBuilder(context, appearingAnimation.value, child);
+        },
+      ),
     );
   }
 }
@@ -959,29 +1027,29 @@ class AnimationInfo {
   final bool loading;
 
   const AnimationInfo(
-      this.start, {
-        this.toggleMode = ToggleMode.none,
-        this.loading = false,
-      }) : end = start;
+    this.start, {
+    this.toggleMode = ToggleMode.none,
+    this.loading = false,
+  }) : end = start;
 
   const AnimationInfo._internal(
-      this.start,
-      this.end, {
-        this.toggleMode = ToggleMode.none,
-        this.loading = false,
-      });
+    this.start,
+    this.end, {
+    this.toggleMode = ToggleMode.none,
+    this.loading = false,
+  });
 
-  const AnimationInfo.animating(
-      this.start,
-      this.end, {
-        this.loading = false,
-      }) : toggleMode = ToggleMode.animating;
+  const AnimationInfo.animating(this.start, this.end, {this.loading = false})
+    : toggleMode = ToggleMode.animating;
 
   AnimationInfo toEnd(double end, {double? current}) =>
       AnimationInfo.animating(current ?? start, end, loading: loading);
 
-  AnimationInfo none({double? current}) => AnimationInfo(current ?? start,
-      toggleMode: ToggleMode.none, loading: loading);
+  AnimationInfo none({double? current}) => AnimationInfo(
+    current ?? start,
+    toggleMode: ToggleMode.none,
+    loading: loading,
+  );
 
   AnimationInfo ended() => AnimationInfo(end, loading: loading);
 
@@ -993,21 +1061,24 @@ class AnimationInfo {
         loading: false,
       );
 
-  AnimationInfo setLoading(bool loading) =>
-      AnimationInfo._internal(start, end,
-          toggleMode: toggleMode, loading: loading);
+  AnimationInfo setLoading(bool loading) => AnimationInfo._internal(
+    start,
+    end,
+    toggleMode: toggleMode,
+    loading: loading,
+  );
 
   double valueAt(num position) => start + (end - start) * position;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AnimationInfo &&
-              runtimeType == other.runtimeType &&
-              start == other.start &&
-              end == other.end &&
-              toggleMode == other.toggleMode &&
-              loading == other.loading;
+      other is AnimationInfo &&
+          runtimeType == other.runtimeType &&
+          start == other.start &&
+          end == other.end &&
+          toggleMode == other.toggleMode &&
+          loading == other.loading;
 
   @override
   int get hashCode =>

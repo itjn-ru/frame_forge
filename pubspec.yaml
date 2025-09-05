@@ -1,6 +1,6 @@
 name: frame_forge
 description: "A Flutter package for creating dynamic UI layouts with a visual editor. Build and modify app interfaces using drag-and-drop components without code changes."
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/itjn-ru/frame_forge
 
 environment:
@@ -15,7 +15,7 @@ dependencies:
   keymap: ^0.0.92
   file_picker: ^10.3.2
   uuid: ^4.4.0
-  vector_math: ^2.1.4
+  vector_math: 2.1.4
   xml: ^6.5.0
   web: ^1.0.0
   

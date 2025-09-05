@@ -6,12 +6,12 @@ import '../flutter_context_menu/components/menu_item.dart';
 import '../flutter_context_menu/core/models/context_menu_entry.dart';
 
 class ProcessElementMenu extends ComponentAndSourceMenu {
-  ProcessElementMenu(super.controller, super.target, {super.onChanged,});
-
+  ProcessElementMenu(super.controller, super.target, {super.onChanged});
 
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     return [
       const MenuHeader(text: "Редактирование"),
       MenuItem(

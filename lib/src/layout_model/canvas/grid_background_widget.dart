@@ -20,9 +20,9 @@ class GridBackgroundBuilder extends StatelessWidget {
     final Rect rect = axisAlignedBoundingBox(quad);
     final int firstRow = (rect.top / cellHeight).floor();
     final int lastRow = (rect.bottom / cellHeight).ceil();
-    return ListView(children: [
-      for (int col = firstRow; col < lastRow; col++) dotsRow(rect),
-    ]);
+    return ListView(
+      children: [for (int col = firstRow; col < lastRow; col++) dotsRow(rect)],
+    );
   }
 
   Widget dotsRow(Rect rect) {
@@ -54,17 +54,14 @@ class GridBackgroundBuilder extends StatelessWidget {
       ),
     );
   }
+
   Rect axisAlignedBoundingBox(Quad quad) {
     double xMin = quad.point0.x;
     double xMax = quad.point0.x;
     double yMin = quad.point0.y;
     double yMax = quad.point0.y;
 
-    for (final point in <Vector3>[
-      quad.point1,
-      quad.point2,
-      quad.point3,
-    ]) {
+    for (final point in <Vector3>[quad.point1, quad.point2, quad.point3]) {
       if (point.x < xMin) {
         xMin = point.x;
       } else if (point.x > xMax) {

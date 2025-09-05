@@ -22,26 +22,25 @@ class HiddenFieldFile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 26,
-                    onPressed: () async {},
-                    icon: const Icon(CupertinoIcons.paperclip)),
-                const SizedBox(
-                  width: 26,
+                  padding: EdgeInsets.zero,
+                  iconSize: 26,
+                  onPressed: () async {},
+                  icon: const Icon(CupertinoIcons.paperclip),
                 ),
+                const SizedBox(width: 26),
                 IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 26,
-                    onPressed: () async {},
-                    icon: const Icon(CupertinoIcons.camera)),
-                const SizedBox(
-                  width: 26,
+                  padding: EdgeInsets.zero,
+                  iconSize: 26,
+                  onPressed: () async {},
+                  icon: const Icon(CupertinoIcons.camera),
                 ),
+                const SizedBox(width: 26),
                 IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 26,
-                    onPressed: () async {},
-                    icon: const Icon(CupertinoIcons.video_camera)),
+                  padding: EdgeInsets.zero,
+                  iconSize: 26,
+                  onPressed: () async {},
+                  icon: const Icon(CupertinoIcons.video_camera),
+                ),
               ],
             ),
           ),
@@ -50,4 +49,3 @@ class HiddenFieldFile extends StatelessWidget {
     );
   }
 }
-

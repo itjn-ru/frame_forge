@@ -6,47 +6,86 @@ import 'package:xml/xml.dart';
 
 import 'item.dart';
 
+/// Saves a layout model map to XML format
+/// 
+/// Converts the layout model's map representation into a well-formatted
+/// XML string that can be saved to a file or transmitted over a network.
+/// 
+/// [root] The layout model map to convert to XML
+/// 
+/// Returns a formatted XML string representation of the layout model.
 String saveMap(Map root) {
   final builder = XmlBuilder();
   builder.processing("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 
-  builder.element("layout", nest: () {
-    _saveMapProperties(builder, root['properties']);
-    _saveMapItems(builder, root['items']);
-  });
+  builder.element(
+    "layout",
+    nest: () {
+      _saveMapProperties(builder, root['properties']);
+      _saveMapItems(builder, root['items']);
+    },
+  );
 
   final document = builder.buildDocument();
   return document.toXmlString(pretty: true);
 }
 
+/// Saves properties section to XML builder
+/// 
+/// [builder] The XML builder to append properties to
+/// [properties] The properties map to serialize
 _saveMapProperties(XmlBuilder builder, Map properties) {
-  builder.element("properties", nest: () {
-    properties.forEach((key, property) {
-      builder.element(key, nest: () {
-        if (property is Map) {
-          property.forEach((key, value) {
-            builder.attribute(key, value);
-          });
-        } else {
-          builder.text(property.toString().replaceAll(' ', '&#x20;'));
-          // builder.text(property.toString());
-        }
+  builder.element(
+    "properties",
+    nest: () {
+      properties.forEach((key, property) {
+        builder.element(
+          key,
+          nest: () {
+            if (property is Map) {
+              property.forEach((key, value) {
+                builder.attribute(key, value);
+              });
+            } else {
+              builder.text(property.toString().replaceAll(' ', '&#x20;'));
+              // builder.text(property.toString());
+            }
+          },
+        );
       });
-    });
-  });
+    },
+  );
 }
 
+/// Saves items section to XML builder
+/// 
+/// [builder] The XML builder to append items to
+/// [items] The items list to serialize
 _saveMapItems(XmlBuilder builder, List items) {
-  builder.element("items", nest: () {
-    for (final element in items) {
-      builder.element(element['type'], nest: () {
-        _saveMapProperties(builder, element['properties']);
-        _saveMapItems(builder, element['items']);
-      });
-    }
-  });
+  builder.element(
+    "items",
+    nest: () {
+      for (final element in items) {
+        builder.element(
+          element['type'],
+          nest: () {
+            _saveMapProperties(builder, element['properties']);
+            _saveMapItems(builder, element['items']);
+          },
+        );
+      }
+    },
+  );
 }
 
+/// Reads a layout model from XML format
+/// 
+/// Parses an XML string representation of a layout model and converts
+/// it back into the internal map format used by the layout system.
+/// 
+/// [layout] The XML string to parse
+/// 
+/// Returns a map representation of the layout model.
 Map<String, dynamic> readMap(String layout) {
   final xml = XmlDocument.parse(layout);
   final xmlRoot = xml.rootElement;
@@ -58,6 +97,11 @@ Map<String, dynamic> readMap(String layout) {
   return root;
 }
 
+/// Reads properties section from XML element
+/// 
+/// [xmlProperties] The XML element containing properties to parse
+/// 
+/// Returns a map of property names to their values.
 Map _readMapProperties(XmlElement? xmlProperties) {
   final Map properties = {};
 
@@ -77,7 +121,7 @@ Map _readMapProperties(XmlElement? xmlProperties) {
     if (xmlProperty.attributes.isNotEmpty) {
       propertyValue = {
         for (final attribute in xmlProperty.attributes)
-          attribute.localName: attribute.value
+          attribute.localName: attribute.value,
       };
     } else if (xmlValue.isNotEmpty) {
       propertyValue = xmlValue.single.value;
@@ -119,7 +163,7 @@ List _readMapItems(XmlElement? xmlItems) {
     final item = {
       'type': xmlItem.localName,
       'properties': _readMapProperties(xmlItem.getElement("properties")),
-      'items': _readMapItems(xmlItem.getElement("items"))
+      'items': _readMapItems(xmlItem.getElement("items")),
     };
     items.add(item);
   }
@@ -131,10 +175,13 @@ String save(Root root) {
   final builder = XmlBuilder();
   builder.processing("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 
-  builder.element("layout", nest: () {
-    _saveProperties(builder, root.properties);
-    _saveItems(builder, root.items);
-  });
+  builder.element(
+    "layout",
+    nest: () {
+      _saveProperties(builder, root.properties);
+      _saveItems(builder, root.items);
+    },
+  );
 
   final document = builder.buildDocument();
 
@@ -142,48 +189,65 @@ String save(Root root) {
 }
 
 _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
-  builder.element("properties", nest: () {
-    properties.forEach((key, property) {
-      builder.element(key, nest: () {
-        switch (property.type) {
-          case const (Offset):
-            builder.attribute("left", (property.value as Offset).dx);
-            builder.attribute("top", (property.value as Offset).dy);
-            break;
-          case const (Size):
-            builder.attribute("width", (property.value as Size).width);
-            builder.attribute("height", (property.value as Size).height);
-            break;
-          case const (Color):
-            builder.text(property.value.value.toRadixString(16).toUpperCase());
-            break;
-          case const (TextStyle):
-            builder.attribute("fontSize", property.value.fontSize);
-            break;
-            case const (CustomBorderStyle):
-            builder.attribute("borderWidth", property.value.width);
-            builder.attribute("borderColor", property.value.color.value.toRadixString(16).toUpperCase());
-            builder.attribute("borderSide", property.value.side);
-            break;
-          //case XFile:
-          //  builder.cdata(base64Encode(property.value));
-          default:
-            builder.text(property.value.toString());
-        }
+  builder.element(
+    "properties",
+    nest: () {
+      properties.forEach((key, property) {
+        builder.element(
+          key,
+          nest: () {
+            switch (property.type) {
+              case const (Offset):
+                builder.attribute("left", (property.value as Offset).dx);
+                builder.attribute("top", (property.value as Offset).dy);
+                break;
+              case const (Size):
+                builder.attribute("width", (property.value as Size).width);
+                builder.attribute("height", (property.value as Size).height);
+                break;
+              case const (Color):
+                builder.text(
+                  property.value.value.toRadixString(16).toUpperCase(),
+                );
+                break;
+              case const (TextStyle):
+                builder.attribute("fontSize", property.value.fontSize);
+                break;
+              case const (CustomBorderStyle):
+                builder.attribute("borderWidth", property.value.width);
+                builder.attribute(
+                  "borderColor",
+                  property.value.color.value.toRadixString(16).toUpperCase(),
+                );
+                builder.attribute("borderSide", property.value.side);
+                break;
+              //case XFile:
+              //  builder.cdata(base64Encode(property.value));
+              default:
+                builder.text(property.value.toString());
+            }
+          },
+        );
       });
-    });
-  });
+    },
+  );
 }
 
 _saveItems(XmlBuilder builder, List<Item> items) {
-  builder.element("items", nest: () {
-    for (final element in items) {
-      builder.element(element.type, nest: () {
-        _saveProperties(builder, element.properties);
-        _saveItems(builder, element.items);
-      });
-    }
-  });
+  builder.element(
+    "items",
+    nest: () {
+      for (final element in items) {
+        builder.element(
+          element.type,
+          nest: () {
+            _saveProperties(builder, element.properties);
+            _saveItems(builder, element.items);
+          },
+        );
+      }
+    },
+  );
 }
 
 Root read(String layout) {
@@ -260,81 +324,107 @@ Map<String, Property> _readProperties(XmlElement? xmlProperties) {
     switch (propertyKey) {
       case "topBorder":
         propertyValue = CustomBorderStyle(
-            double.tryParse(xmlProperty.attributes
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "width")
                     .single
-                    .value) ??
-                0.0,
-            Colors.black,
-            xmlProperty.attributes
-                .where((attribute) => attribute.name.local == "side")
-                .single
-                .value as CustomBorderSide);
+                    .value,
+              ) ??
+              0.0,
+          Colors.black,
+          xmlProperty.attributes
+                  .where((attribute) => attribute.name.local == "side")
+                  .single
+                  .value
+              as CustomBorderSide,
+        );
         break;
       case "leftBorder":
         propertyValue = CustomBorderStyle(
-            double.tryParse(xmlProperty.attributes
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "width")
                     .single
-                    .value) ??
-                0.0,
-            Colors.black,
-            xmlProperty.attributes
-                .where((attribute) => attribute.name.local == "side")
-                .single
-                .value as CustomBorderSide);
+                    .value,
+              ) ??
+              0.0,
+          Colors.black,
+          xmlProperty.attributes
+                  .where((attribute) => attribute.name.local == "side")
+                  .single
+                  .value
+              as CustomBorderSide,
+        );
         break;
       case "rightBorder":
         propertyValue = CustomBorderStyle(
-            double.tryParse(xmlProperty.attributes
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "width")
                     .single
-                    .value) ??
-                0.0,
-            Colors.black,
-            xmlProperty.attributes
-                .where((attribute) => attribute.name.local == "side")
-                .single
-                .value as CustomBorderSide);
+                    .value,
+              ) ??
+              0.0,
+          Colors.black,
+          xmlProperty.attributes
+                  .where((attribute) => attribute.name.local == "side")
+                  .single
+                  .value
+              as CustomBorderSide,
+        );
         break;
       case "bottomBorder":
         propertyValue = CustomBorderStyle(
-            double.tryParse(xmlProperty.attributes
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "width")
                     .single
-                    .value) ??
-                0.0,
-            Colors.black,
-            xmlProperty.attributes
-                .where((attribute) => attribute.name.local == "side")
-                .single
-                .value as CustomBorderSide);
+                    .value,
+              ) ??
+              0.0,
+          Colors.black,
+          xmlProperty.attributes
+                  .where((attribute) => attribute.name.local == "side")
+                  .single
+                  .value
+              as CustomBorderSide,
+        );
         break;
       case "position":
         propertyValue = Offset(
-            double.tryParse(xmlProperty.attributes
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "left")
                     .single
-                    .value) ??
-                0.0,
-            double.tryParse(xmlProperty.attributes
+                    .value,
+              ) ??
+              0.0,
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "top")
                     .single
-                    .value) ??
-                0.0);
+                    .value,
+              ) ??
+              0.0,
+        );
         break;
       case "size":
         propertyValue = Size(
-            double.tryParse(xmlProperty.attributes
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "width")
                     .single
-                    .value) ??
-                0.0,
-            double.tryParse(xmlProperty.attributes
+                    .value,
+              ) ??
+              0.0,
+          double.tryParse(
+                xmlProperty.attributes
                     .where((attribute) => attribute.name.local == "height")
                     .single
-                    .value) ??
-                0.0);
+                    .value,
+              ) ??
+              0.0,
+        );
         break;
       case "color":
         break;
@@ -345,8 +435,11 @@ Map<String, Property> _readProperties(XmlElement? xmlProperties) {
     }
 
     if (propertyValue != null) {
-      properties[propertyKey] =
-          Property(propertyKey, propertyValue, type: propertyValue.runtimeType);
+      properties[propertyKey] = Property(
+        propertyKey,
+        propertyValue,
+        type: propertyValue.runtimeType,
+      );
     }
 
     /*if (xmlProperty.childElements.isEmpty) {

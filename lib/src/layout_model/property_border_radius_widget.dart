@@ -7,8 +7,11 @@ import 'custom_border_radius.dart';
 import 'property_widget.dart';
 
 class PropertyBorderRadiusWidget extends PropertyWidget {
-  const PropertyBorderRadiusWidget(super.controller, super.propertyKey,
-      {super.key});
+  const PropertyBorderRadiusWidget(
+    super.controller,
+    super.propertyKey, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +31,9 @@ class _PropertyBorderRadiusWidget extends StatefulWidget {
 
 class __PropertyBorderRadiusWidgetState
     extends State<_PropertyBorderRadiusWidget> {
-  late final property =
-      widget.controller.getCurrentItem()?.properties[widget.propertyKey]!;
+  late final property = widget.controller
+      .getCurrentItem()
+      ?.properties[widget.propertyKey]!;
   final controllerRadius = TextEditingController();
   late CustomBorderRadiusEnum selected;
   @override
@@ -40,8 +44,9 @@ class __PropertyBorderRadiusWidgetState
       controllerRadius.text = property?.value?.radius.toString() ?? '0';
     }
     selected = CustomBorderRadiusEnum.values.firstWhere(
-        (e) => e.type.runtimeType == property?.value.runtimeType,
-        orElse: () => CustomBorderRadiusEnum.none);
+      (e) => e.type.runtimeType == property?.value.runtimeType,
+      orElse: () => CustomBorderRadiusEnum.none,
+    );
     super.initState();
   }
 
@@ -77,10 +82,8 @@ class __PropertyBorderRadiusWidgetState
           isExpanded: true,
           items: CustomBorderRadiusEnum.values
               .map<DropdownMenuItem<CustomBorderRadiusEnum>>(
-                  (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e.title),
-                      ))
+                (e) => DropdownMenuItem(value: e, child: Text(e.title)),
+              )
               .toList(),
           onChanged: (value) {
             if (value != null) {
@@ -106,8 +109,12 @@ class __PropertyBorderRadiusWidgetState
         property?.value = BorderRadiusTop(radius);
       case CustomBorderRadiusEnum.bottom:
         property?.value = BorderRadiusBottom(radius);
-     
     }
-    widget.controller.eventBus.emit(ChangeItem(id: const Uuid().v4(), itemId: widget.controller.layoutModel.curItem.id));
+    widget.controller.eventBus.emit(
+      ChangeItem(
+        id: const Uuid().v4(),
+        itemId: widget.controller.layoutModel.curItem.id,
+      ),
+    );
   }
 }

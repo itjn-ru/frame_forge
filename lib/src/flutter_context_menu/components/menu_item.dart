@@ -52,8 +52,11 @@ final class MenuItem<T> extends ContextMenuItem<T> {
   }) : super.submenu(items: items);
 
   @override
-  Widget builder(BuildContext context, ContextMenuState menuState,
-      [FocusNode? focusNode]) {
+  Widget builder(
+    BuildContext context,
+    ContextMenuState menuState, [
+    FocusNode? focusNode,
+  ]) {
     bool isFocused = menuState.focusedEntry == this;
 
     final background = context.colorScheme.surface;
@@ -82,11 +85,7 @@ final class MenuItem<T> extends ContextMenuItem<T> {
               children: [
                 SizedBox.square(
                   dimension: 32.0,
-                  child: Icon(
-                    icon,
-                    size: 16.0,
-                    color: foregroundColor,
-                  ),
+                  child: Icon(icon, size: 16.0, color: foregroundColor),
                 ),
                 const SizedBox(width: 4.0),
                 Expanded(
@@ -107,7 +106,7 @@ final class MenuItem<T> extends ContextMenuItem<T> {
                       color: foregroundColor,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),

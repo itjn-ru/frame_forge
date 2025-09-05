@@ -56,13 +56,12 @@ class _ExpandableWidgetContentState extends State<_ExpandableWidgetContent>
       vsync: this,
     );
 
-    _heightAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: widget.style.animationCurve,
-    ));
+    _heightAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: widget.style.animationCurve,
+      ),
+    );
 
     _stateSubscription = widget.controller.stateChanges.listen((isExpanded) {
       if (isExpanded) {
@@ -96,10 +95,7 @@ class _ExpandableWidgetContentState extends State<_ExpandableWidgetContent>
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildToggleButton(),
-        _buildContent(),
-      ],
+      children: [_buildToggleButton(), _buildContent()],
     );
   }
 
@@ -118,8 +114,10 @@ class _ExpandableWidgetContentState extends State<_ExpandableWidgetContent>
               child: Padding(
                 padding: widget.style.buttonPadding,
                 child: RotationTransition(
-                  turns:
-                      Tween(begin: 0.0, end: 0.5).animate(_animationController),
+                  turns: Tween(
+                    begin: 0.0,
+                    end: 0.5,
+                  ).animate(_animationController),
                   child: Icon(
                     Icons.expand_more,
                     color: widget.style.buttonIconColor,
@@ -138,18 +136,16 @@ class _ExpandableWidgetContentState extends State<_ExpandableWidgetContent>
       animation: _heightAnimation,
       builder: (context, child) {
         return ClipRect(
-          child: Align(
-            heightFactor: _heightAnimation.value,
-            child: child,
-          ),
+          child: Align(heightFactor: _heightAnimation.value, child: child),
         );
       },
       child: Container(
-          margin: EdgeInsets.only(top: widget.style.marginTop),
-          key: _contentKey,
-          padding: widget.style.contentPadding,
-          decoration: widget.style.contentDecoration,
-          child: widget.child),
+        margin: EdgeInsets.only(top: widget.style.marginTop),
+        key: _contentKey,
+        padding: widget.style.contentPadding,
+        decoration: widget.style.contentDecoration,
+        child: widget.child,
+      ),
     );
   }
 }

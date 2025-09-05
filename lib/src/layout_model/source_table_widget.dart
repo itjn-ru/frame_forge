@@ -7,8 +7,6 @@ class SourceTableWidget extends SourceWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-
-
     var columns = source.items.whereType<SourceTableColumn>();
 
     List<TableRow> tableRows = [];
@@ -16,18 +14,19 @@ class SourceTableWidget extends SourceWidget {
     for (var column in columns) {
       List<TableCell> tableCells = [];
 
+      var cellText = column['name'] ?? '';
 
-        var cellText = column['name'] ?? '';
-
-
-      tableCells.add(TableCell(
-        child: Text(cellText,
+      tableCells.add(
+        TableCell(
+          child: Text(
+            cellText,
             //style: TextStyle(
-              //fontSize: column["fontSize"],
-              //fontWeight: column["fontWeight"],
+            //fontSize: column["fontSize"],
+            //fontWeight: column["fontWeight"],
             //)
-                ),
-      ));
+          ),
+        ),
+      );
 
       tableRows.add(TableRow(children: tableCells));
     }

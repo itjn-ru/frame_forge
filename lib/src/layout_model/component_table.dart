@@ -49,5 +49,3 @@ class ComponentTableCell extends Item {
     properties["style"] = Property("стиль", Style.basic, type: Style);
   }
 }
-
-

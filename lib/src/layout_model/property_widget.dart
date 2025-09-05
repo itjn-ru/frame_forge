@@ -27,7 +27,9 @@ class PropertyWidget extends StatelessWidget {
   const PropertyWidget(this.controller, this.propertyKey, {super.key});
 
   factory PropertyWidget.create(
-      LayoutModelController controller, String propertyKey) {
+    LayoutModelController controller,
+    String propertyKey,
+  ) {
     switch (controller.getCurrentItem()?.properties[propertyKey]?.type) {
       case const (CustomBorderRadius):
         return PropertyBorderRadiusWidget(controller, propertyKey);
@@ -63,8 +65,10 @@ class PropertyWidget extends StatelessWidget {
     return InputTextProperty(
       controller,
       propertyKey,
-      key: ValueKey(controller.getCurrentItem()?.properties['id']?.value ??
-          const Uuid().v4()),
+      key: ValueKey(
+        controller.getCurrentItem()?.properties['id']?.value ??
+            const Uuid().v4(),
+      ),
     );
   }
 }
@@ -82,26 +86,25 @@ class _InputTextPropertyState extends State<InputTextProperty> {
   final txtController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-
   Property? get property =>
-    widget.controller.getCurrentItem()?.properties[widget.propertyKey];
+      widget.controller.getCurrentItem()?.properties[widget.propertyKey];
 
- @override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  final prop = property;
-  if (prop != null && prop.value != null) {
-    txtController.text = prop.value.toString();
-  } else {
-    txtController.text = '';
+    final prop = property;
+    if (prop != null && prop.value != null) {
+      txtController.text = prop.value.toString();
+    } else {
+      txtController.text = '';
+    }
+    // _focusNode.addListener(() {
+    //     if (!_focusNode.hasFocus) {
+    //       onChanged(); // Вызываем onChanged при потере фокуса
+    //     }
+    //   });
   }
-  // _focusNode.addListener(() {
-  //     if (!_focusNode.hasFocus) {
-  //       onChanged(); // Вызываем onChanged при потере фокуса
-  //     }
-  //   });
-}
 
   @override
   void dispose() {
@@ -117,9 +120,9 @@ void initState() {
         Expanded(
           child: TextField(
             controller: txtController,
-           onSubmitted: (_) => FocusScope.of(context).unfocus(),
-             onTapOutside: (_) => FocusScope.of(context).unfocus(),
-             onEditingComplete:() => FocusScope.of(context).unfocus(),
+            onSubmitted: (_) => FocusScope.of(context).unfocus(),
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            onEditingComplete: () => FocusScope.of(context).unfocus(),
             focusNode: _focusNode,
             onChanged: (value) {
               switch (property?.type) {
@@ -137,10 +140,9 @@ void initState() {
   }
 
   void onChanged() {
-    widget.controller.eventBus.emit(ChangeItem(
-      id: const Uuid().v4(),
-      itemId: widget.controller.selectedId,
-    ));
+    widget.controller.eventBus.emit(
+      ChangeItem(id: const Uuid().v4(), itemId: widget.controller.selectedId),
+    );
     setState(() {}); // перерисовать поле, если нужно
   }
 }

@@ -13,7 +13,7 @@ class FormSliderButtonMenu extends ComponentAndSourceMenu {
           controller.layoutModel.deleteItem(target);
           onChanged!(target);
         },
-      )
+      ),
     ];
   }
 }

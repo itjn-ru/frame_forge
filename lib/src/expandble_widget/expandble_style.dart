@@ -13,8 +13,8 @@ class ExpandableStyle {
 
   /// Отступ(расстояние) списка от заголовка
   final double marginTop;
-  
-final Widget? title;
+
+  final Widget? title;
   const ExpandableStyle({
     this.title = const Text('Развернуть'),
     this.animationDuration = const Duration(milliseconds: 300),
@@ -25,7 +25,7 @@ final Widget? title;
       fontSize: 16,
       fontWeight: FontWeight.w600,
     ),
-    this.marginTop=0.0,
+    this.marginTop = 0.0,
     this.buttonIconColor = Colors.black,
     this.buttonColor = Colors.transparent,
     this.buttonBorderRadius = BorderRadius.zero,

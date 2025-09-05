@@ -2,39 +2,59 @@ import 'package:flutter/material.dart';
 
 import 'layout_model_controller.dart';
 
-/// События используются для связи между [LayoutModelController] и виджетами редактора.
-/// События могут (где это применимо) содержать данные, которые будут использоваться виджетами для обновления их состояния.
-/// События можно использовать для запуска анимации или для обновления состояния виджетов.
-/// Виджеты могут обрабатывать события, чтобы предотвратить попадание события на родительские виджеты.
-/// Событие может быть отброшено с помощью флага [isHandled] для группировки перестроек виджетов.
-/// Между методами контроллера и событиями не существует однозначного соответствия,
-/// последние существуют только если есть данные, которые нужно передать,
-/// или перестроения, которые нужно запустить.
+/// Events system for communication between [LayoutModelController] and editor widgets.
+///
+/// Events can contain data that widgets use to update their state. They can trigger
+/// animations or state updates. Widgets can handle events to prevent propagation to
+/// parent widgets. Events can be discarded using the [isHandled] flag to group
+/// widget rebuilds. There's no one-to-one correspondence between controller methods
+/// and events - events exist only when there's data to pass or rebuilds to trigger.
 
-/// Базовый класс событий для [LayoutModelController].
+/// Base class for all layout model events.
+///
+/// All events in the Frame Forge system extend this class, providing common
+/// functionality like unique identification, handling state, and undo capability.
 @immutable
 abstract base class LayoutModelEvent {
+  /// Unique identifier for this event instance.
   final String id;
+
+  /// Whether this event has been handled and should not propagate further.
   final bool isHandled;
+
+  /// Whether this event represents an undoable operation.
   final bool isUndoable;
 
+  /// Creates a new layout model event with the specified [id].
+  ///
+  /// - [isHandled]: Whether the event is already handled (defaults to false)
+  /// - [isUndoable]: Whether the event can be undone (defaults to false)
   const LayoutModelEvent({
     required this.id,
     this.isHandled = false,
     this.isUndoable = false,
   });
 
+  /// Converts this event to a JSON representation using the provided [dataHandlers].
   Map<String, dynamic> toJson(Map<String, DataHandler> dataHandlers) => {
-        'id': id,
-        'isHandled': isHandled,
-        'isUndoable': isUndoable,
-      };
+    'id': id,
+    'isHandled': isHandled,
+    'isUndoable': isUndoable,
+  };
 }
 
+/// Event fired when the viewport offset changes.
+///
+/// This event is triggered when the user pans or programmatically scrolls
+/// the canvas viewport.
 final class ViewportOffsetEvent extends LayoutModelEvent {
+  /// The new viewport offset position.
   final Offset offset;
+
+  /// Whether the offset change should be animated.
   final bool animate;
 
+  /// Creates a new viewport offset event.
   const ViewportOffsetEvent(
     this.offset, {
     this.animate = true,
@@ -43,8 +63,15 @@ final class ViewportOffsetEvent extends LayoutModelEvent {
   });
 }
 
+/// Event fired when the viewport zoom level changes.
+///
+/// This event is triggered when the user zooms in/out or programmatically
+/// changes the canvas zoom level.
 final class ViewportZoomEvent extends LayoutModelEvent {
+  /// The new zoom level (1.0 = 100%).
   final double zoom;
+
+  /// Whether the zoom change should be animated.
   final bool animate;
 
   const ViewportZoomEvent(
@@ -74,10 +101,10 @@ final class DragSelectionStartEvent extends LayoutModelEvent {
 
   @override
   Map<String, dynamic> toJson(dataHandlers) => {
-        ...super.toJson(dataHandlers),
-        'nodeIds': nodeIds.toList(),
-        'position': [position.dx, position.dy],
-      };
+    ...super.toJson(dataHandlers),
+    'nodeIds': nodeIds.toList(),
+    'position': [position.dx, position.dy],
+  };
 
   factory DragSelectionStartEvent.fromJson(Map<String, dynamic> json) {
     return DragSelectionStartEvent(
@@ -102,10 +129,10 @@ final class DragSelectionEvent extends LayoutModelEvent {
 
   @override
   Map<String, dynamic> toJson(dataHandlers) => {
-        ...super.toJson(dataHandlers),
-        'nodeIds': nodeIds.toList(),
-        'delta': [delta.dx, delta.dy],
-      };
+    ...super.toJson(dataHandlers),
+    'nodeIds': nodeIds.toList(),
+    'delta': [delta.dx, delta.dy],
+  };
 
   factory DragSelectionEvent.fromJson(Map<String, dynamic> json) {
     return DragSelectionEvent(
@@ -130,10 +157,10 @@ final class DragSelectionEndEvent extends LayoutModelEvent {
 
   @override
   Map<String, dynamic> toJson(dataHandlers) => {
-        ...super.toJson(dataHandlers),
-        'position': [position.dx, position.dy],
-        'nodeIds': nodeIds.toList(),
-      };
+    ...super.toJson(dataHandlers),
+    'position': [position.dx, position.dy],
+    'nodeIds': nodeIds.toList(),
+  };
 
   factory DragSelectionEndEvent.fromJson(Map<String, dynamic> json) {
     return DragSelectionEndEvent(
@@ -146,26 +173,27 @@ final class DragSelectionEndEvent extends LayoutModelEvent {
 }
 
 final class SelectionEvent extends LayoutModelEvent {
-final String? itemId;
-  const SelectionEvent({required super.id,required this.itemId, super.isHandled});
+  final String? itemId;
+  const SelectionEvent({
+    required super.id,
+    required this.itemId,
+    super.isHandled,
+  });
 }
 
-
 /// Event fired when a new item is added to the layout.
-/// 
+///
 /// This event is undoable and can be used to trigger UI updates
 /// when components are added to the layout model.
 final class AddItemEvent extends LayoutModelEvent {
   /// Creates an [AddItemEvent] with the specified [id].
-  const AddItemEvent({
-    required super.id,
-    super.isHandled,
-  }) : super(isUndoable: true);
+  const AddItemEvent({required super.id, super.isHandled})
+    : super(isUndoable: true);
 }
 
 final class RemoveItemEvent extends LayoutModelEvent {
   const RemoveItemEvent({required super.id, super.isHandled})
-      : super(isUndoable: true);
+    : super(isUndoable: true);
 }
 
 final class PasteSelectionEvent extends LayoutModelEvent {
@@ -209,13 +237,13 @@ final class PanEnd extends LayoutModelEvent {
 }
 
 /// Event fired when an item in the layout is modified.
-/// 
+///
 /// Contains the [itemId] of the changed item to identify which
 /// component was modified. Used to trigger specific UI updates.
 final class ChangeItem extends LayoutModelEvent {
   /// The ID of the item that was changed.
   final String? itemId;
-  
+
   /// Creates a [ChangeItem] event for the specified [itemId].
   const ChangeItem({required super.id, required this.itemId});
 }

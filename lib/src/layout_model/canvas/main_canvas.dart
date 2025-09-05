@@ -228,7 +228,7 @@ late final ScreenSizeEnum screenSize;
   }
 
   void _onPanUpdate(Offset delta) {
-    final matrix = _transform.value.clone();
+    final Matrix4 matrix = _transform.value.clone();
     matrix.translate(delta.dx, delta.dy);
     if (delta.dy < 0) {
       Rect rect =

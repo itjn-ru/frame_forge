@@ -8,9 +8,10 @@ import 'file_picker_service.dart';
 class MobileFilePickerService implements FilePickerService {
   @override
   Future<Uint8List?> pickImageFile() async {
-    final FilePickerResult? result = await FilePicker.platform
-        .pickFiles(type: FileType.image);
-    
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
     if (result != null && result.files.isNotEmpty) {
       return result.files.first.bytes;
     }
@@ -18,7 +19,10 @@ class MobileFilePickerService implements FilePickerService {
   }
 
   @override
-  Future<void> saveFile({required String content, required String filename}) async {
+  Future<void> saveFile({
+    required String content,
+    required String filename,
+  }) async {
     // Basic file save for desktop platforms
     try {
       final file = File(filename);

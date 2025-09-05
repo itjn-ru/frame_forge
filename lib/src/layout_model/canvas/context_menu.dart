@@ -7,11 +7,11 @@ import '../../flutter_context_menu/core/utils/helpers.dart';
 bool isContextMenuVisible = false;
 
 void createAndShowContextMenu(
-    BuildContext context, {
-      required List<ContextMenuEntry> entries,
-      required Offset position,
-      Function(String? value)? onDismiss,
-    }) async {
+  BuildContext context, {
+  required List<ContextMenuEntry> entries,
+  required Offset position,
+  Function(String? value)? onDismiss,
+}) async {
   if (isContextMenuVisible) return;
 
   isContextMenuVisible = true;
@@ -23,11 +23,9 @@ void createAndShowContextMenu(
     padding: const EdgeInsets.all(8),
   );
 
-  final copiedValue = await showContextMenu(
-    context,
-    contextMenu: menu,
-
-  ).then((value) {
+  final copiedValue = await showContextMenu(context, contextMenu: menu).then((
+    value,
+  ) {
     isContextMenuVisible = false;
     return value;
   });

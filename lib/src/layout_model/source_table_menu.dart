@@ -24,8 +24,8 @@ class SourceTableMenu extends ComponentAndSourceMenu {
           onTap: () {
             controller.layoutModel.deleteItem(controller.layoutModel.curItem);
 
-//            controller.layoutModel.curPage.items.remove(controller.layoutModel.curItem);
-//            controller.layoutModel.curItem = controller.layoutModel.curPage;
+            //            controller.layoutModel.curPage.items.remove(controller.layoutModel.curItem);
+            //            controller.layoutModel.curItem = controller.layoutModel.curPage;
 
             onChanged!(controller.layoutModel.curItem);
           },
@@ -33,23 +33,26 @@ class SourceTableMenu extends ComponentAndSourceMenu {
       ];
     } else {
       switch (controller.layoutModel.curItem.runtimeType) {
-        case SourceTableColumn:
+        case SourceTableColumn _:
           return [
             PopupMenuItem(
-              onTap: controller.layoutModel.getComponentByItem(target)!.items
+              onTap:
+                  controller.layoutModel
+                          .getComponentByItem(target)!
+                          .items
                           .whereType<SourceTableColumn>()
                           .length >
                       1
                   ? () {
-                      controller.layoutModel.deleteItem(controller.layoutModel.curItem);
+                      controller.layoutModel.deleteItem(
+                        controller.layoutModel.curItem,
+                      );
                       onChanged!(controller.layoutModel.curItem);
                     }
                   : null,
               child: const Text("Удалить колонку"),
             ),
           ];
-
-
 
         default:
           return [];

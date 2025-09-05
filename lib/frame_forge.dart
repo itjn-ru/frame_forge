@@ -1,11 +1,11 @@
 /// A Flutter package for creating dynamic UI layouts with a visual editor.
-/// 
-/// Frame Forge provides tools to build and modify app interfaces using 
+///
+/// Frame Forge provides tools to build and modify app interfaces using
 /// drag-and-drop components without requiring code changes. Perfect for
 /// creating dynamic layouts that can be modified at runtime.
 ///
 /// ## Main Components
-/// 
+///
 /// - [LayoutModel] - Core model for managing UI components
 /// - [LayoutModelController] - Controller for handling layout operations
 /// - [ComponentWidget] - Base widget for rendering components
@@ -17,7 +17,7 @@
 /// final layoutModel = LayoutModel(
 ///   screenSizes: [ScreenSizeEnum.mobile, ScreenSizeEnum.desktop],
 /// );
-/// 
+///
 /// final controller = LayoutModelController(
 ///   layoutModel: layoutModel,
 ///   projectSaver: (map) async => true,

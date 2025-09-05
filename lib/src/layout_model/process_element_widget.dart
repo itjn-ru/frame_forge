@@ -16,9 +16,8 @@ class ProcessElementWidget extends ProcessWidget {
       //  color: column["color"],
       //),
       //alignment: column["alignment"],
-        child: Text(
-            cellText
-        ));
+      child: Text(cellText),
+    );
 
     /*var columns = source.items.whereType<SourceTableColumn>();
 

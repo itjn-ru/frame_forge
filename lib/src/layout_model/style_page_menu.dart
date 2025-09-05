@@ -9,7 +9,8 @@ class StylePageMenu extends ComponentAndSourceMenu {
 
   @override
   List<ContextMenuEntry> getContextMenu(
-      void Function(LayoutModelEvent event)? onChanged) {
+    void Function(LayoutModelEvent event)? onChanged,
+  ) {
     return [
       const MenuHeader(text: "Редактирование"),
 

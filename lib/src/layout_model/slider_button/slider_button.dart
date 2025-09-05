@@ -64,33 +64,42 @@ class _SliderButtonState extends State<SliderButton> {
       current: value,
       foregroundIndicatorIconBuilder:
           (BuildContext contex, DetailedGlobalToggleProperties<int?> global) {
-        double pos = global.position;
-        double transitionValue = pos - pos.floorToDouble();
-        final text = switcherText[pos.floor()];
-        return Stack(children: [
-          Opacity(
-            opacity: 1 - transitionValue,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: pos.floor()==1? goodColor : badColor,
-              ),
-              child: Center(
-                  child: Text(text, style: const TextStyle(color: Colors.white))),
-            ),
-          ),
-          Opacity(
-            opacity: transitionValue,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: pos.ceil()==1? goodColor : badColor,
-              ),
-              child: Center(
-                  child: Text(switcherText[pos.ceil()],
-                      style: const TextStyle(color: Colors.white))),
-            ),
-          )
-        ]);
-      },
+            double pos = global.position;
+            double transitionValue = pos - pos.floorToDouble();
+            final text = switcherText[pos.floor()];
+            return Stack(
+              children: [
+                Opacity(
+                  opacity: 1 - transitionValue,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: pos.floor() == 1 ? goodColor : badColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        text,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                Opacity(
+                  opacity: transitionValue,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: pos.ceil() == 1 ? goodColor : badColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        switcherText[pos.ceil()],
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
       style: ToggleStyle(
         backgroundColor: const Color(0xFF919191),
         // indicatorColor: indicatorColor,
@@ -113,33 +122,46 @@ class _SliderButtonState extends State<SliderButton> {
       spacing: 1.0,
       customSeparatorBuilder: (context, local, global) {
         return const VerticalDivider(
-            indent: 7.0,
-            endIndent: 7.0,
-            color: Colors.white38);
+          indent: 7.0,
+          endIndent: 7.0,
+          color: Colors.white38,
+        );
       },
       customIconBuilder: (context, local, global) {
         final text = switcherText[local.index];
         return local.index == 0
             ? DecoratedBox(
-          decoration: BoxDecoration(
-            color: firstTabBackgroundColor,
-          ),
-          child: Center(
-              child: Text(text,
-                  style: TextStyle(
-                      color: Color.lerp(Colors.white, Colors.white,
-                          local.animationValue)))),
-        )
+                decoration: BoxDecoration(color: firstTabBackgroundColor),
+                child: Center(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: Color.lerp(
+                        Colors.white,
+                        Colors.white,
+                        local.animationValue,
+                      ),
+                    ),
+                  ),
+                ),
+              )
             : Center(
-            child: Text(text,
-                style: TextStyle(
-                    color: Color.lerp(Colors.black, Colors.white,
-                        local.animationValue))));
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Color.lerp(
+                      Colors.black,
+                      Colors.white,
+                      local.animationValue,
+                    ),
+                  ),
+                ),
+              );
       },
       borderWidth: 1.0,
       onChanged: (i) {
         switch (i) {
-          case(0):
+          case (0):
             firstTabBackgroundColor = badColor;
             switcherText = widget.inactiveText!;
           case (1):

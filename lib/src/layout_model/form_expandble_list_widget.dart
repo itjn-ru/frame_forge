@@ -14,19 +14,17 @@ import 'controller/events.dart';
 import 'style_element.dart';
 
 class FormExpandbleListWidget extends ComponentWidget {
-  const FormExpandbleListWidget(
-      {required super.component, super.key});
+  const FormExpandbleListWidget({required super.component, super.key});
 
   @override
   Widget buildWidget(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final screenSize = ScreenSizeProvider.of(context);
-      final scale = screenSize.width / constraints.maxWidth;
-      return ExpandbleComponent(
-        component: component,
-        scale: scale,
-      );
-    });
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenSize = ScreenSizeProvider.of(context);
+        final scale = screenSize.width / constraints.maxWidth;
+        return ExpandbleComponent(component: component, scale: scale);
+      },
+    );
   }
 }
 
@@ -53,18 +51,20 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
   late final layoutModel = modelController.layoutModel;
   late var style =
       layoutModel.getStyleElementById(widget.component['style'].id) ??
-          StyleElement("стиль");
+      StyleElement("стиль");
   late final border = style['borderRadius'];
   late final items = List.generate(
-      widget.component.items.length - 1,
-      (index) => SizedBox(
-            height: widget.component.items[index + 1]['size'].height,
-            child: ComponentWidget(
-              component: widget.component.items[index + 1] as LayoutComponent,
-            ),
-          ));
+    widget.component.items.length - 1,
+    (index) => SizedBox(
+      height: widget.component.items[index + 1]['size'].height,
+      child: ComponentWidget(
+        component: widget.component.items[index + 1] as LayoutComponent,
+      ),
+    ),
+  );
   late final header = widget.component.items.whereType<ComponentGroup>().first;
-  late var headerStyle = layoutModel.getStyleElementById(header['style'].id) ??
+  late var headerStyle =
+      layoutModel.getStyleElementById(header['style'].id) ??
       StyleElement("стиль");
   late final TextStyle textStyle = TextStyle(
     color: style['color'],
@@ -85,16 +85,22 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
       if (expandedHeight != null && value && size.height != expandedHeight) {
         widget.component.properties['expandble']?.value = value;
         widget.component.properties['expandedSize']?.value = size;
-        widget.component.properties['size']?.value =
-            Size(size.width, expandedHeight!);
-        modelController.eventBus.emit(ChangeItem(id: const Uuid().v4(), itemId: layoutModel.curItem.id));
+        widget.component.properties['size']?.value = Size(
+          size.width,
+          expandedHeight!,
+        );
+        modelController.eventBus.emit(
+          ChangeItem(id: const Uuid().v4(), itemId: layoutModel.curItem.id),
+        );
       } else if (expandedHeight != null) {
         widget.component.properties['expandble']?.value = value;
         final collapsedSize =
             widget.component.properties['expandedSize']?.value;
         widget.component.properties['expandedSize']?.value = size;
         widget.component.properties['size']?.value = collapsedSize;
-        modelController.eventBus.emit(ChangeItem(id: const Uuid().v4(), itemId: layoutModel.curItem.id));
+        modelController.eventBus.emit(
+          ChangeItem(id: const Uuid().v4(), itemId: layoutModel.curItem.id),
+        );
       }
     });
     controller.heightChanges.listen((height) {
@@ -118,20 +124,18 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
           style: ExpandableStyle(
             marginTop: style['margin'][1],
             contentDecoration: BoxDecoration(
-                color: style['backgroundColor'],
-                borderRadius: border?.borderRadius(widget.scale)),
-            title: ComponentWidget.create(
-              header as LayoutComponent,
+              color: style['backgroundColor'],
+              borderRadius: border?.borderRadius(widget.scale),
             ),
+            title: ComponentWidget.create(header as LayoutComponent),
             buttonIconColor: headerStyle['color'],
-            buttonBorderRadius:
-                headerStyle['borderRadius']?.borderRadius(widget.scale),
+            buttonBorderRadius: headerStyle['borderRadius']?.borderRadius(
+              widget.scale,
+            ),
             buttonColor: style['backgroundColor'],
           ),
           controller: controller,
-          child: Column(
-            children: items,
-          ),
+          child: Column(children: items),
         ),
       ],
     );
