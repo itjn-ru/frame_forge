@@ -45,7 +45,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage>{
   ScreenSizeEnum screenSize = ScreenSizeEnum.mobile;
   final LayoutModel layoutModel = LayoutModel(
     screenSizes: [ScreenSizeEnum.mobile, ScreenSizeEnum.desktop],
