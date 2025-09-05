@@ -1,7 +1,8 @@
 name: frame_forge
 description: "A DSL Model with UI editor."
 version: 0.0.1
-homepage:
+homepage: http://itjn.ru
+repository: https://github.com/itjn-ru/layout_editor/tree/frame_forge
 
 environment:
   sdk: ^3.8.1
