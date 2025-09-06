@@ -39,10 +39,10 @@ class ComponentGroupWidget extends ComponentWidget {
           // key: ValueKey('${component['id']}'),
           decoration: BoxDecoration(
             border: Border(
-              top: topBorder.value,
-              bottom: bottomBorder.value,
-              left: leftBorder.value,
-              right: rightBorder.value,
+              top: topBorder.borderSide,
+              bottom: bottomBorder.borderSide,
+              left: leftBorder.borderSide,
+              right: rightBorder.borderSide,
             ),
             color: style['backgroundColor'],
             borderRadius: (() {

@@ -33,11 +33,7 @@ class StyleElement extends LayoutStyle {
       FontWeight.normal,
       type: FontWeight,
     );
-    properties['border'] = Property(
-      'граница',
-      CustomBorderStyle.init(),
-      type: CustomBorderStyle,
-    );
+
     properties['borderRadius'] = Property(
       'закругление',
       BorderRadiusNone.fromJson({'borderRadius': 'BorderRadiusNone'}),
@@ -50,5 +46,30 @@ class StyleElement extends LayoutStyle {
       0,
       0,
     ], type: CustomMargin);
+    properties["topBorder"] = Property(
+      "верхняя граница",
+      CustomBorderStyle.init(),
+      type: CustomBorderStyle,
+    );
+    properties["bottomBorder"] = Property(
+      "нижняя граница",
+      CustomBorderStyle.init(),
+      type: CustomBorderStyle,
+    );
+    properties["leftBorder"] = Property(
+      "левая граница",
+      CustomBorderStyle.init(),
+      type: CustomBorderStyle,
+    );
+    properties["rightBorder"] = Property(
+      "правая граница",
+      CustomBorderStyle.init(),
+      type: CustomBorderStyle,
+    );
+    properties["borderRadius"] = Property(
+      "радиус",
+      BorderRadiusNone,
+      type: CustomBorderRadius,
+    );
   }
 }
