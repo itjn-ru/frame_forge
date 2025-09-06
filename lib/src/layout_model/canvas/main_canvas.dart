@@ -27,7 +27,6 @@ class MainCanvas extends StatefulWidget {
 class _MainCanvasState extends State<MainCanvas> {
   List<Widget> templateWidgets = [];
   List<Item> items = [];
-  List<Widget> components = [];
   double wrappedWidth = 0;
   double wrappedHeight = 0;
   Offset position = const Offset(0, 0);
@@ -42,7 +41,7 @@ class _MainCanvasState extends State<MainCanvas> {
 
   /// The scale size for the viewport, used to zoom in and out.
   /// This is updated when the user interacts with the canvas.
-  double scaleSize = 1;
+  double scaleZoom = 1;
   double cellWidth = 20;
   double cellHeight = 20;
   bool onIteraction = false;
@@ -123,8 +122,8 @@ late final ScreenSizeEnum screenSize;
               _schedulePanEndEmit();
             },
             onInteractionEnd: (scaleEndDetails) {
-              scaleSize = _transform.value.getMaxScaleOnAxis();
-              controller.viewportZoom = scaleSize;
+              scaleZoom = _transform.value.getMaxScaleOnAxis();
+              controller.viewportZoom = scaleZoom;
               // Cancel any pending debounce and emit final PanEnd immediately
               _panDebounce?.cancel();
               controller.eventBus.emit(PanEnd(id: const Uuid().v4()));
@@ -151,7 +150,7 @@ late final ScreenSizeEnum screenSize;
                         final dx = (item["position"]?.dx ?? 0) * scaleFactor;
                         final dy = (item["position"]?.dy ?? 0) * scaleFactor;
                         final w = (item["size"]?.width ?? _canvasWidth) * scaleFactor;
-                        final h = (item["size"]?.height ?? 50) * scaleFactor;
+                        final h = (item["size"]?.height ?? 30) * scaleFactor;
 
                         final itemRect = Rect.fromLTWH(dx, dy, w, h);
                         if (!itemRect.overlaps(expandedViewport)) {
@@ -171,14 +170,14 @@ late final ScreenSizeEnum screenSize;
                                   key: ValueKey(item.id),
                                   position: Offset(dx, dy),
                                   initWidth: w == 0 ? _canvasWidth : w,
-                                  initHeight: h == 0 ? 50 : h,
+                                  initHeight: h == 0 ? 30 : h,
                                   cellWidth: cellWidth / 2,
                                   cellHeight: cellHeight / 2,
                                   canvasWidth: _canvasWidth,
                                   canvasHeight: _canvasHeight,
                                   bgColor: Colors.white,
                                   squareColor: Colors.blueAccent,
-                                  scaleConstraints: scaleFactor,
+                                  scaleFactor: scaleFactor,
                                   child: item,
                                   selected: selectedId == item.id,
                                 );
