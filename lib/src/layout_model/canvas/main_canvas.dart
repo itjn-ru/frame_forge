@@ -139,7 +139,7 @@ late final ScreenSizeEnum screenSize;
                 child: ValueListenableBuilder<Set<String?>>(
                     valueListenable: controller.changedItems,
                     builder: (context, updatedItemIds, _) {
-                      final curPage = layoutModel.getCurPage;
+                      final curPage = controller.getCurrentPage();
                       // Simple view culling: render only items that intersect the viewport
                       final expandedViewport = viewport.inflate(200);
                       final items = curPage.items;

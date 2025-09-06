@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import '../item.dart';
 import '../layout_model.dart';
+import '../page.dart';
 import 'file_picker/file_picker_service.dart';
 import 'file_picker/file_picker_factory.dart';
 import 'clipboard.dart';
@@ -121,6 +122,50 @@ class LayoutModelController {
   }
 
   Item? getCurrentItem() => getItemById(selectedId);
+
+  /// Returns the current page based on the current item and page type.
+  ComponentAndSourcePage getCurrentPage() {
+    final currentItem = getCurrentItem();
+    if (currentItem == null) {
+      return layoutModel.root.items
+          .whereType<ComponentAndSourcePage>()
+          .first; // Returns the first page by default
+    }
+
+    return _findParentPage(currentItem) ?? layoutModel.root.items
+        .whereType<ComponentAndSourcePage>()
+        .first; // Returns the first page by default
+  }
+
+  /// Finds the nearest parent page for the given item
+  ComponentAndSourcePage? _findParentPage(Item item) {
+    // Если сам item является Page, возвращаем его
+    if (item is ComponentAndSourcePage) {
+      return item;
+    }
+    
+    // Ищем родительскую страницу, обходя дерево элементов
+    ComponentAndSourcePage? searchInItems(List<Item> items, Item target) {
+      for (final currentItem in items) {
+        // Проверяем, есть ли target в дочерних элементах currentItem
+        if (currentItem.items.contains(target)) {
+          // Если currentItem является Page, возвращаем его
+          if (currentItem is ComponentAndSourcePage) {
+            return currentItem;
+          }
+          // Иначе продолжаем поиск вверх по дереву
+          return _findParentPage(currentItem);
+        }
+        
+        // Рекурсивно ищем в дочерних элементах
+        final found = searchInItems(currentItem.items, target);
+        if (found != null) return found;
+      }
+      return null;
+    }
+    
+    return searchInItems([layoutModel.root], item);
+  }
 
   /// This method is used to dispose of the node editor controller and all of its resources, subsystems and members.
   void dispose() {

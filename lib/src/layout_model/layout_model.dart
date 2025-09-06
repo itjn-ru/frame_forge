@@ -37,11 +37,6 @@ class LayoutModel with FromMapToMap {
   /// Defines which screen size configurations are supported by this model.
   final List<ScreenSizeEnum> screenSizes;
 
-  /// Gets the current page based on the current item
-  ///
-  /// Returns a [ComponentAndSourcePage] that contains the current item.
-  ComponentAndSourcePage get getCurPage => getPageByItem(curItem);
-
   /// The type of the currently active page
   ///
   /// Used to track which type of page is currently being viewed/edited.

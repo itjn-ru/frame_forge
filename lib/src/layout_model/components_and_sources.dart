@@ -26,7 +26,7 @@ class ComponentsAndSources extends StatelessWidget {
         child: Builder(
           builder: (context) {
             final ComponentAndSourcePage curPage =
-                controller.layoutModel.getCurPage;
+                controller.getCurrentPage();
             if (curPage is StylePage) {
               return Column(
                 children: List.generate(
