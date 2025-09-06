@@ -49,7 +49,7 @@ class ComponentWidget extends StatelessWidget {
       case const (FormRadio):
         return ComponentRadioWidget(component: component);
       case const (ComponentGroup):
-        return ComponentGroupWidget(component: component);
+        return ComponentGroupWidget(component: component, scaleFactor: scaleFactor,);
       case const (ComponentText):
         return ComponentTextWidget(component: component, scaleFactor: scaleFactor);
       case const (ComponentTable):
