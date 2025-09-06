@@ -26,6 +26,18 @@ class ComponentTextWidget extends ComponentWidget {
         layoutModel.getStyleElementById(component['style'].id) ??
         StyleElement("стиль");
     final border = style['borderRadius'];
+    final alignment = component['alignment'];
+    
+    // Преобразуем Alignment в TextAlign
+    TextAlign getTextAlign(dynamic alignment) {
+      if (alignment is Alignment) {
+        if (alignment.x < -0.5) return TextAlign.left;
+        if (alignment.x > 0.5) return TextAlign.right;
+        return TextAlign.center;
+      }
+      return TextAlign.left; // default
+    }
+    
     final TextStyle textStyle = TextStyle(
       color: style['color'],
       fontSize: style['fontSize'],
@@ -46,8 +58,8 @@ class ComponentTextWidget extends ComponentWidget {
             padding[2] / scale,
             padding[3] / scale,
           ),
-          alignment: component['alignment'],
-          child: Text(text, style: textStyle),
+          alignment: alignment,
+          child: Text(text, style: textStyle, textAlign: getTextAlign(alignment)),
         );
       },
     );
