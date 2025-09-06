@@ -112,7 +112,7 @@ class GroupCanvas extends StatelessWidget {
                     canvasHeight: component['size'].height / scale,
                     bgColor: const Color(0x33FFFFFF),
                     squareColor: Colors.blueAccent,
-                    scaleConstraints: 1 / scale,
+                    scaleFactor: 1 / scale,
                     child: item,
                     selected: selectedId == item.id,
                   );

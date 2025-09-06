@@ -58,7 +58,7 @@ class CustomBorderStyle {
   CustomBorderSide side;
 
   /// Converts to Flutter's BorderSide for rendering
-  BorderSide get value =>
+  BorderSide get borderSide =>
       BorderSide(width: width, color: color, style: side.borderStyle);
 
   static CustomBorderStyle basic = CustomBorderStyle(

@@ -7,7 +7,7 @@ import '../component_widget.dart';
 import '../controller/events.dart';
 import '../item.dart';
 
-// Направления изменения размера
+/// Directions for resizing
 enum ResizeDirection {
   none,
   top,
@@ -20,8 +20,8 @@ enum ResizeDirection {
   bottomRight,
 }
 
-///Возвращает изменяемый виджет
-
+/// A widget that allows its child to be resized and dragged within a canvas.
+/// It provides visual cues for resizing and handles user interactions.
 class ResizableDraggableWidget extends StatefulWidget {
   const ResizableDraggableWidget({
     super.key,
@@ -30,28 +30,40 @@ class ResizableDraggableWidget extends StatefulWidget {
     this.child,
     this.bgColor,
     this.squareColor,
-    // this.changed,
     required this.canvasWidth,
     required this.canvasHeight,
-    required this.scaleConstraints,
+    required this.scaleFactor,
     this.cellWidth = 10.0,
     this.cellHeight = 10.0,
     required this.position,
     required this.selected,
   });
 
-  ///Начальня ширина, по умолчанию ширина canvas
+  /// width at start, default 360
   final double? initWidth;
 
-  ///Начальная высота, по умолчанию 60
+  /// height at start, default 60
   final double? initHeight;
-  final double scaleConstraints;
+
+  /// scale of canvas constraints to real size
+  final double scaleFactor;
+
+  /// width of each cell in the grid
   final double cellWidth;
+
+  /// height of each cell in the grid
   final double cellHeight;
+
+  /// initial position of the widget
   final Offset position;
+
+  /// The child widget to be made resizable and draggable.
   final Item? child;
+
+  /// If true, shows a square handle for resizing.
   final Color? squareColor;
 
+  /// Background color of the widget.
   final Color? bgColor;
 
   //final Function(double width, double height, Offset transformOffset)? changed;
@@ -73,9 +85,9 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
   double trLastH = 0;
   double trLastW = 0;
 
-  bool _isResizing = false; // Флаг для отслеживания процесса изменения размера
+  bool _isResizing = false; // Flag to track the resizing process
 
-  // Накопители для медленного изменения размера
+  // Accumulators for slow resize changes
   double _accumulatedDx = 0.0;
   double _accumulatedDy = 0.0;
 
@@ -95,22 +107,22 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     trW = (trW / 5.0).round() * 5.0;
     trH = (trH / 5.0).round() * 5.0;
 
-    // Получаем реальные размеры из компонента
+    // Get real sizes from the component
     final item = widget.child;
     final componentSize = item?.properties["size"]?.value as Size?;
     final componentWidth = componentSize?.width ?? 360.0;
     final componentHeight = componentSize?.height ?? 30.0;
 
-    // Инициализируем динамические размеры с учетом scale
-    _dynamicH = componentHeight * widget.scaleConstraints;
-    _dynamicW = componentWidth * widget.scaleConstraints;
+    // Initialize dynamic sizes with scale factor
+    _dynamicH = componentHeight * widget.scaleFactor;
+    _dynamicW = componentWidth * widget.scaleFactor;
 
-    // Отладочная информация
+    // Debug information
     debugPrint('Component size: $componentWidth x $componentHeight');
-    debugPrint('Scale constraints: ${widget.scaleConstraints}');
+    debugPrint('Scale constraints: ${widget.scaleFactor}');
     debugPrint('Dynamic size: $_dynamicW x $_dynamicH');
 
-    _child = ComponentWidget.create(widget.child as LayoutComponent);
+    _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
     _bgColor = widget.bgColor == null ? Colors.amber : widget.bgColor!;
     super.initState();
 
@@ -121,18 +133,18 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
   void didUpdateWidget(ResizableDraggableWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Проверяем, не изменились ли размеры компонента извне
-    // НО НЕ ОБНОВЛЯЕМ размеры если мы сейчас в процессе изменения размера
+    // Check if component sizes changed externally
+    // BUT DO NOT UPDATE sizes if we are currently resizing
     if (!_isResizing) {
       final item = widget.child;
       final componentSize = item?.properties["size"]?.value as Size?;
       final componentWidth = componentSize?.width ?? 360.0;
       final componentHeight = componentSize?.height ?? 30.0;
 
-      final newDynamicW = componentWidth * widget.scaleConstraints;
-      final newDynamicH = componentHeight * widget.scaleConstraints;
+      final newDynamicW = componentWidth * widget.scaleFactor;
+      final newDynamicH = componentHeight * widget.scaleFactor;
 
-      // Увеличиваем порог для предотвращения мелких обновлений
+      // Increase threshold to prevent minor updates
       if ((_dynamicW - newDynamicW).abs() > 5.0 ||
           (_dynamicH - newDynamicH).abs() > 5.0) {
         debugPrint(
@@ -150,18 +162,18 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       debugPrint('Skipping external size check - currently resizing');
     }
 
-    // Обновляем child, если он изменился
+    // Update child if it changed
     if (oldWidget.child != widget.child) {
-      _child = ComponentWidget.create(widget.child as LayoutComponent);
+      _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
     }
   }
 
-  // Переменные для отслеживания областей изменения размера
+  // Variables for tracking resize areas
   static const double _resizeEdgeWidth =
-      15.0; // Увеличиваем область захвата края
+      15.0; // Increase the edge capture area
   ResizeDirection _currentResizeDirection = ResizeDirection.none;
 
-  // Определяет направление изменения размера на основе позиции курсора
+  // Determines resize direction based on cursor position
   ResizeDirection _getResizeDirection(Offset localPosition) {
     if (!widget.selected) return ResizeDirection.none;
 
@@ -170,10 +182,10 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     final double x = localPosition.dx;
     final double y = localPosition.dy;
 
-    // Убираем избыточные логи для производительности
+    // Remove excessive logs for performance
     // debugPrint('_getResizeDirection: pos($x, $y), size($width x $height), edge: $_resizeEdgeWidth');
 
-    // Проверяем углы (с приоритетом)
+    // Check corners (with priority)
     if (x <= _resizeEdgeWidth && y <= _resizeEdgeWidth) {
       return ResizeDirection.topLeft;
     } else if (x >= width - _resizeEdgeWidth && y <= _resizeEdgeWidth) {
@@ -184,7 +196,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
         y >= height - _resizeEdgeWidth) {
       return ResizeDirection.bottomRight;
     }
-    // Проверяем края
+    // Check edges
     else if (y <= _resizeEdgeWidth) {
       return ResizeDirection.top;
     } else if (y >= height - _resizeEdgeWidth) {
@@ -198,7 +210,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     return ResizeDirection.none;
   }
 
-  // Возвращает соответствующий курсор для направления изменения размера
+  // Returns appropriate cursor for resize direction
   SystemMouseCursor _getCursorForDirection(ResizeDirection direction) {
     switch (direction) {
       case ResizeDirection.top:
@@ -226,7 +238,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
           setState(() {
             _currentResizeDirection = direction;
           });
-          // Убираем избыточные логи - оставляем только для отладки при необходимости
+          // Remove excessive logs - keep only for debugging when necessary
           // debugPrint('Hover direction changed to: $direction');
         }
       },
@@ -272,7 +284,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Отладочная информация о текущих размерах при каждом рендеринге
+    // Debug information about current sizes on each render
     if (widget.selected) {
       debugPrint(
         'Building widget with size: $_dynamicW x $_dynamicH, position: ${trW + updateMoveOffset.dx} x ${trH + updateMoveOffset.dy}',
@@ -310,7 +322,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             if (_currentResizeDirection != ResizeDirection.none) {
               _isResizing = true;
               _accumulatedDx =
-                  0.0; // Сбрасываем накопители при начале изменения размера
+                  0.0; // Reset accumulators at the start of resizing
               _accumulatedDy = 0.0;
               debugPrint(
                 'Start resizing in direction: $_currentResizeDirection',
@@ -338,13 +350,13 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
                   'Resize completed. Final size: $_dynamicW x $_dynamicH',
                 );
 
-                // Финальное обновление свойств компонента с привязкой к сетке
+                // Final component property update with grid snapping
                 final finalSize = Size(
-                  ((_dynamicW / widget.scaleConstraints) / 5.0).round() * 5.0,
-                  ((_dynamicH / widget.scaleConstraints) / 5.0).round() * 5.0,
+                  ((_dynamicW / widget.scaleFactor) / 5.0).round() * 5.0,
+                  ((_dynamicH / widget.scaleFactor) / 5.0).round() * 5.0,
                 );
 
-                // Принудительно обновляем свойства компонента
+                // Force update component properties
                 if (widget.child?.properties["size"] != null) {
                   widget.child?.properties["size"]?.value = finalSize;
                   controller.updateProperty(
@@ -355,26 +367,26 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
                 debugPrint('Final component size set to: $finalSize');
 
-                // Принудительно обновляем состояние после завершения изменения размера
+                // Force state update after resize completion
                 setState(() {
-                  // Убеждаемся, что размеры соответствуют новым значениям
+                  // Ensure sizes match new values
                   final newComponentSize =
                       widget.child?.properties["size"]?.value as Size?;
                   if (newComponentSize != null) {
                     final expectedDynamicW =
-                        newComponentSize.width * widget.scaleConstraints;
+                        newComponentSize.width * widget.scaleFactor;
                     final expectedDynamicH =
-                        newComponentSize.height * widget.scaleConstraints;
+                        newComponentSize.height * widget.scaleFactor;
                     debugPrint(
                       'Expected dynamic size based on component: $expectedDynamicW x $expectedDynamicH',
                     );
-                    // Синхронизируем динамические размеры с компонентом
+                    // Synchronize dynamic sizes with component
                     _dynamicW = expectedDynamicW;
                     _dynamicH = expectedDynamicH;
                   }
                 });
 
-                // Сбрасываем флаг изменения размера ПОСЛЕ всех обновлений
+                // Reset resize flag AFTER all updates
                 _isResizing = false;
                 _currentResizeDirection = ResizeDirection.none;
               } else {
@@ -391,17 +403,17 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
   void onChanged(double width, double height, Offset transformOffset) {
     final offset = Offset(
-      ((transformOffset.dx / widget.scaleConstraints) / 5.0).round() * 5.0,
-      ((transformOffset.dy / widget.scaleConstraints) / 5.0).round() * 5.0,
+      ((transformOffset.dx / widget.scaleFactor) / 5.0).round() * 5.0,
+      ((transformOffset.dy / widget.scaleFactor) / 5.0).round() * 5.0,
     );
 
-    // Привязка к сетке кратно 5 пикселям для размеров
+    // Grid snapping to multiples of 5 pixels for sizes
     final size = Size(
-      ((width / widget.scaleConstraints) / 5.0).round() * 5.0,
-      ((height / widget.scaleConstraints) / 5.0).round() * 5.0,
+      ((width / widget.scaleFactor) / 5.0).round() * 5.0,
+      ((height / widget.scaleFactor) / 5.0).round() * 5.0,
     );
 
-    // Обновляем свойства компонента
+    // Update component properties
     if (widget.child?.properties["position"] != null) {
       widget.child?.properties["position"]?.value = offset;
     }
@@ -410,7 +422,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       widget.child?.properties["size"]?.value = size;
     }
 
-    // Уведомляем контроллер об изменениях
+    // Notify controller about changes
     controller.updateProperty(
       "position",
       Property("положение", offset, type: Offset),
@@ -418,7 +430,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     controller.updateProperty("size", Property("размер", size, type: Size));
 
     debugPrint(
-      'onChanged: new size: $size, new position: $offset, scale: ${widget.scaleConstraints}, dynamic size: $width x $height',
+      'onChanged: new size: $size, new position: $offset, scale: ${widget.scaleFactor}, dynamic size: $width x $height',
     );
   }
 
@@ -426,12 +438,12 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     var intervalOffset =
         details.localPosition - startMoveOffset + endMoveOffset;
 
-    // Ограничение по вертикали
+    // Vertical constraint
     if (intervalOffset.dy < -trLastH) {
       intervalOffset = Offset(intervalOffset.dx, -trLastH);
     }
 
-    // Привязка к сетке кратно 5 пикселям
+    // Grid snapping to multiples of 5 pixels
     final snappedOffset = Offset(
       (intervalOffset.dx / 5.0).round() * 5.0,
       (intervalOffset.dy / 5.0).round() * 5.0,
@@ -448,11 +460,11 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       '_handleResize: direction=$_currentResizeDirection, delta=${details.delta}, current size: $_dynamicW x $_dynamicH',
     );
 
-    // Накапливаем дельту для обработки медленных движений
+    // Accumulate delta for handling slow movements
     _accumulatedDx += details.delta.dx;
     _accumulatedDy += details.delta.dy;
 
-    // Применяем изменения только когда накопленная дельта достигает порога (например, 5 пикселей)
+    // Apply changes only when accumulated delta reaches threshold (e.g., 5 pixels)
     double dx = 0.0;
     double dy = 0.0;
 
@@ -466,7 +478,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       _accumulatedDy -= dy;
     }
 
-    // Если нет значимых изменений, выходим
+    // If no significant changes, exit
     if (dx == 0.0 && dy == 0.0) {
       return;
     }
@@ -476,7 +488,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     final oldTrW = trW;
     final oldTrH = trH;
 
-    // Сначала вычисляем новые размеры без привязки к сетке
+    // First calculate new sizes without grid snapping
     double newDynamicW = _dynamicW;
     double newDynamicH = _dynamicH;
     double newTrW = trW;
@@ -488,10 +500,10 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
         debugPrint('Right resize: $oldW -> $newDynamicW (delta: $dx)');
         break;
       case ResizeDirection.left:
-        // При тяжении левого края вправо: уменьшаем размер, увеличиваем отступ
-        // При тяжении левого края влево: увеличиваем размер, уменьшаем отступ
+        // When dragging left edge right: decrease size, increase offset
+        // When dragging left edge left: increase size, decrease offset
         newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
-        newTrW = trW + dx; // Сдвигаем позицию на величину изменения
+        newTrW = trW + dx; // Move position by the change amount
         debugPrint(
           'Left resize: $oldW -> $newDynamicW, trW: $oldTrW -> $newTrW (delta: $dx)',
         );
@@ -503,12 +515,12 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
         debugPrint('Bottom resize: $oldH -> $newDynamicH (delta: $dy)');
         break;
       case ResizeDirection.top:
-        // При тяжении верхнего края вниз: уменьшаем размер, увеличиваем отступ
-        // При тяжении верхнего края вверх: увеличиваем размер, уменьшаем отступ
+        // When dragging top edge down: decrease size, increase offset
+        // When dragging top edge up: increase size, decrease offset
         newDynamicH = (_dynamicH - dy)
             .clamp(20, widget.canvasHeight)
             .toDouble();
-        newTrH = trH + dy; // Сдвигаем позицию на величину изменения
+        newTrH = trH + dy; // Move position by the change amount
         debugPrint(
           'Top resize: $oldH -> $newDynamicH, trH: $oldTrH -> $newTrH (delta: $dy)',
         );
@@ -554,20 +566,30 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
         );
         break;
       case ResizeDirection.none:
-        return; // Не делаем ничего, если нет направления
+        return; // Do nothing if no direction
     }
 
-    // Применяем изменения и обновляем состояние
+    // Apply changes and update state
     setState(() {
       _dynamicW = newDynamicW;
       _dynamicH = newDynamicH;
       trW = newTrW;
       trH = newTrH;
 
-      // Размеры уже кратны 5, так как dx и dy уже округлены
+      // Update component sizes in real time during resize
+      if (widget.child?.properties["size"] != null) {
+        final newComponentSize = Size(
+          newDynamicW / widget.scaleFactor,
+          newDynamicH / widget.scaleFactor,
+        );
+        widget.child?.properties["size"]?.value = newComponentSize;
+        
+        // Recreate child with new sizes
+        _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
+      }
     });
 
-    // Обновляем свойства компонента и уведомляем контроллер
+    // Update component properties and notify controller
     onChanged(_dynamicW, _dynamicH, updateMoveOffset + Offset(trW, trH));
   }
 }

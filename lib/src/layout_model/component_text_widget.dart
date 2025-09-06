@@ -8,11 +8,15 @@ import 'style_element.dart';
 /// A widget that displays text with styles defined in a StyleElement.
 /// It uses ComponentDecorationWidget to apply decorations like borders, background color, and padding.
 class ComponentTextWidget extends ComponentWidget {
-  const ComponentTextWidget({required super.component, super.key});
+  final double scaleFactor;
+  const ComponentTextWidget({
+    required this.scaleFactor,
+    required super.component,
+    super.key,
+  });
 
   @override
   Widget buildWidget(BuildContext context) {
-    final screenSize = ScreenSizeProvider.of(context);
     String text = component["text"];
     final controller = LayoutModelControllerProvider.of(context);
     final layoutModel = controller.layoutModel;
@@ -31,29 +35,25 @@ class ComponentTextWidget extends ComponentWidget {
       return TextAlign.left; // default
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final scale = constraints.maxWidth / screenSize.width;
-        final TextStyle textStyle = TextStyle(
-          color: style['color'],
-          fontSize: style['fontSize'] * scale,
-          fontWeight: style['fontWeight'],
-        );
-        return ComponentDecorationWidget(
-          component: component,
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  text,
-                  style: textStyle,
-                  textAlign: getTextAlign(alignment),
-                ),
-              ),
-            ],
+    final TextStyle textStyle = TextStyle(
+      color: style['color'],
+      fontSize: style['fontSize'] * scaleFactor,
+      fontWeight: style['fontWeight'],
+    );
+    return ComponentDecorationWidget(
+      component: component,
+      scaleFactor: scaleFactor,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              text,
+              style: textStyle,
+              textAlign: getTextAlign(alignment),
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

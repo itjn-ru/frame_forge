@@ -11,6 +11,8 @@ import 'form_hidden_field.dart';
 import 'form_image.dart';
 import 'form_image_widget.dart';
 import 'form_radio.dart';
+import 'form_slider_button.dart';
+import 'form_slider_button_widget.dart';
 import 'form_text_field.dart';
 import 'component_group.dart';
 import 'component_group_widget.dart';
@@ -40,7 +42,7 @@ class ComponentWidget extends StatelessWidget {
   ///
   /// Automatically selects the correct widget implementation based on
   /// the component's runtime type (FormRadio, ComponentGroup, etc.).
-  factory ComponentWidget.create(LayoutComponent component) {
+  factory ComponentWidget.create(LayoutComponent component,{ required double scaleFactor }) {
     switch (component.runtimeType) {
       case const (FormHiddenField):
         return FormHiddenFieldWidget(component: component);
@@ -49,7 +51,7 @@ class ComponentWidget extends StatelessWidget {
       case const (ComponentGroup):
         return ComponentGroupWidget(component: component);
       case const (ComponentText):
-        return ComponentTextWidget(component: component);
+        return ComponentTextWidget(component: component, scaleFactor: scaleFactor);
       case const (ComponentTable):
         return ComponentTableWidget(component: component);
       case const (FormTextField):
@@ -59,7 +61,9 @@ class ComponentWidget extends StatelessWidget {
       case const (FormCheckbox):
         return FormCheckboxWidget(component: component);
       case const (FormExpandbleList):
-        return FormExpandbleListWidget(component: component);
+        return FormExpandbleListWidget(component: component, scaleFactor: scaleFactor,);
+        case const (FormSliderButton):
+          return FormSliderButtonWidget(component: component);
       default:
         return ComponentWidget(component: component);
     }
