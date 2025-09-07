@@ -63,7 +63,7 @@ class ComponentWidget extends StatelessWidget {
       case const (FormExpandbleList):
         return FormExpandbleListWidget(component: component, scaleFactor: scaleFactor,);
         case const (FormSliderButton):
-          return FormSliderButtonWidget(component: component);
+          return FormSliderButtonWidget(component: component, scaleFactor: scaleFactor,);
       default:
         return ComponentWidget(component: component);
     }

@@ -33,6 +33,7 @@ mixin FromMapToMap {
     final map = {};
 
     item.properties.forEach((key, property) {
+      try{
       map[key] = switch (property.type) {
         const (String) => property.value,
         const (CustomMargin) => property.value.join(','),
@@ -62,6 +63,9 @@ mixin FromMapToMap {
         const (Alignment) => {'x': property.value.x, 'y': property.value.y},
         _ => property.value.toString(),
       };
+      } catch(e) {
+       debugPrint('Error serializing property $key: $e');
+      }
     });
 
     return map;
@@ -218,6 +222,21 @@ mixin FromMapToMap {
         'color' => Property(
           'цвет',
           Color(int.tryParse(value.toString(), radix: 16) ?? 0),
+          type: Color,
+        ),
+        'activeColor' => Property(
+          'activeColor',
+          Color(int.tryParse(value.toString(), radix: 16) ?? 1),
+          type: Color,
+        ),
+        'activeColor' => Property(
+          'activeColor',
+          Color(int.tryParse(value.toString(), radix: 16) ?? 1),
+          type: Color,
+        ),
+        'thumbColor' => Property(
+          'thumbColor',
+          Color(int.tryParse(value.toString(), radix: 16) ?? 1),
           type: Color,
         ),
         'backgroundColor' => Property(
