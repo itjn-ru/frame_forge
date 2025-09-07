@@ -5,7 +5,14 @@
 
 ## Description
 
-A Flutter package for creating dynamic UI layouts with a visual editor.
+This package provides a visual editor for designing and rendering user interfaces.
+Its core concept is using XML as the structure definition for UI. Originally built for documents and structured data, it is well suited for applications following the BDUI (Backend-Driven UI) architecture.
+
+Features:
+📌 XML markup defines UI components and their properties.
+📌 UI designer to visually compose UI and export it as XML.
+📌 Dynamic rendering — the interface is generated from server-provided data without updating the client app.
+📌 Ideal for applications where the UI changes frequently and must be controlled by the server.
 
 ## Motivation
 

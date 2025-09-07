@@ -1,13 +1,23 @@
 # Changelog
 
-## [1.0.2] - 2025-09-05
+## [1.0.2] - 2025-09-08
 ### Documentation
-- Enhanced API documentation coverage with comprehensive dartdoc comments
-- Improved public API documentation for better pub.dev compliance
-- Added detailed class descriptions and parameter documentation
+- fix switch between ComponentPage
+- fix textAlignt in ComponentText
+- add to Style "BorderSide" (LTRB)
+- fix view of TextComponent
+- add a decoration widget as a wrapper for components and implement it in ComponentTextWidget, ComponentGroup, SliderButton
+- add attributes for SliderButton: activeColor, inactiveColor, thumbColor
+- fix resize and move events to register in controller only on end
+- enhanced API documentation coverage with comprehensive dartdoc comments
+- canvas rendering optimization
+- add to controller: move/moveById/resize/resizeById methods and sealed ChangeItem with ChangeEvent, MoveEvent, ResizeEvent, AttributeChangeEvent. Move business logic out of UI.
+- refactor new event type of properties, add reusable textfield like size, offset, padding, marging, border, borderRadius and InputTextPropertyWidget 
+- add compatibility for border radius values from older versions
+- improved public API documentation for better pub.dev compliance
+- added detailed class descriptions and parameter documentation
 
 ### Technical
-- Fixed vector_math dependency constraint to be more flexible
 - Code formatting improvements across all files
 
 ## [1.0.1] - 2025-09-05

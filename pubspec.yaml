@@ -1,5 +1,5 @@
 name: frame_forge
-description: "A Flutter package for creating dynamic UI layouts with a visual editor. Build and modify app interfaces using drag-and-drop components without code changes."
+description: "A visual editor (Figma-like) for creating and rendering interfaces based on XML. Designed for BDUI (Backend-Driven UI) applications where the UI is generated from server data."
 version: 1.0.2
 repository: https://github.com/itjn-ru/frame_forge
 
