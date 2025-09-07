@@ -9,7 +9,7 @@ import 'property_widget.dart';
 /// Handles left (dx) and top (dy) offsets
 class PropertyOffsetWidget extends PropertyWidget {
   const PropertyOffsetWidget(super.controller, super.propertyKey, {super.key});
-  
+
   void _emitChange() {
     controller.eventBus.emit(
       AttributeChangeEvent(

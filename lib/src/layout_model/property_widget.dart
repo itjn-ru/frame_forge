@@ -26,7 +26,7 @@ import 'property_border_style_widget.dart';
 class PropertyWidget extends StatelessWidget {
   final String propertyKey;
   final LayoutModelController controller;
-  
+
   const PropertyWidget(this.controller, this.propertyKey, {super.key});
 
   /// Factory method for creating appropriate property widgets based on type
@@ -36,9 +36,11 @@ class PropertyWidget extends StatelessWidget {
   ) {
     switch (controller.getCurrentItem()?.properties[propertyKey]?.type) {
       case const (CustomBorderRadius):
-        return PropertyBorderRadiusWidget(controller, propertyKey) as PropertyWidget;
+        return PropertyBorderRadiusWidget(controller, propertyKey)
+            as PropertyWidget;
       case const (CustomBorderStyle):
-        return PropertyBorderStyleWidget(controller, propertyKey) as PropertyWidget;
+        return PropertyBorderStyleWidget(controller, propertyKey)
+            as PropertyWidget;
       case const (Offset):
         return PropertyOffsetWidget(controller, propertyKey) as PropertyWidget;
       case const (CustomMargin):
@@ -50,11 +52,13 @@ class PropertyWidget extends StatelessWidget {
       case const (Color):
         return PropertyColorWidget(controller, propertyKey) as PropertyWidget;
       case const (Alignment):
-        return PropertyAlignmentWidget(controller, propertyKey) as PropertyWidget;
+        return PropertyAlignmentWidget(controller, propertyKey)
+            as PropertyWidget;
       case const (Style):
         return PropertyStyleWidget(controller, propertyKey) as PropertyWidget;
       case const (FontWeight):
-        return PropertyFontWeightWidget(controller, propertyKey) as PropertyWidget;
+        return PropertyFontWeightWidget(controller, propertyKey)
+            as PropertyWidget;
       case const (UuidValue):
         return PropertyUuidWidget(controller, propertyKey) as PropertyWidget;
       case const (Uint8List):
@@ -72,15 +76,21 @@ class PropertyWidget extends StatelessWidget {
 
 /// Default text input property widget for unhandled types
 class InputTextPropertyWidget extends PropertyWidget {
-  
-  const InputTextPropertyWidget(super.controller, super.propertyKey, {super.key});
+  const InputTextPropertyWidget(
+    super.controller,
+    super.propertyKey, {
+    super.key,
+  });
 
   Property? get property =>
       controller.getCurrentItem()?.properties[propertyKey];
 
   void _emitChange() {
     controller.eventBus.emit(
-      AttributeChangeEvent(id: const Uuid().v4(), itemId: controller.selectedId),
+      AttributeChangeEvent(
+        id: const Uuid().v4(),
+        itemId: controller.selectedId,
+      ),
     );
   }
 

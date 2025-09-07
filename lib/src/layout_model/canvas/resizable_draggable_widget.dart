@@ -1,4 +1,3 @@
-
 import 'layout_model_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -147,12 +146,11 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     }
 
     // Update child if it changed
-  // Child rebuild handled in build via factory to reflect property changes
+    // Child rebuild handled in build via factory to reflect property changes
   }
 
   // Variables for tracking resize areas
-  static const double _resizeEdgeWidth =
-      15.0; // Increase the edge capture area
+  static const double _resizeEdgeWidth = 15.0; // Increase the edge capture area
   ResizeDirection _currentResizeDirection = ResizeDirection.none;
 
   // Determines resize direction based on cursor position
@@ -239,7 +237,10 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
-            ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor),
+            ComponentWidget.create(
+              widget.child as LayoutComponent,
+              scaleFactor: widget.scaleFactor,
+            ),
             if (widget.selected)
               Positioned(
                 right: 10,
@@ -308,22 +309,23 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             if (widget.selected) {
               if (_isResizing) {
                 // Final size in model coordinates with grid snapping
-                final finalSizeModel = _logic!
-                    .snapFinalSize(_dynamicW, _dynamicH);
-
-                // Apply to controller (emits ChangeItem and updates properties)
-                controller.resize(
-                  widget.child!,
-                  finalSizeModel,
-                  snap: false,
+                final finalSizeModel = _logic!.snapFinalSize(
+                  _dynamicW,
+                  _dynamicH,
                 );
 
+                // Apply to controller (emits ChangeItem and updates properties)
+                controller.resize(widget.child!, finalSizeModel, snap: false);
+
                 // If resizing from left/top edges, position may change too
-                final snappedModelPos = _logic!
-                    .snapFinalPosition(updateMoveOffset, trW, trH);
+                final snappedModelPos = _logic!.snapFinalPosition(
+                  updateMoveOffset,
+                  trW,
+                  trH,
+                );
                 final currentModelPos =
                     (widget.child?.properties["position"]?.value as Offset?) ??
-                        Offset.zero;
+                    Offset.zero;
                 final deltaPos = snappedModelPos - currentModelPos;
                 if (deltaPos.dx != 0 || deltaPos.dy != 0) {
                   controller.move(widget.child!, deltaPos, snap: false);
@@ -350,21 +352,20 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
               } else {
                 // Final position in model coordinates with grid snapping
                 endMoveOffset = updateMoveOffset;
-                final snappedModelPos = _logic!
-                    .snapFinalPosition(updateMoveOffset, trW, trH);
+                final snappedModelPos = _logic!.snapFinalPosition(
+                  updateMoveOffset,
+                  trW,
+                  trH,
+                );
 
                 // Compute delta in model space from current property
                 final currentModelPos =
                     (widget.child?.properties["position"]?.value as Offset?) ??
-                        Offset.zero;
+                    Offset.zero;
                 final delta = snappedModelPos - currentModelPos;
 
                 // Apply to controller (emits ChangeItem and updates properties)
-                controller.move(
-                  widget.child!,
-                  delta,
-                  snap: false,
-                );
+                controller.move(widget.child!, delta, snap: false);
 
                 // Update local state to the snapped scaled position
                 setState(() {
@@ -425,7 +426,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       return;
     }
 
-
     // Compute new sizes/translation using logic helper
     final outcome = _logic!.computeResize(
       direction: _currentResizeDirection,
@@ -447,13 +447,13 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       // Update component sizes in real time during resize
       if (widget.child?.properties["size"] != null) {
         final newComponentSize = Size(
-      outcome.dynamicW / widget.scaleFactor,
-      outcome.dynamicH / widget.scaleFactor,
+          outcome.dynamicW / widget.scaleFactor,
+          outcome.dynamicH / widget.scaleFactor,
         );
         widget.child?.properties["size"]?.value = newComponentSize;
-        
+
         // Recreate child with new sizes
-  // child is rebuilt in build
+        // child is rebuilt in build
       }
     });
 

@@ -27,8 +27,9 @@ class PropertyBorderRadiusWidget extends PropertyWidget {
   @override
   Widget build(BuildContext context) {
     final property = controller.getCurrentItem()?.properties[propertyKey]!;
-    final CustomBorderRadiusEnum selected =
-        CustomBorderRadiusEnum.fromModel(property?.value);
+    final CustomBorderRadiusEnum selected = CustomBorderRadiusEnum.fromModel(
+      property?.value,
+    );
 
     double currentRadius = 0;
     final val = property?.value;

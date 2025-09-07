@@ -251,19 +251,32 @@ final class ChangeItem extends ChangeEvent {
 final class MoveEvent extends ChangeEvent {
   final Offset delta;
   final Offset newPosition;
-  const MoveEvent({required super.id, required super.itemId, required this.delta, required this.newPosition});
+  const MoveEvent({
+    required super.id,
+    required super.itemId,
+    required this.delta,
+    required this.newPosition,
+  });
 }
 
 /// Emitted when an item is resized in model coordinates
 final class ResizeEvent extends ChangeEvent {
   final Size newSize;
-  const ResizeEvent({required super.id, required super.itemId, required this.newSize});
+  const ResizeEvent({
+    required super.id,
+    required super.itemId,
+    required this.newSize,
+  });
 }
 
 /// Emitted when item's attributes (non-geometry) change
 final class AttributeChangeEvent extends ChangeEvent {
   final Map<String, dynamic> changes;
-  const AttributeChangeEvent({required super.id, required super.itemId, this.changes = const {}});
+  const AttributeChangeEvent({
+    required super.id,
+    required super.itemId,
+    this.changes = const {},
+  });
 }
 
 /// Класс, позволяющий задавать логику сериализации и десериализации

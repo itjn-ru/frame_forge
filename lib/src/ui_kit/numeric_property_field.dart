@@ -19,8 +19,6 @@ class NumericPropertyTextField extends PropertyTextField {
   }) : super(keyboardType: TextInputType.number);
 }
 
-
-
 /// Виджет для ввода пары значений (например, координат, размеров)
 class DualPropertyTextField extends StatelessWidget {
   final String firstLabel;
@@ -59,7 +57,7 @@ class DualPropertyTextField extends StatelessWidget {
         Text("$firstLabel: "),
         Expanded(
           child: NumericPropertyTextField(
-           defaultValue: firstValue,
+            defaultValue: firstValue,
             onChanged: onFirstChanged,
             onSubmitted: onSubmitted,
             onTapOutside: onTapOutside,

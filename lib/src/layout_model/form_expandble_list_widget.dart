@@ -6,7 +6,6 @@ import 'package:uuid/uuid.dart';
 import '../expandble_widget/expandble_widget_content.dart';
 import '../expandble_widget/expandble_widget_controller.dart';
 import 'canvas/layout_model_provider.dart';
-import 'canvas/screensize_provider.dart';
 import 'component.dart';
 import 'component_group.dart';
 import 'component_widget.dart';
@@ -15,8 +14,11 @@ import 'style_element.dart';
 
 class FormExpandbleListWidget extends ComponentWidget {
   final double scaleFactor;
-  const FormExpandbleListWidget({required super.component,
-  required this.scaleFactor, super.key});
+  const FormExpandbleListWidget({
+    required super.component,
+    required this.scaleFactor,
+    super.key,
+  });
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -123,7 +125,10 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
               color: style['backgroundColor'],
               borderRadius: border?.borderRadius(widget.scale),
             ),
-            title: ComponentWidget.create(header as LayoutComponent, scaleFactor: widget.scale,),
+            title: ComponentWidget.create(
+              header as LayoutComponent,
+              scaleFactor: widget.scale,
+            ),
             buttonIconColor: headerStyle['color'],
             buttonBorderRadius: headerStyle['borderRadius']?.borderRadius(
               widget.scale,

@@ -45,7 +45,7 @@ sealed class CustomBorderRadius {
         return BorderRadiusBottom.fromJson(json);
       default:
         return BorderRadiusNone.fromJson({});
-        // throw Exception('Unknown class: $discriminator');
+      // throw Exception('Unknown class: $discriminator');
     }
   }
   static Map<String, dynamic> toJson(CustomBorderRadius obj) {

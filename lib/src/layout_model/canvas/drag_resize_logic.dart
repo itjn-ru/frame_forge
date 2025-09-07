@@ -47,7 +47,10 @@ class DragResizeLogic {
 
   /// Snap absolute final position to grid (in unscaled canvas units).
   Offset snapFinalPosition(Offset updateMoveOffset, double trW, double trH) {
-    final finalPosition = Offset(updateMoveOffset.dx + trW, updateMoveOffset.dy + trH);
+    final finalPosition = Offset(
+      updateMoveOffset.dx + trW,
+      updateMoveOffset.dy + trH,
+    );
     return Offset(
       ((finalPosition.dx / scaleFactor) / gridStep).round() * gridStep,
       ((finalPosition.dy / scaleFactor) / gridStep).round() * gridStep,

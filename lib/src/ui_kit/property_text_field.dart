@@ -37,10 +37,10 @@ class PropertyTextField extends StatefulWidget {
 }
 
 class _PropertyTextFieldState extends State<PropertyTextField> {
-final TextEditingController controller = TextEditingController();
-final FocusNode focusNode = FocusNode();
+  final TextEditingController controller = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
-@override
+  @override
   void initState() {
     controller.text = widget.defaultValue;
     // Configuring Tab handling
@@ -71,7 +71,7 @@ final FocusNode focusNode = FocusNode();
     super.initState();
   }
 
-@override
+  @override
   void didUpdateWidget(covariant PropertyTextField oldWidget) {
     if (oldWidget.defaultValue != widget.defaultValue) {
       controller.text = widget.defaultValue;
@@ -85,7 +85,7 @@ final FocusNode focusNode = FocusNode();
     super.didUpdateWidget(oldWidget);
   }
 
-@override
+  @override
   void dispose() {
     controller.dispose();
     focusNode.dispose();
@@ -94,22 +94,29 @@ final FocusNode focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
-    
-
     return TextField(
       controller: controller,
       focusNode: focusNode,
       enabled: widget.enabled,
       keyboardType: widget.keyboardType,
-      decoration: widget.decoration ?? InputDecoration(
-        hintText: widget.hintText,
-        labelText: widget.labelText,
-        border: const UnderlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      ),
+      decoration:
+          widget.decoration ??
+          InputDecoration(
+            hintText: widget.hintText,
+            labelText: widget.labelText,
+            border: const UnderlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 8,
+            ),
+          ),
       onChanged: widget.onChanged,
-      onSubmitted: widget.onSubmitted != null ? (_) => widget.onSubmitted!() : null,
-      onTapOutside: widget.onTapOutside != null ? (_) => widget.onTapOutside!() : null,
+      onSubmitted: widget.onSubmitted != null
+          ? (_) => widget.onSubmitted!()
+          : null,
+      onTapOutside: widget.onTapOutside != null
+          ? (_) => widget.onTapOutside!()
+          : null,
     );
   }
 }

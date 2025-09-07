@@ -4,7 +4,11 @@ import 'component_widget.dart';
 
 class FormSliderButtonWidget extends ComponentWidget {
   final double scaleFactor;
-  const FormSliderButtonWidget({required super.component, required this.scaleFactor, super.key}); 
+  const FormSliderButtonWidget({
+    required super.component,
+    required this.scaleFactor,
+    super.key,
+  });
 
   @override
   Widget buildWidget(BuildContext context) {

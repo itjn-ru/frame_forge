@@ -5,19 +5,19 @@ import 'canvas/context_menu.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that displays process items in a hierarchical tree view
-/// 
+///
 /// This widget renders process definitions and workflows as an interactive
 /// tree structure, allowing users to navigate and manage business logic
 /// processes within the layout model.
 class ProcessItems extends StatefulWidget {
   /// The root process item to display
   final Item _item;
-  
+
   /// The controller managing the layout model state
   final LayoutModelController controller;
 
   /// Creates a ProcessItems widget
-  /// 
+  ///
   /// [_item] The root process item to display in the tree
   /// [controller] The layout model controller
   const ProcessItems(this._item, this.controller, {super.key});

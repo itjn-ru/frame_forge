@@ -116,7 +116,6 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
         }
         if (curPageType is ComponentPage) {
           widget.controller.layoutModel.curComponentItem = item;
-          
         }
         // widget.controller.layoutModel.curItem = item;
         // setState(() {

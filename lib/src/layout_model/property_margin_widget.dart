@@ -26,8 +26,8 @@ class PropertyMarginWidget extends PropertyWidget {
     final List<int> values = List<int>.from(
       (property?.value is List)
           ? (property!.value as List)
-              .map((e) => int.tryParse(e.toString()) ?? 0)
-              .toList()
+                .map((e) => int.tryParse(e.toString()) ?? 0)
+                .toList()
           : const [0, 0, 0, 0],
     );
 

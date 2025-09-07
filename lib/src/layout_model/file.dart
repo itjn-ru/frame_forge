@@ -7,12 +7,12 @@ import 'package:xml/xml.dart';
 import 'item.dart';
 
 /// Saves a layout model map to XML format
-/// 
+///
 /// Converts the layout model's map representation into a well-formatted
 /// XML string that can be saved to a file or transmitted over a network.
-/// 
+///
 /// [root] The layout model map to convert to XML
-/// 
+///
 /// Returns a formatted XML string representation of the layout model.
 String saveMap(Map root) {
   final builder = XmlBuilder();
@@ -31,7 +31,7 @@ String saveMap(Map root) {
 }
 
 /// Saves properties section to XML builder
-/// 
+///
 /// [builder] The XML builder to append properties to
 /// [properties] The properties map to serialize
 _saveMapProperties(XmlBuilder builder, Map properties) {
@@ -58,7 +58,7 @@ _saveMapProperties(XmlBuilder builder, Map properties) {
 }
 
 /// Saves items section to XML builder
-/// 
+///
 /// [builder] The XML builder to append items to
 /// [items] The items list to serialize
 _saveMapItems(XmlBuilder builder, List items) {
@@ -79,12 +79,12 @@ _saveMapItems(XmlBuilder builder, List items) {
 }
 
 /// Reads a layout model from XML format
-/// 
+///
 /// Parses an XML string representation of a layout model and converts
 /// it back into the internal map format used by the layout system.
-/// 
+///
 /// [layout] The XML string to parse
-/// 
+///
 /// Returns a map representation of the layout model.
 Map<String, dynamic> readMap(String layout) {
   final xml = XmlDocument.parse(layout);
@@ -98,9 +98,9 @@ Map<String, dynamic> readMap(String layout) {
 }
 
 /// Reads properties section from XML element
-/// 
+///
 /// [xmlProperties] The XML element containing properties to parse
-/// 
+///
 /// Returns a map of property names to their values.
 Map _readMapProperties(XmlElement? xmlProperties) {
   final Map properties = {};

@@ -33,38 +33,38 @@ mixin FromMapToMap {
     final map = {};
 
     item.properties.forEach((key, property) {
-      try{
-      map[key] = switch (property.type) {
-        const (String) => property.value,
-        const (CustomMargin) => property.value.join(','),
-        const (List<int>) => property.value.join(','),
-        const (CustomBorderRadius) => property.value.toJson(),
-        const (ScreenSizeEnum) => property.value.index,
-        const (Uint8List) => base64.encode(property.value),
-        const (CustomBorderStyle) => property.value.toMap(),
-        const (Offset) => {
-          'left': property.value.dx.toString(),
-          'top': property.value.dy.toString(),
-        },
-        const (Size) => {
-          'width': property.value.width.toString(),
-          'height': property.value.height.toString(),
-        },
-        const (Color) => property.value.value.toRadixString(16).toUpperCase(),
-        const (Style) => {
-          'id': property.value.id.toString(),
-          'name': property.value.name.toString(),
-        },
-        const (FontWeight) => property.value.value.toString(),
-        const (TextStyle) => {
-          'fontSize': property.value.fontSize,
-          'fontWeight': property.value.fontWeight.value,
-        },
-        const (Alignment) => {'x': property.value.x, 'y': property.value.y},
-        _ => property.value.toString(),
-      };
-      } catch(e) {
-       debugPrint('Error serializing property $key: $e');
+      try {
+        map[key] = switch (property.type) {
+          const (String) => property.value,
+          const (CustomMargin) => property.value.join(','),
+          const (List<int>) => property.value.join(','),
+          const (CustomBorderRadius) => property.value.toJson(),
+          const (ScreenSizeEnum) => property.value.index,
+          const (Uint8List) => base64.encode(property.value),
+          const (CustomBorderStyle) => property.value.toMap(),
+          const (Offset) => {
+            'left': property.value.dx.toString(),
+            'top': property.value.dy.toString(),
+          },
+          const (Size) => {
+            'width': property.value.width.toString(),
+            'height': property.value.height.toString(),
+          },
+          const (Color) => property.value.value.toRadixString(16).toUpperCase(),
+          const (Style) => {
+            'id': property.value.id.toString(),
+            'name': property.value.name.toString(),
+          },
+          const (FontWeight) => property.value.value.toString(),
+          const (TextStyle) => {
+            'fontSize': property.value.fontSize,
+            'fontWeight': property.value.fontWeight.value,
+          },
+          const (Alignment) => {'x': property.value.x, 'y': property.value.y},
+          _ => property.value.toString(),
+        };
+      } catch (e) {
+        debugPrint('Error serializing property $key: $e');
       }
     });
 
@@ -229,8 +229,8 @@ mixin FromMapToMap {
           Color(int.tryParse(value.toString(), radix: 16) ?? 1),
           type: Color,
         ),
-        'activeColor' => Property(
-          'activeColor',
+        'inactiveColor' => Property(
+          'inactiveColor',
           Color(int.tryParse(value.toString(), radix: 16) ?? 1),
           type: Color,
         ),
@@ -258,7 +258,7 @@ mixin FromMapToMap {
               100 => FontWeight.w100,
               200 => FontWeight.w200,
               300 => FontWeight.w300,
-              4400 => FontWeight.w300,
+              400 => FontWeight.w400,
               500 => FontWeight.w500,
               600 => FontWeight.w600,
               700 => FontWeight.w700,
