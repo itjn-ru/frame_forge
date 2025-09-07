@@ -275,7 +275,7 @@ class _ItemUpdateScope extends StatelessWidget {
     // если это просто был ChangeItem, но не относящийся к этому item
     final last = controller.lastEvent;
 
-    final isIsolated = last is ChangeItem;
+    final isIsolated = (last is ChangeItem && last.itemId != itemId);
     return isIsolated ? RepaintBoundary(child: child) : child;
   }
 }
