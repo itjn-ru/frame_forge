@@ -92,7 +92,7 @@ class LayoutModelController {
     eventBus.events.listen((event) {
       lastEvent = event;
       debugPrint('Got event: $event');
-      if (event is ChangeItem) {
+      if (event is ChangeEvent) {
         changedItems.value = {...changedItems.value, event.itemId};
       }
     });
@@ -133,9 +133,10 @@ class LayoutModelController {
           .first; // Returns the first page by default
     }
 
-    return _findParentPage(currentItem) ?? layoutModel.root.items
-        .whereType<ComponentAndSourcePage>()
-        .first; // Returns the first page by default
+    return _findParentPage(currentItem) ??
+        layoutModel.root.items
+            .whereType<ComponentAndSourcePage>()
+            .first; // Returns the first page by default
   }
 
   /// Finds the nearest parent page for the given item
@@ -144,7 +145,7 @@ class LayoutModelController {
     if (item is ComponentAndSourcePage) {
       return item;
     }
-    
+
     // Ищем родительскую страницу, обходя дерево элементов
     ComponentAndSourcePage? searchInItems(List<Item> items, Item target) {
       for (final currentItem in items) {
@@ -157,14 +158,14 @@ class LayoutModelController {
           // Иначе продолжаем поиск вверх по дереву
           return _findParentPage(currentItem);
         }
-        
+
         // Рекурсивно ищем в дочерних элементах
         final found = searchInItems(currentItem.items, target);
         if (found != null) return found;
       }
       return null;
     }
-    
+
     return searchInItems([layoutModel.root], item);
   }
 
@@ -217,5 +218,83 @@ class LayoutModelController {
   /// Picks an image file and returns the bytes
   Future<Uint8List?> pickUploadFiles() async {
     return await filePickerService.pickImageFile();
+  }
+
+  // --- Трансформации ---
+  double _snapToGrid(double value, {double step = 5.0}) =>
+      (value / step).round() * step;
+
+  /// Сдвинуть элемент на delta (в координатах модели, без scale).
+  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
+  void move(
+    Item element,
+    Offset delta, {
+    bool snap = false,
+    double step = 5.0,
+  }) {
+    final current =
+        (element.properties["position"]?.value as Offset?) ?? Offset.zero;
+    var next = current + delta;
+    if (snap) {
+      next = Offset(
+        _snapToGrid(next.dx, step: step),
+        _snapToGrid(next.dy, step: step),
+      );
+    }
+
+    element.properties["position"]?.value = next;
+    updateProperty("position", Property("положение", next, type: Offset));
+    final id = const Uuid().v4();
+    eventBus.emit(ChangeItem(id: id, itemId: element.id));
+    eventBus.emit(
+      MoveEvent(id: id, itemId: element.id, delta: delta, newPosition: next),
+    );
+  }
+
+  /// Сдвинуть элемент по id.
+  void moveById(
+    String? itemId,
+    Offset delta, {
+    bool snap = false,
+    double step = 5.0,
+  }) {
+    final item = getItemById(itemId);
+    if (item == null) return;
+    move(item, delta, snap: snap, step: step);
+  }
+
+  /// Задать новый размер (в координатах модели, без scale).
+  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
+  void resize(
+    Item element,
+    Size newSize, {
+    bool snap = false,
+    double step = 5.0,
+  }) {
+    var size = newSize;
+    if (snap) {
+      size = Size(
+        _snapToGrid(newSize.width, step: step),
+        _snapToGrid(newSize.height, step: step),
+      );
+    }
+
+    element.properties["size"]?.value = size;
+    updateProperty("size", Property("размер", size, type: Size));
+    final id = const Uuid().v4();
+    eventBus.emit(ChangeItem(id: id, itemId: element.id));
+    eventBus.emit(ResizeEvent(id: id, itemId: element.id, newSize: size));
+  }
+
+  /// Задать новый размер по id.
+  void resizeById(
+    String? itemId,
+    Size newSize, {
+    bool snap = false,
+    double step = 5.0,
+  }) {
+    final item = getItemById(itemId);
+    if (item == null) return;
+    resize(item, newSize, snap: snap, step: step);
   }
 }

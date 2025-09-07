@@ -15,10 +15,7 @@ import 'resizable_draggable_widget.dart';
 
 class MainCanvas extends StatefulWidget {
   final BoxConstraints constraints;
-  const MainCanvas({
-    super.key,
-    required this.constraints,
-  });
+  const MainCanvas({super.key, required this.constraints});
 
   @override
   State<MainCanvas> createState() => _MainCanvasState();
@@ -51,8 +48,8 @@ class _MainCanvasState extends State<MainCanvas> {
   bool changed = false;
   late BoxConstraints oldConstraints;
   late final LayoutModelController controller;
-  
-late final ScreenSizeEnum screenSize;
+
+  late final ScreenSizeEnum screenSize;
   // Debounce timer to avoid emitting PanEnd on every interaction update
   Timer? _panDebounce;
   // Simple debug mode flag. Set to true for overlay with diagnostics.
@@ -70,7 +67,7 @@ late final ScreenSizeEnum screenSize;
   void didChangeDependencies() {
     super.didChangeDependencies();
     controller = LayoutModelControllerProvider.of(context);
-    screenSize=ScreenSizeProvider.of(context);
+    screenSize = ScreenSizeProvider.of(context);
     layoutModel = controller.layoutModel;
     _recalculateScale();
   }
@@ -97,8 +94,8 @@ late final ScreenSizeEnum screenSize;
 
   @override
   void dispose() {
-  _transform.dispose();
-  _panDebounce?.cancel();
+    _transform.dispose();
+    _panDebounce?.cancel();
     super.dispose();
   }
 
@@ -113,115 +110,132 @@ late final ScreenSizeEnum screenSize;
         color: Colors.grey.shade50,
         margin: const EdgeInsets.all(10),
         child: InteractiveViewer.builder(
-            panEnabled: true,
-            transformationController: _transform,
-            onInteractionStart: (details) {},
-            onInteractionUpdate: (details) {
-              _onPanUpdate(details.focalPointDelta);
-              // Debounce emitting PanEnd to avoid spamming event bus on each frame
-              _schedulePanEndEmit();
-            },
-            onInteractionEnd: (scaleEndDetails) {
-              scaleZoom = _transform.value.getMaxScaleOnAxis();
-              controller.viewportZoom = scaleZoom;
-              // Cancel any pending debounce and emit final PanEnd immediately
-              _panDebounce?.cancel();
-              controller.eventBus.emit(PanEnd(id: const Uuid().v4()));
-            },
-            minScale: 1,
-            maxScale: 8,
-            builder: (BuildContext context, quad) {
-              return SizedBox.fromSize(
-                key: ValueKey('${_canvasWidth}_${_canvasHeight}'),
-                // key: UniqueKey(),
-                size: viewport.size,
-                child: ValueListenableBuilder<Set<String?>>(
-                    valueListenable: controller.changedItems,
-                    builder: (context, updatedItemIds, _) {
-                      final curPage = controller.getCurrentPage();
-                      // Simple view culling: render only items that intersect the viewport
-                      final expandedViewport = viewport.inflate(200);
-                      final items = curPage.items;
-                      final visibleWidgets = <Widget>[];
-                      _renderedItemCount = 0;
+          panEnabled: true,
+          transformationController: _transform,
+          onInteractionStart: (details) {},
+          onInteractionUpdate: (details) {
+            _onPanUpdate(details.focalPointDelta);
+            // Debounce emitting PanEnd to avoid spamming event bus on each frame
+            _schedulePanEndEmit();
+          },
+          onInteractionEnd: (scaleEndDetails) {
+            scaleZoom = _transform.value.getMaxScaleOnAxis();
+            controller.viewportZoom = scaleZoom;
+            // Cancel any pending debounce and emit final PanEnd immediately
+            _panDebounce?.cancel();
+            controller.eventBus.emit(PanEnd(id: const Uuid().v4()));
+          },
+          minScale: 1,
+          maxScale: 8,
+          builder: (BuildContext context, quad) {
+            return SizedBox.fromSize(
+              key: ValueKey('${_canvasWidth}_${_canvasHeight}'),
+              // key: UniqueKey(),
+              size: viewport.size,
+              child: ValueListenableBuilder<Set<String?>>(
+                valueListenable: controller.changedItems,
+                builder: (context, updatedItemIds, _) {
+                  final curPage = controller.getCurrentPage();
+                  // Simple view culling: render only items that intersect the viewport
+                  final expandedViewport = viewport.inflate(200);
+                  final items = curPage.items;
+                  final visibleWidgets = <Widget>[];
+                  _renderedItemCount = 0;
 
-                      for (var i = 0; i < items.length; i++) {
-                        final item = items[i];
-                        final dx = (item["position"]?.dx ?? 0) * scaleFactor;
-                        final dy = (item["position"]?.dy ?? 0) * scaleFactor;
-                        final w = (item["size"]?.width ?? _canvasWidth) * scaleFactor;
-                        final h = (item["size"]?.height ?? 30) * scaleFactor;
+                  for (var i = 0; i < items.length; i++) {
+                    final item = items[i];
+                    final dx = (item["position"]?.dx ?? 0) * scaleFactor;
+                    final dy = (item["position"]?.dy ?? 0) * scaleFactor;
+                    final w =
+                        (item["size"]?.width ?? _canvasWidth) * scaleFactor;
+                    final h = (item["size"]?.height ?? 30) * scaleFactor;
 
-                        final itemRect = Rect.fromLTWH(dx, dy, w, h);
-                        if (!itemRect.overlaps(expandedViewport)) {
-                          // Skip rendering this item (outside of viewport)
-                          continue;
-                        }
+                    final itemRect = Rect.fromLTWH(dx, dy, w, h);
+                    if (!itemRect.overlaps(expandedViewport)) {
+                      // Skip rendering this item (outside of viewport)
+                      continue;
+                    }
 
-                        _renderedItemCount++;
+                    _renderedItemCount++;
 
-                        visibleWidgets.add(_ItemUpdateScope(
-                          itemId: item.id,
-                          updatedItemIds: updatedItemIds,
-                          child: ValueListenableBuilder<String?>(
-                              valueListenable: controller.selectedIdNotifier,
-                              builder: (context, selectedId, _) {
-                                return ResizableDraggableWidget(
-                                  key: ValueKey(item.id),
-                                  position: Offset(dx, dy),
-                                  initWidth: w == 0 ? _canvasWidth : w,
-                                  initHeight: h == 0 ? 30 : h,
-                                  cellWidth: cellWidth / 2,
-                                  cellHeight: cellHeight / 2,
-                                  canvasWidth: _canvasWidth,
-                                  canvasHeight: _canvasHeight,
-                                  bgColor: Colors.white,
-                                  squareColor: Colors.blueAccent,
-                                  scaleFactor: scaleFactor,
-                                  child: item,
-                                  selected: selectedId == item.id,
-                                );
-                              }),
-                        ));
-                      }
-
-                      return Stack(children: [
-                        Positioned.fill(
-                          child: GridBackgroundBuilder(
-                            quad: quad,
-                            cellHeight: cellHeight,
-                            cellWidth: cellWidth,
-                            canvasWidth: _canvasWidth,
-                          ),
+                    visibleWidgets.add(
+                      _ItemUpdateScope(
+                        itemId: item.id,
+                        updatedItemIds: updatedItemIds,
+                        child: ValueListenableBuilder<String?>(
+                          valueListenable: controller.selectedIdNotifier,
+                          builder: (context, selectedId, _) {
+                            return ResizableDraggableWidget(
+                              key: ValueKey(item.id),
+                              position: Offset(dx, dy),
+                              initWidth: w == 0 ? _canvasWidth : w,
+                              initHeight: h == 0 ? 30 : h,
+                              cellWidth: cellWidth / 2,
+                              cellHeight: cellHeight / 2,
+                              canvasWidth: _canvasWidth,
+                              canvasHeight: _canvasHeight,
+                              bgColor: Colors.white,
+                              squareColor: Colors.blueAccent,
+                              scaleFactor: scaleFactor,
+                              child: item,
+                              selected: selectedId == item.id,
+                            );
+                          },
                         ),
-                        ...visibleWidgets,
-                        // Debug overlay
-                        if (debugMode)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              color: Colors.black.withAlpha(160),
-                              child: DefaultTextStyle(
-                                style: const TextStyle(color: Colors.white, fontSize: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('scaleFactor: ${scaleFactor.toStringAsFixed(2)}'),
-                                    Text('viewport: ${viewport.width.toStringAsFixed(0)}x${viewport.height.toStringAsFixed(0)}'),
-                                    Text('rendered items: $_renderedItemCount / ${items.length}'),
-                                  ],
-                                ),
+                      ),
+                    );
+                  }
+
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: GridBackgroundBuilder(
+                          quad: quad,
+                          cellHeight: cellHeight,
+                          cellWidth: cellWidth,
+                          canvasWidth: _canvasWidth,
+                        ),
+                      ),
+                      ...visibleWidgets,
+                      // Debug overlay
+                      if (debugMode)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            color: Colors.black.withAlpha(160),
+                            child: DefaultTextStyle(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'scaleFactor: ${scaleFactor.toStringAsFixed(2)}',
+                                  ),
+                                  Text(
+                                    'viewport: ${viewport.width.toStringAsFixed(0)}x${viewport.height.toStringAsFixed(0)}',
+                                  ),
+                                  Text(
+                                    'rendered items: $_renderedItemCount / ${items.length}',
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        // ...templateWidgets,
-                      ]);
-                    }),
-                // }),
-              );
-            }),
+                        ),
+                      // ...templateWidgets,
+                    ],
+                  );
+                },
+              ),
+              // }),
+            );
+          },
+        ),
       ),
     );
   }
@@ -230,8 +244,12 @@ late final ScreenSizeEnum screenSize;
     final Matrix4 matrix = _transform.value.clone();
     matrix.translate(delta.dx, delta.dy);
     if (delta.dy < 0) {
-      Rect rect =
-          Rect.fromLTRB(0, 0, _canvasWidth, viewport.height + delta.dy.abs());
+      Rect rect = Rect.fromLTRB(
+        0,
+        0,
+        _canvasWidth,
+        viewport.height + delta.dy.abs(),
+      );
       setState(() {
         viewport = rect;
       });
@@ -262,8 +280,9 @@ class _ItemUpdateScope extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = LayoutModelControllerProvider.of(context);
     final shouldUpdate = updatedItemIds.contains(itemId);
-// Отметим как обработанный после перерисовки
+    // Отметим как обработанный после перерисовки
     if (shouldUpdate) {
+      print('ItemUpdateScope: Marking item $itemId as handled');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         controller.markItemAsHandled(itemId);
       });
@@ -275,7 +294,7 @@ class _ItemUpdateScope extends StatelessWidget {
     // если это просто был ChangeItem, но не относящийся к этому item
     final last = controller.lastEvent;
 
-    final isIsolated = (last is ChangeItem && last.itemId != itemId);
+  final isIsolated = (last is ChangeEvent && last.itemId == itemId);
     return isIsolated ? RepaintBoundary(child: child) : child;
   }
 }

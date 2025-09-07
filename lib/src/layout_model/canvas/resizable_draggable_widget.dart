@@ -1,26 +1,13 @@
-import 'package:uuid/uuid.dart';
 
-import '../property.dart';
 import 'layout_model_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../component.dart';
+import 'drag_resize_logic.dart';
 import '../component_widget.dart';
 import '../controller/events.dart';
 import '../item.dart';
-
-/// Directions for resizing
-enum ResizeDirection {
-  none,
-  top,
-  bottom,
-  left,
-  right,
-  topLeft,
-  topRight,
-  bottomLeft,
-  bottomRight,
-}
+import 'resize_types.dart';
 
 /// A widget that allows its child to be resized and dragged within a canvas.
 /// It provides visual cues for resizing and handles user interactions.
@@ -93,11 +80,12 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
   double _accumulatedDx = 0.0;
   double _accumulatedDy = 0.0;
 
-  Widget? _child;
+  // Build child on the fly to reflect latest properties
   Color? _bgColor;
   double scale = 1.0;
 
   late final controller = LayoutModelControllerProvider.of(context);
+  DragResizeLogic? _logic;
 
   @override
   void initState() {
@@ -119,9 +107,14 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     _dynamicH = componentHeight * widget.scaleFactor;
     _dynamicW = componentWidth * widget.scaleFactor;
 
-    _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
     _bgColor = widget.bgColor == null ? Colors.amber : widget.bgColor!;
     super.initState();
+    _logic = DragResizeLogic(
+      scaleFactor: widget.scaleFactor,
+      gridStep: 5.0,
+      canvasWidth: widget.canvasWidth,
+      canvasHeight: widget.canvasHeight,
+    );
 
     // if(_showSquare) context.read<LayoutModel>().curComponentItem=widget.child!;
   }
@@ -154,9 +147,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     }
 
     // Update child if it changed
-    if (oldWidget.child != widget.child) {
-      _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
-    }
+  // Child rebuild handled in build via factory to reflect property changes
   }
 
   // Variables for tracking resize areas
@@ -248,7 +239,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
-            _child!,
+            ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor),
             if (widget.selected)
               Positioned(
                 right: 10,
@@ -316,47 +307,75 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
           onPanEnd: (details) {
             if (widget.selected) {
               if (_isResizing) {
+                // Final size in model coordinates with grid snapping
+                final finalSizeModel = _logic!
+                    .snapFinalSize(_dynamicW, _dynamicH);
 
-                // Final component property update with grid snapping
-                final finalSize = Size(
-                  ((_dynamicW / widget.scaleFactor) / 5.0).round() * 5.0,
-                  ((_dynamicH / widget.scaleFactor) / 5.0).round() * 5.0,
+                // Apply to controller (emits ChangeItem and updates properties)
+                controller.resize(
+                  widget.child!,
+                  finalSizeModel,
+                  snap: false,
                 );
 
-                // Force update component properties
-                if (widget.child?.properties["size"] != null) {
-                  widget.child?.properties["size"]?.value = finalSize;
-                  controller.updateProperty(
-                    "size",
-                    Property("размер", finalSize, type: Size),
-                  );
-                  controller.eventBus.emit(
-                      ChangeItem(id: Uuid().v4(), itemId: widget.child!.id),
-                    );
+                // If resizing from left/top edges, position may change too
+                final snappedModelPos = _logic!
+                    .snapFinalPosition(updateMoveOffset, trW, trH);
+                final currentModelPos =
+                    (widget.child?.properties["position"]?.value as Offset?) ??
+                        Offset.zero;
+                final deltaPos = snappedModelPos - currentModelPos;
+                if (deltaPos.dx != 0 || deltaPos.dy != 0) {
+                  controller.move(widget.child!, deltaPos, snap: false);
                 }
 
-                // Force state update after resize completion
+                // Sync local dynamic sizes to snapped values
                 setState(() {
-                  // Ensure sizes match new values
-                  final newComponentSize =
-                      widget.child?.properties["size"]?.value as Size?;
-                  if (newComponentSize != null) {
-                    final expectedDynamicW =
-                        newComponentSize.width * widget.scaleFactor;
-                    final expectedDynamicH =
-                        newComponentSize.height * widget.scaleFactor;
-                    
-                    // Synchronize dynamic sizes with component
-                    _dynamicW = expectedDynamicW;
-                    _dynamicH = expectedDynamicH;
-                  }
+                  _dynamicW = finalSizeModel.width * widget.scaleFactor;
+                  _dynamicH = finalSizeModel.height * widget.scaleFactor;
+
+                  // Sync local translation to snapped position
+                  final scaled = Offset(
+                    snappedModelPos.dx * widget.scaleFactor,
+                    snappedModelPos.dy * widget.scaleFactor,
+                  );
+                  final relative = scaled - Offset(trW, trH);
+                  updateMoveOffset = relative;
+                  endMoveOffset = relative;
                 });
 
                 // Reset resize flag AFTER all updates
                 _isResizing = false;
                 _currentResizeDirection = ResizeDirection.none;
               } else {
+                // Final position in model coordinates with grid snapping
                 endMoveOffset = updateMoveOffset;
+                final snappedModelPos = _logic!
+                    .snapFinalPosition(updateMoveOffset, trW, trH);
+
+                // Compute delta in model space from current property
+                final currentModelPos =
+                    (widget.child?.properties["position"]?.value as Offset?) ??
+                        Offset.zero;
+                final delta = snappedModelPos - currentModelPos;
+
+                // Apply to controller (emits ChangeItem and updates properties)
+                controller.move(
+                  widget.child!,
+                  delta,
+                  snap: false,
+                );
+
+                // Update local state to the snapped scaled position
+                setState(() {
+                  final scaled = Offset(
+                    snappedModelPos.dx * widget.scaleFactor,
+                    snappedModelPos.dy * widget.scaleFactor,
+                  );
+                  final relative = scaled - Offset(trW, trH);
+                  updateMoveOffset = relative;
+                  endMoveOffset = relative;
+                });
               }
               controller.eventBus.emit(PanEnd(id: widget.child!.id));
             }
@@ -367,54 +386,19 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     );
   }
 
-  void onChanged(double width, double height, Offset transformOffset) {
-    final offset = Offset(
-      ((transformOffset.dx / widget.scaleFactor) / 5.0).round() * 5.0,
-      ((transformOffset.dy / widget.scaleFactor) / 5.0).round() * 5.0,
-    );
-
-    // Grid snapping to multiples of 5 pixels for sizes
-    final size = Size(
-      ((width / widget.scaleFactor) / 5.0).round() * 5.0,
-      ((height / widget.scaleFactor) / 5.0).round() * 5.0,
-    );
-
-    // Update component properties
-    if (widget.child?.properties["position"] != null) {
-      widget.child?.properties["position"]?.value = offset;
-    }
-
-    if (widget.child?.properties["size"] != null) {
-      widget.child?.properties["size"]?.value = size;
-    }
-
-    // Notify controller about changes
-    controller.updateProperty(
-      "position",
-      Property("положение", offset, type: Offset),
-    );
-    controller.updateProperty("size", Property("размер", size, type: Size));
-  }
+  // removed: onChanged (controller is called onPanEnd)
 
   void _handleMove(DragUpdateDetails details) {
-    var intervalOffset =
-        details.localPosition - startMoveOffset + endMoveOffset;
-
-    // Vertical constraint
-    if (intervalOffset.dy < -trLastH) {
-      intervalOffset = Offset(intervalOffset.dx, -trLastH);
-    }
-
-    // Grid snapping to multiples of 5 pixels
-    final snappedOffset = Offset(
-      (intervalOffset.dx / 5.0).round() * 5.0,
-      (intervalOffset.dy / 5.0).round() * 5.0,
+    final intervalOffset = _logic!.computeMoveOffset(
+      details.localPosition,
+      startMoveOffset,
+      endMoveOffset,
+      trLastH,
     );
 
     setState(() {
-      updateMoveOffset = snappedOffset;
+      updateMoveOffset = intervalOffset; // no snapping during move
     });
-    onChanged(_dynamicW, _dynamicH, updateMoveOffset + Offset(trW, trH));
   }
 
   void _handleResize(DragUpdateDetails details) {
@@ -441,93 +425,38 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       return;
     }
 
-    final oldW = _dynamicW;
-    final oldH = _dynamicH;
-    final oldTrW = trW;
-    final oldTrH = trH;
 
-    // First calculate new sizes without grid snapping
-    double newDynamicW = _dynamicW;
-    double newDynamicH = _dynamicH;
-    double newTrW = trW;
-    double newTrH = trH;
-
-    switch (_currentResizeDirection) {
-      case ResizeDirection.right:
-        newDynamicW = (_dynamicW + dx).clamp(20, widget.canvasWidth).toDouble();
-        break;
-      case ResizeDirection.left:
-        // When dragging left edge right: decrease size, increase offset
-        // When dragging left edge left: increase size, decrease offset
-        newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
-        newTrW = trW + dx; // Move position by the change amount
-        break;
-      case ResizeDirection.bottom:
-        newDynamicH = (_dynamicH + dy)
-            .clamp(20, widget.canvasHeight)
-            .toDouble();
-        break;
-      case ResizeDirection.top:
-        // When dragging top edge down: decrease size, increase offset
-        // When dragging top edge up: increase size, decrease offset
-        newDynamicH = (_dynamicH - dy)
-            .clamp(20, widget.canvasHeight)
-            .toDouble();
-        newTrH = trH + dy; // Move position by the change amount
-        break;
-      case ResizeDirection.topLeft:
-        newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
-        newDynamicH = (_dynamicH - dy)
-            .clamp(20, widget.canvasHeight)
-            .toDouble();
-        newTrW = trW + dx;
-        newTrH = trH + dy;
-        break;
-      case ResizeDirection.topRight:
-        newDynamicW = (_dynamicW + dx).clamp(20, widget.canvasWidth).toDouble();
-        newDynamicH = (_dynamicH - dy)
-            .clamp(20, widget.canvasHeight)
-            .toDouble();
-        newTrH = trH + dy;
-        break;
-      case ResizeDirection.bottomLeft:
-        newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
-        newDynamicH = (_dynamicH + dy)
-            .clamp(20, widget.canvasHeight)
-            .toDouble();
-        newTrW = trW + dx;
-        break;
-      case ResizeDirection.bottomRight:
-        newDynamicW = (_dynamicW + dx).clamp(20, widget.canvasWidth).toDouble();
-        newDynamicH = (_dynamicH + dy)
-            .clamp(20, widget.canvasHeight)
-            .toDouble();
-        break;
-      case ResizeDirection.none:
-        return; // Do nothing if no direction
-    }
+    // Compute new sizes/translation using logic helper
+    final outcome = _logic!.computeResize(
+      direction: _currentResizeDirection,
+      dx: dx,
+      dy: dy,
+      dynamicW: _dynamicW,
+      dynamicH: _dynamicH,
+      trW: trW,
+      trH: trH,
+    );
 
     // Apply changes and update state
     setState(() {
-      _dynamicW = newDynamicW;
-      _dynamicH = newDynamicH;
-      trW = newTrW;
-      trH = newTrH;
+      _dynamicW = outcome.dynamicW;
+      _dynamicH = outcome.dynamicH;
+      trW = outcome.trW;
+      trH = outcome.trH;
 
       // Update component sizes in real time during resize
       if (widget.child?.properties["size"] != null) {
         final newComponentSize = Size(
-          newDynamicW / widget.scaleFactor,
-          newDynamicH / widget.scaleFactor,
+      outcome.dynamicW / widget.scaleFactor,
+      outcome.dynamicH / widget.scaleFactor,
         );
         widget.child?.properties["size"]?.value = newComponentSize;
         
         // Recreate child with new sizes
-        _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
+  // child is rebuilt in build
       }
     });
 
-    // Update component properties and notify controller
-    onChanged(_dynamicW, _dynamicH, updateMoveOffset + Offset(trW, trH));
+    // Skip controller updates during drag; apply on pan end
   }
 }
