@@ -80,7 +80,7 @@ class LayoutModelController {
   void select(String? itemId) {
     selectedIdNotifier.value = itemId;
 
-    /// Закидывает все [Property] в нотифаер
+    /// Update all [Property] in the notifier
     propertiesNotifier.value = getItemById(itemId)?.properties ?? {};
 
     eventBus.emit(SelectionEvent(id: const Uuid().v4(), itemId: itemId));
@@ -99,6 +99,7 @@ class LayoutModelController {
   }
 
   void updateProperty(String key, Property value) {
+    // Update notifier for UI widgets
     propertiesNotifier.value = {...propertiesNotifier.value, key: value};
   }
 

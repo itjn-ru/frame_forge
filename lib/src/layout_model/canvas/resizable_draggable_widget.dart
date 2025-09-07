@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 import '../property.dart';
 import 'layout_model_provider.dart';
 import 'package:flutter/material.dart';
@@ -117,11 +119,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     _dynamicH = componentHeight * widget.scaleFactor;
     _dynamicW = componentWidth * widget.scaleFactor;
 
-    // Debug information
-    debugPrint('Component size: $componentWidth x $componentHeight');
-    debugPrint('Scale constraints: ${widget.scaleFactor}');
-    debugPrint('Dynamic size: $_dynamicW x $_dynamicH');
-
     _child = ComponentWidget.create(widget.child as LayoutComponent, scaleFactor: widget.scaleFactor);
     _bgColor = widget.bgColor == null ? Colors.amber : widget.bgColor!;
     super.initState();
@@ -147,12 +144,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       // Increase threshold to prevent minor updates
       if ((_dynamicW - newDynamicW).abs() > 5.0 ||
           (_dynamicH - newDynamicH).abs() > 5.0) {
-        debugPrint(
-          'External size change detected: $_dynamicW x $_dynamicH -> $newDynamicW x $newDynamicH',
-        );
-        debugPrint(
-          'Component size from properties: $componentWidth x $componentHeight',
-        );
         setState(() {
           _dynamicW = newDynamicW;
           _dynamicH = newDynamicH;
@@ -284,13 +275,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Debug information about current sizes on each render
-    if (widget.selected) {
-      debugPrint(
-        'Building widget with size: $_dynamicW x $_dynamicH, position: ${trW + updateMoveOffset.dx} x ${trH + updateMoveOffset.dy}',
-      );
-    }
-
     return Transform.translate(
       offset: updateMoveOffset + Offset(trW, trH),
       child: GestureDetector(
@@ -305,18 +289,10 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanStart: (details) {
-            debugPrint('onPanStart called! selected: ${widget.selected}');
             if (!widget.selected) return;
 
             _currentResizeDirection = _getResizeDirection(
               details.localPosition,
-            );
-
-            debugPrint(
-              'onPanStart: localPosition=${details.localPosition}, direction=$_currentResizeDirection',
-            );
-            debugPrint(
-              'Widget size: $_dynamicW x $_dynamicH, edge width: $_resizeEdgeWidth',
             );
 
             if (_currentResizeDirection != ResizeDirection.none) {
@@ -324,31 +300,22 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
               _accumulatedDx =
                   0.0; // Reset accumulators at the start of resizing
               _accumulatedDy = 0.0;
-              debugPrint(
-                'Start resizing in direction: $_currentResizeDirection',
-              );
             } else {
               startMoveOffset = details.localPosition;
-              debugPrint('Start moving, startOffset: $startMoveOffset');
             }
           },
           onPanUpdate: (details) {
             if (!widget.selected) return;
 
             if (_isResizing) {
-              debugPrint('onPanUpdate: resizing with delta=${details.delta}');
               _handleResize(details);
             } else {
-              debugPrint('onPanUpdate: moving with delta=${details.delta}');
               _handleMove(details);
             }
           },
           onPanEnd: (details) {
             if (widget.selected) {
               if (_isResizing) {
-                debugPrint(
-                  'Resize completed. Final size: $_dynamicW x $_dynamicH',
-                );
 
                 // Final component property update with grid snapping
                 final finalSize = Size(
@@ -363,9 +330,10 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
                     "size",
                     Property("размер", finalSize, type: Size),
                   );
+                  controller.eventBus.emit(
+                      ChangeItem(id: Uuid().v4(), itemId: widget.child!.id),
+                    );
                 }
-
-                debugPrint('Final component size set to: $finalSize');
 
                 // Force state update after resize completion
                 setState(() {
@@ -377,9 +345,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
                         newComponentSize.width * widget.scaleFactor;
                     final expectedDynamicH =
                         newComponentSize.height * widget.scaleFactor;
-                    debugPrint(
-                      'Expected dynamic size based on component: $expectedDynamicW x $expectedDynamicH',
-                    );
+                    
                     // Synchronize dynamic sizes with component
                     _dynamicW = expectedDynamicW;
                     _dynamicH = expectedDynamicH;
@@ -428,10 +394,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
       Property("положение", offset, type: Offset),
     );
     controller.updateProperty("size", Property("размер", size, type: Size));
-
-    debugPrint(
-      'onChanged: new size: $size, new position: $offset, scale: ${widget.scaleFactor}, dynamic size: $width x $height',
-    );
   }
 
   void _handleMove(DragUpdateDetails details) {
@@ -456,10 +418,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
   }
 
   void _handleResize(DragUpdateDetails details) {
-    debugPrint(
-      '_handleResize: direction=$_currentResizeDirection, delta=${details.delta}, current size: $_dynamicW x $_dynamicH',
-    );
-
     // Accumulate delta for handling slow movements
     _accumulatedDx += details.delta.dx;
     _accumulatedDy += details.delta.dy;
@@ -497,22 +455,17 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
     switch (_currentResizeDirection) {
       case ResizeDirection.right:
         newDynamicW = (_dynamicW + dx).clamp(20, widget.canvasWidth).toDouble();
-        debugPrint('Right resize: $oldW -> $newDynamicW (delta: $dx)');
         break;
       case ResizeDirection.left:
         // When dragging left edge right: decrease size, increase offset
         // When dragging left edge left: increase size, decrease offset
         newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
         newTrW = trW + dx; // Move position by the change amount
-        debugPrint(
-          'Left resize: $oldW -> $newDynamicW, trW: $oldTrW -> $newTrW (delta: $dx)',
-        );
         break;
       case ResizeDirection.bottom:
         newDynamicH = (_dynamicH + dy)
             .clamp(20, widget.canvasHeight)
             .toDouble();
-        debugPrint('Bottom resize: $oldH -> $newDynamicH (delta: $dy)');
         break;
       case ResizeDirection.top:
         // When dragging top edge down: decrease size, increase offset
@@ -521,9 +474,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             .clamp(20, widget.canvasHeight)
             .toDouble();
         newTrH = trH + dy; // Move position by the change amount
-        debugPrint(
-          'Top resize: $oldH -> $newDynamicH, trH: $oldTrH -> $newTrH (delta: $dy)',
-        );
         break;
       case ResizeDirection.topLeft:
         newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
@@ -532,9 +482,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             .toDouble();
         newTrW = trW + dx;
         newTrH = trH + dy;
-        debugPrint(
-          'TopLeft resize: ${oldW}x$oldH -> ${newDynamicW}x$newDynamicH, pos: $oldTrW,$oldTrH -> $newTrW,$newTrH',
-        );
         break;
       case ResizeDirection.topRight:
         newDynamicW = (_dynamicW + dx).clamp(20, widget.canvasWidth).toDouble();
@@ -542,9 +489,6 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             .clamp(20, widget.canvasHeight)
             .toDouble();
         newTrH = trH + dy;
-        debugPrint(
-          'TopRight resize: ${oldW}x$oldH -> ${newDynamicW}x$newDynamicH, trH: $oldTrH -> $newTrH',
-        );
         break;
       case ResizeDirection.bottomLeft:
         newDynamicW = (_dynamicW - dx).clamp(20, widget.canvasWidth).toDouble();
@@ -552,18 +496,12 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             .clamp(20, widget.canvasHeight)
             .toDouble();
         newTrW = trW + dx;
-        debugPrint(
-          'BottomLeft resize: ${oldW}x$oldH -> ${newDynamicW}x$newDynamicH, trW: $oldTrW -> $newTrW',
-        );
         break;
       case ResizeDirection.bottomRight:
         newDynamicW = (_dynamicW + dx).clamp(20, widget.canvasWidth).toDouble();
         newDynamicH = (_dynamicH + dy)
             .clamp(20, widget.canvasHeight)
             .toDouble();
-        debugPrint(
-          'BottomRight resize: ${oldW}x$oldH -> ${newDynamicW}x$newDynamicH',
-        );
         break;
       case ResizeDirection.none:
         return; // Do nothing if no direction
