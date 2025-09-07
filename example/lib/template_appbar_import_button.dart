@@ -14,7 +14,7 @@ class TemplateAppbarImportButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
         onPressed: () async => controller.project.load(),
-        child: const Text('Импорт', style: TextStyle(color: Colors.white)),
+        child: const Text('Импорт', style: TextStyle(color: Colors.black)),
       ),
     );
   }
