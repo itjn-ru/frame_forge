@@ -46,3 +46,6 @@ export 'src/layout_model/controller/project.dart';
 export 'src/layout_model/controller/helpers/constants.dart';
 export 'src/layout_model/controller/events.dart';
 export 'src/layout_model/screen_size_enum.dart';
+
+// UI Kit components
+export 'src/ui_kit/ui_kit.dart';

@@ -32,7 +32,7 @@ class PropertyStyleWidget extends PropertyWidget {
             onChanged: (Style? value) {
               property?.value = value ?? Style.basic;
               controller.eventBus.emit(
-                ChangeItem(
+                AttributeChangeEvent(
                   id: const Uuid().v4(),
                   itemId: controller.getCurrentItem()?.id,
                 ),

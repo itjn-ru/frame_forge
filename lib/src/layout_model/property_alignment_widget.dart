@@ -54,7 +54,7 @@ class PropertyAlignmentWidget extends PropertyWidget {
             onChanged: (Object? value) {
               property?.value = value;
               controller.eventBus.emit(
-                ChangeItem(
+                AttributeChangeEvent(
                   id: const Uuid().v4(),
                   itemId: controller.layoutModel.curItem.id,
                 ),

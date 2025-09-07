@@ -35,25 +35,25 @@ class PropertyBorderStyleWidget extends PropertyWidget {
                 focusNode: FocusNode(),
                 controller: controllerWidth,
                 onTap: () => controller.eventBus.emit(
-                  ChangeItem(
+                  AttributeChangeEvent(
                     id: const Uuid().v4(),
                     itemId: controller.layoutModel.curItem.id,
                   ),
                 ),
                 onSubmitted: (value) => controller.eventBus.emit(
-                  ChangeItem(
+                  AttributeChangeEvent(
                     id: const Uuid().v4(),
                     itemId: controller.layoutModel.curItem.id,
                   ),
                 ),
                 onTapOutside: (value) => controller.eventBus.emit(
-                  ChangeItem(
+                  AttributeChangeEvent(
                     id: const Uuid().v4(),
                     itemId: controller.layoutModel.curItem.id,
                   ),
                 ),
                 onEditingComplete: () => controller.eventBus.emit(
-                  ChangeItem(
+                  AttributeChangeEvent(
                     id: const Uuid().v4(),
                     itemId: controller.layoutModel.curItem.id,
                   ),

@@ -18,7 +18,7 @@ class PropertyFontWeightWidget extends PropertyWidget {
         Expanded(
           child: DropdownButton<FontWeight>(
             onTap: () => controller.eventBus.emit(
-              ChangeItem(
+              AttributeChangeEvent(
                 id: const Uuid().v4(),
                 itemId: controller.layoutModel.curItem.id,
               ),

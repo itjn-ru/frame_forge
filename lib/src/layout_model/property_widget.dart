@@ -21,40 +21,43 @@ import 'property_padding_widget.dart';
 import 'style.dart';
 import 'property_border_style_widget.dart';
 
+/// Base class for property widgets - kept for backward compatibility
 class PropertyWidget extends StatelessWidget {
   final String propertyKey;
   final LayoutModelController controller;
+  
   const PropertyWidget(this.controller, this.propertyKey, {super.key});
 
+  /// Factory method for creating appropriate property widgets based on type
   factory PropertyWidget.create(
     LayoutModelController controller,
     String propertyKey,
   ) {
     switch (controller.getCurrentItem()?.properties[propertyKey]?.type) {
       case const (CustomBorderRadius):
-        return PropertyBorderRadiusWidget(controller, propertyKey);
+        return PropertyBorderRadiusWidget(controller, propertyKey) as PropertyWidget;
       case const (CustomBorderStyle):
-        return PropertyBorderStyleWidget(controller, propertyKey);
+        return PropertyBorderStyleWidget(controller, propertyKey) as PropertyWidget;
       case const (Offset):
-        return PropertyOffsetWidget(controller, propertyKey);
+        return PropertyOffsetWidget(controller, propertyKey) as PropertyWidget;
       case const (CustomMargin):
-        return PropertyMarginWidget(controller, propertyKey);
+        return PropertyMarginWidget(controller, propertyKey) as PropertyWidget;
       case const (List<int>):
-        return PropertyPaddingWidget(controller, propertyKey);
+        return PropertyPaddingWidget(controller, propertyKey) as PropertyWidget;
       case const (Size):
-        return PropertySizeWidget(controller, propertyKey);
+        return PropertySizeWidget(controller, propertyKey) as PropertyWidget;
       case const (Color):
-        return PropertyColorWidget(controller, propertyKey);
+        return PropertyColorWidget(controller, propertyKey) as PropertyWidget;
       case const (Alignment):
-        return PropertyAlignmentWidget(controller, propertyKey);
+        return PropertyAlignmentWidget(controller, propertyKey) as PropertyWidget;
       case const (Style):
-        return PropertyStyleWidget(controller, propertyKey);
+        return PropertyStyleWidget(controller, propertyKey) as PropertyWidget;
       case const (FontWeight):
-        return PropertyFontWeightWidget(controller, propertyKey);
+        return PropertyFontWeightWidget(controller, propertyKey) as PropertyWidget;
       case const (UuidValue):
-        return PropertyUuidWidget(controller, propertyKey);
+        return PropertyUuidWidget(controller, propertyKey) as PropertyWidget;
       case const (Uint8List):
-        return PropertyImageWidget(controller, propertyKey);
+        return PropertyImageWidget(controller, propertyKey) as PropertyWidget;
       default:
         return PropertyWidget(controller, propertyKey);
     }
@@ -62,27 +65,22 @@ class PropertyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InputTextProperty(
-      controller,
-      propertyKey,
-      key: ValueKey(
-        controller.getCurrentItem()?.properties['id']?.value ??
-            const Uuid().v4(),
-      ),
-    );
+    return InputTextPropertyWidget(controller, propertyKey);
   }
 }
 
-class InputTextProperty extends StatefulWidget {
-  final LayoutModelController controller;
+/// Default text input property widget for unhandled types
+class InputTextPropertyWidget extends StatefulWidget {
   final String propertyKey;
-  const InputTextProperty(this.controller, this.propertyKey, {super.key});
+  final LayoutModelController controller;
+  
+  const InputTextPropertyWidget(this.controller, this.propertyKey, {super.key});
 
   @override
-  State<InputTextProperty> createState() => _InputTextPropertyState();
+  State<InputTextPropertyWidget> createState() => _InputTextPropertyWidgetState();
 }
 
-class _InputTextPropertyState extends State<InputTextProperty> {
+class _InputTextPropertyWidgetState extends State<InputTextPropertyWidget> {
   final txtController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
@@ -141,7 +139,7 @@ class _InputTextPropertyState extends State<InputTextProperty> {
 
   void onChanged() {
     widget.controller.eventBus.emit(
-      ChangeItem(id: const Uuid().v4(), itemId: widget.controller.selectedId),
+      AttributeChangeEvent(id: const Uuid().v4(), itemId: widget.controller.selectedId),
     );
     setState(() {}); // перерисовать поле, если нужно
   }

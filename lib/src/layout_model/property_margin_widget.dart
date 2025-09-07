@@ -98,7 +98,7 @@ class _MarginStyleWidgetState extends State<MarginStyleWidget> {
 
   onChanged() {
     widget.controller.eventBus.emit(
-      ChangeItem(
+      AttributeChangeEvent(
         id: const Uuid().v4(),
         itemId: widget.controller.layoutModel.curItem.id,
       ),
