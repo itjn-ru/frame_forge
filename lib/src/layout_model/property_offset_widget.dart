@@ -5,6 +5,8 @@ import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
 import 'property_widget.dart';
 
+/// Widget for editing offset properties
+/// Handles left (dx) and top (dy) offsets
 class PropertyOffsetWidget extends PropertyWidget {
   const PropertyOffsetWidget(super.controller, super.propertyKey, {super.key});
   

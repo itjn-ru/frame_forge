@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frame_forge/src/layout_model/component_decoration_widget.dart';
 import 'canvas/layout_model_provider.dart';
-import 'canvas/screensize_provider.dart';
 import 'component_widget.dart';
 import 'style_element.dart';
 

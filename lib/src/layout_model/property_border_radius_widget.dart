@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
-import 'controller/layout_model_controller.dart';
 import 'custom_border_radius.dart';
 import 'property_widget.dart';
 
+/// Widget for editing border radius properties
+/// Handles different border radius styles: none, all, top, bottom
 class PropertyBorderRadiusWidget extends PropertyWidget {
   const PropertyBorderRadiusWidget(
     super.controller,
@@ -13,51 +15,41 @@ class PropertyBorderRadiusWidget extends PropertyWidget {
     super.key,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return _PropertyBorderRadiusWidget(controller, propertyKey);
-  }
-}
-
-class _PropertyBorderRadiusWidget extends StatefulWidget {
-  final LayoutModelController controller;
-  final String propertyKey;
-  const _PropertyBorderRadiusWidget(this.controller, this.propertyKey);
-
-  @override
-  State<_PropertyBorderRadiusWidget> createState() =>
-      __PropertyBorderRadiusWidgetState();
-}
-
-class __PropertyBorderRadiusWidgetState
-    extends State<_PropertyBorderRadiusWidget> {
-  late final property = widget.controller
-      .getCurrentItem()
-      ?.properties[widget.propertyKey]!;
-  final controllerRadius = TextEditingController();
-  late CustomBorderRadiusEnum selected;
-  @override
-  void initState() {
-    if (property?.value.runtimeType == BorderRadiusAll ||
-        property?.value.runtimeType == BorderRadiusTop ||
-        property?.value.runtimeType == BorderRadiusBottom) {
-      controllerRadius.text = property?.value?.radius.toString() ?? '0';
-    }
-    selected = CustomBorderRadiusEnum.values.firstWhere(
-      (e) => e.type.runtimeType == property?.value.runtimeType,
-      orElse: () => CustomBorderRadiusEnum.none,
+  void _emitChange() {
+    controller.eventBus.emit(
+      AttributeChangeEvent(
+        id: const Uuid().v4(),
+        itemId: controller.getCurrentItem()?.id,
+      ),
     );
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    controllerRadius.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final CustomBorderRadiusEnum selected =
+        CustomBorderRadiusEnum.fromModel(property?.value);
+
+    double currentRadius = 0;
+    final val = property?.value;
+    if (val is BorderRadiusAll) currentRadius = val.radius;
+    if (val is BorderRadiusTop) currentRadius = val.radius;
+    if (val is BorderRadiusBottom) currentRadius = val.radius;
+
+    void updateRadius(String value) {
+      final radius = double.tryParse(value) ?? 0;
+      switch (selected) {
+        case CustomBorderRadiusEnum.none:
+          property?.value = const BorderRadiusNone();
+        case CustomBorderRadiusEnum.all:
+          property?.value = BorderRadiusAll(radius);
+        case CustomBorderRadiusEnum.top:
+          property?.value = BorderRadiusTop(radius);
+        case CustomBorderRadiusEnum.bottom:
+          property?.value = BorderRadiusBottom(radius);
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -65,14 +57,13 @@ class __PropertyBorderRadiusWidgetState
           children: [
             const Text('Радиус: '),
             Expanded(
-              child: TextField(
-                focusNode: FocusNode(),
-                controller: controllerRadius,
-                onTap: () => onChanged(),
-                onSubmitted: (value) => onChanged(),
-                onTapOutside: (value) => onChanged(),
-                onEditingComplete: () => onChanged(),
-                onChanged: (value) => onChanged(),
+              child: NumericPropertyTextField(
+                defaultValue: currentRadius.toString(),
+                onChanged: updateRadius,
+                onSubmitted: _emitChange,
+                onTapOutside: _emitChange,
+                onTabPressed: _emitChange,
+                onFocusLost: _emitChange,
               ),
             ),
           ],
@@ -87,34 +78,22 @@ class __PropertyBorderRadiusWidgetState
               .toList(),
           onChanged: (value) {
             if (value != null) {
-              setState(() {
-                selected = value;
-              });
-              onChanged();
+              final radius = currentRadius;
+              switch (value) {
+                case CustomBorderRadiusEnum.none:
+                  property?.value = const BorderRadiusNone();
+                case CustomBorderRadiusEnum.all:
+                  property?.value = BorderRadiusAll(radius);
+                case CustomBorderRadiusEnum.top:
+                  property?.value = BorderRadiusTop(radius);
+                case CustomBorderRadiusEnum.bottom:
+                  property?.value = BorderRadiusBottom(radius);
+              }
+              _emitChange();
             }
           },
         ),
       ],
-    );
-  }
-
-  onChanged() {
-    final radius = double.tryParse(controllerRadius.text) ?? 0;
-    switch (selected) {
-      case CustomBorderRadiusEnum.none:
-        property?.value = const BorderRadiusNone();
-      case CustomBorderRadiusEnum.all:
-        property?.value = BorderRadiusAll(radius);
-      case CustomBorderRadiusEnum.top:
-        property?.value = BorderRadiusTop(radius);
-      case CustomBorderRadiusEnum.bottom:
-        property?.value = BorderRadiusBottom(radius);
-    }
-    widget.controller.eventBus.emit(
-      ChangeItem(
-        id: const Uuid().v4(),
-        itemId: widget.controller.layoutModel.curItem.id,
-      ),
     );
   }
 }

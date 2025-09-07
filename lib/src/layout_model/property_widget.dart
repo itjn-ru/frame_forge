@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import '../ui_kit/ui_kit.dart';
 import 'custom_margin.dart';
 import 'controller/events.dart';
 import 'controller/layout_model_controller.dart';
@@ -70,77 +71,45 @@ class PropertyWidget extends StatelessWidget {
 }
 
 /// Default text input property widget for unhandled types
-class InputTextPropertyWidget extends StatefulWidget {
-  final String propertyKey;
-  final LayoutModelController controller;
+class InputTextPropertyWidget extends PropertyWidget {
   
-  const InputTextPropertyWidget(this.controller, this.propertyKey, {super.key});
-
-  @override
-  State<InputTextPropertyWidget> createState() => _InputTextPropertyWidgetState();
-}
-
-class _InputTextPropertyWidgetState extends State<InputTextPropertyWidget> {
-  final txtController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  const InputTextPropertyWidget(super.controller, super.propertyKey, {super.key});
 
   Property? get property =>
-      widget.controller.getCurrentItem()?.properties[widget.propertyKey];
+      controller.getCurrentItem()?.properties[propertyKey];
 
-  @override
-  void initState() {
-    super.initState();
-
-    final prop = property;
-    if (prop != null && prop.value != null) {
-      txtController.text = prop.value.toString();
-    } else {
-      txtController.text = '';
-    }
-    // _focusNode.addListener(() {
-    //     if (!_focusNode.hasFocus) {
-    //       onChanged(); // Вызываем onChanged при потере фокуса
-    //     }
-    //   });
-  }
-
-  @override
-  void dispose() {
-    txtController.dispose();
-    _focusNode.dispose();
-    super.dispose();
+  void _emitChange() {
+    controller.eventBus.emit(
+      AttributeChangeEvent(id: const Uuid().v4(), itemId: controller.selectedId),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: txtController,
-            onSubmitted: (_) => FocusScope.of(context).unfocus(),
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
-            onEditingComplete: () => FocusScope.of(context).unfocus(),
-            focusNode: _focusNode,
-            onChanged: (value) {
-              switch (property?.type) {
-                case const (double):
-                  property?.value = double.tryParse(value);
-                default:
-                  property?.value = value;
-              }
-              onChanged();
-            },
-          ),
-        ),
-      ],
-    );
-  }
+    final defaultValue = property?.value?.toString() ?? '';
+    final isDouble = switch (property?.type) {
+      const (double) => true,
+      _ => false,
+    };
 
-  void onChanged() {
-    widget.controller.eventBus.emit(
-      AttributeChangeEvent(id: const Uuid().v4(), itemId: widget.controller.selectedId),
-    );
-    setState(() {}); // перерисовать поле, если нужно
+    final field = isDouble
+        ? NumericPropertyTextField(
+            defaultValue: defaultValue,
+            onChanged: (v) => property?.value = double.tryParse(v),
+            onSubmitted: _emitChange,
+            onTapOutside: _emitChange,
+            onTabPressed: _emitChange,
+            onFocusLost: _emitChange,
+          )
+        : PropertyTextField(
+            defaultValue: defaultValue,
+            onChanged: (v) => property?.value = v,
+            onSubmitted: _emitChange,
+            onTapOutside: _emitChange,
+            onTabPressed: _emitChange,
+            onFocusLost: _emitChange,
+          );
+
+    return Row(children: [Expanded(child: field)]);
   }
 }

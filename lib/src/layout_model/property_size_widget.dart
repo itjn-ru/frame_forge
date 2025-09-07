@@ -5,6 +5,8 @@ import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
 import 'property_widget.dart';
 
+/// Widget for editing padding properties
+/// Handles left, right, top, and bottom padding
 class PropertySizeWidget extends PropertyWidget {
   const PropertySizeWidget(super.controller, super.propertyKey, {super.key});
   void _emitChange() {

@@ -1,10 +1,13 @@
 import 'package:frame_forge/src/color_picker/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
 import 'property_widget.dart';
 import 'style.dart';
 
+/// Widget for editing border style properties
+/// Handles width, color, and side of the border
 class PropertyBorderStyleWidget extends PropertyWidget {
   const PropertyBorderStyleWidget(
     super.controller,
@@ -12,16 +15,24 @@ class PropertyBorderStyleWidget extends PropertyWidget {
     super.key,
   });
 
+  void _emitChange() {
+    controller.eventBus.emit(
+      AttributeChangeEvent(
+        id: const Uuid().v4(),
+        itemId: controller.getCurrentItem()?.id,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    late final property = controller.getCurrentItem()?.properties[propertyKey]!;
-    final controllerWidth = TextEditingController();
-    controllerWidth.text = property?.value?.width.toString() ?? '';
+    final property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final String widthValue = property?.value?.width.toString() ?? '';
 
     const List<CustomBorderSide> sides = CustomBorderSide.values;
 
     if (!sides.contains(property?.value.side)) {
-      property?.value = CustomBorderSide.none;
+      property?.value.side = CustomBorderSide.none;
     }
 
     return Column(
@@ -31,36 +42,15 @@ class PropertyBorderStyleWidget extends PropertyWidget {
           children: [
             const Text('Ширина: '),
             Expanded(
-              child: TextField(
-                focusNode: FocusNode(),
-                controller: controllerWidth,
-                onTap: () => controller.eventBus.emit(
-                  AttributeChangeEvent(
-                    id: const Uuid().v4(),
-                    itemId: controller.layoutModel.curItem.id,
-                  ),
-                ),
-                onSubmitted: (value) => controller.eventBus.emit(
-                  AttributeChangeEvent(
-                    id: const Uuid().v4(),
-                    itemId: controller.layoutModel.curItem.id,
-                  ),
-                ),
-                onTapOutside: (value) => controller.eventBus.emit(
-                  AttributeChangeEvent(
-                    id: const Uuid().v4(),
-                    itemId: controller.layoutModel.curItem.id,
-                  ),
-                ),
-                onEditingComplete: () => controller.eventBus.emit(
-                  AttributeChangeEvent(
-                    id: const Uuid().v4(),
-                    itemId: controller.layoutModel.curItem.id,
-                  ),
-                ),
+              child: NumericPropertyTextField(
+                defaultValue: widthValue,
                 onChanged: (value) {
                   property?.value.width = double.tryParse(value) ?? 0;
                 },
+                onSubmitted: _emitChange,
+                onTapOutside: _emitChange,
+                onTabPressed: _emitChange,
+                onFocusLost: _emitChange,
               ),
             ),
           ],
@@ -83,7 +73,7 @@ class PropertyBorderStyleWidget extends PropertyWidget {
                         onColorChanged: (Color color) {
                           property?.value.color = color;
                           Navigator.of(context).pop();
-                          onChanged();
+                          _emitChange();
                         },
                       ),
                     ),
@@ -104,19 +94,10 @@ class PropertyBorderStyleWidget extends PropertyWidget {
               .toList(),
           onChanged: (value) {
             property?.value.side = value ?? CustomBorderSide.none;
-            onChanged();
+            _emitChange();
           },
         ),
       ],
-    );
-  }
-
-  onChanged() {
-    controller.eventBus.emit(
-      ChangeItem(
-        id: const Uuid().v4(),
-        itemId: controller.layoutModel.curItem.id,
-      ),
     );
   }
 }
