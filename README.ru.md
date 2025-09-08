@@ -1,7 +1,7 @@
 # Frame Forge
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.md)
-[![ru](https://img.shields.io/badge/lang-ru-blue.svg)](https://github.com/itjn-ru/layout_editor/blob/frame_forge/README.ru.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/itjn-ru/frame_forge/blob/main/README.md)
+[![ru](https://img.shields.io/badge/lang-ru-blue.svg)](https://github.com/itjn-ru/frame_forge/blob/main/README.ru.md)
 
 ## Описание
 Этот пакет предоставляет визуальный редактор для проектирования и рендеринга пользовательских интерфейсов.
