@@ -36,7 +36,7 @@ class StyleElement extends LayoutStyle {
 
     properties['borderRadius'] = Property(
       'закругление',
-      BorderRadiusNone.fromJson({'borderRadius': 'BorderRadiusNone'}),
+      const BorderRadiusNone(),
       type: CustomBorderRadius,
     );
     properties['padding'] = Property('отступ', [0, 0, 0, 0], type: List<int>);
@@ -66,10 +66,6 @@ class StyleElement extends LayoutStyle {
       CustomBorderStyle.init(),
       type: CustomBorderStyle,
     );
-    properties["borderRadius"] = Property(
-      "радиус",
-      BorderRadiusNone,
-      type: CustomBorderRadius,
-    );
+  // removed duplicate borderRadius property that mistakenly stored a Type
   }
 }

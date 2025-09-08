@@ -276,7 +276,6 @@ class LayoutModel with FromMapToMap {
       if (key == 'id' && value is Property && value.value is String) {
         String id = value.value;
         if (usedIds.contains(id)) {
-          // Генерируем новый уникальный id
           final newId = const Uuid().v4();
           value.value = newId;
           usedIds.add(newId);
