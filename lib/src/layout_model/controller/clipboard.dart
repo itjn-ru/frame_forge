@@ -19,9 +19,9 @@ class LayoutModelClipboard with FromMapToMap {
 
   LayoutModelEventBus get eventBus => controller.eventBus;
 
-  Item get item => controller.layoutModel.curItem;
+  Item? get item => controller.getCurrentItem();
 
-  ComponentAndSourcePage get page => controller.layoutModel.getPageByItem(item);
+  ComponentAndSourcePage? get page => item == null ? null : controller.layoutModel.getPageByItem(item!);
 
   LayoutModelClipboard(this.controller);
 
@@ -31,7 +31,14 @@ class LayoutModelClipboard with FromMapToMap {
   /// (во избежание прямого вмешательства в данные JSON),
   /// а затем копируются в буфер обмена.
   Future<String> copySelection() async {
-    final selectedItem = item.toMap();
+    if (item == null) {
+      showNodeEditorSnackbar(
+        'Ошибка копирования. Нет выбранного элемента.',
+        SnackbarType.error,
+      );
+      return '';
+    }
+    final selectedItem = item!.toMap();
 
     late final String base64Data;
 
@@ -102,7 +109,7 @@ class LayoutModelClipboard with FromMapToMap {
   void cutSelection() async {
     final clipboardContent = await copySelection();
 
-    controller.layoutModel.deleteCurrentItem();
+    controller.layoutModel.deleteItem(item!);
 
     eventBus.emit(CutSelectionEvent(id: const Uuid().v4(), clipboardContent));
   }
