@@ -179,6 +179,23 @@ class LayoutModelController {
   Offset _viewportOffset = Offset.zero;
   double _viewportZoom = 1.0;
 
+  // Grid steps in model units (not pixels)
+  double _gridStepX = 20.0;
+  double _gridStepY = 20.0;
+
+  double get gridStepX => _gridStepX;
+  double get gridStepY => _gridStepY;
+
+  /// Update grid steps (in model units). Pass null to keep current.
+  void setGridSteps({double? stepX, double? stepY}) {
+    final newX = stepX ?? _gridStepX;
+    final newY = stepY ?? _gridStepY;
+    if (newX == _gridStepX && newY == _gridStepY) return;
+    _gridStepX = newX;
+    _gridStepY = newY;
+    // Optionally, we could emit a dedicated event here if needed for listeners.
+  }
+
   Offset get viewportOffset => _viewportOffset;
 
   double get viewportZoom => _viewportZoom;

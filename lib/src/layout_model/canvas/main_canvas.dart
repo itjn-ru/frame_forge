@@ -87,8 +87,11 @@ class _MainCanvasState extends State<MainCanvas> {
     _canvasWidth = widget.constraints.maxWidth - 20;
     _canvasHeight = widget.constraints.maxHeight - 20;
     scaleFactor = _canvasWidth / screenSize.width;
-    cellWidth = 20 * scaleFactor;
-    cellHeight = 20 * scaleFactor;
+  // Grid step is stored in model units; convert to pixels for drawing
+  final modelStepX = controller.gridStepX; // default 20
+  final modelStepY = controller.gridStepY; // default 20
+  cellWidth = modelStepX * scaleFactor;
+  cellHeight = modelStepY * scaleFactor;
     viewport = Rect.fromLTRB(0, 0, _canvasWidth, _canvasHeight);
   }
 
@@ -135,100 +138,109 @@ class _MainCanvasState extends State<MainCanvas> {
               child: ValueListenableBuilder<Set<String?>>(
                 valueListenable: controller.changedItems,
                 builder: (context, updatedItemIds, _) {
-                  final curPage = controller.getCurrentPage();
-                  // Simple view culling: render only items that intersect the viewport
-                  final expandedViewport = viewport.inflate(200);
-                  final items = curPage.items;
-                  final visibleWidgets = <Widget>[];
-                  _renderedItemCount = 0;
+                  // Rebuild ordering when selection changes so selected is on top
+                  return ValueListenableBuilder<String?>(
+                    valueListenable: controller.selectedIdNotifier,
+                    builder: (context, selectedId, __) {
+                      final curPage = controller.getCurrentPage();
+                      // Simple view culling: render only items that intersect the viewport
+                      final expandedViewport = viewport.inflate(200);
+                      final items = curPage.items;
+                      final nonSelected = <Widget>[];
+                      Widget? selectedWidget;
+                      _renderedItemCount = 0;
 
-                  for (var i = 0; i < items.length; i++) {
-                    final item = items[i];
-                    final dx = (item["position"]?.dx ?? 0) * scaleFactor;
-                    final dy = (item["position"]?.dy ?? 0) * scaleFactor;
-                    final w =
-                        (item["size"]?.width ?? _canvasWidth) * scaleFactor;
-                    final h = (item["size"]?.height ?? 30) * scaleFactor;
+                      for (var i = 0; i < items.length; i++) {
+                        final item = items[i];
+                        final dx = (item["position"]?.dx ?? 0) * scaleFactor;
+                        final dy = (item["position"]?.dy ?? 0) * scaleFactor;
+                        final w =
+                            (item["size"]?.width ?? _canvasWidth) * scaleFactor;
+                        final h = (item["size"]?.height ?? 30) * scaleFactor;
 
-                    final itemRect = Rect.fromLTWH(dx, dy, w, h);
-                    if (!itemRect.overlaps(expandedViewport)) {
-                      // Skip rendering this item (outside of viewport)
-                      continue;
-                    }
+                        final itemRect = Rect.fromLTWH(dx, dy, w, h);
+                        if (!itemRect.overlaps(expandedViewport)) {
+                          continue;
+                        }
 
-                    _renderedItemCount++;
+                        _renderedItemCount++;
+                        final widgetItem = _ItemUpdateScope(
+                          itemId: item.id,
+                          updatedItemIds: updatedItemIds,
+                          child: ResizableDraggableWidget(
+                            key: ValueKey(item.id),
+                            position: Offset(dx, dy),
+                            initWidth: w == 0 ? _canvasWidth : w,
+                            initHeight: h == 0 ? 30 : h,
+                            // Pass grid step in model units
+                            cellWidth: controller.gridStepX,
+                            cellHeight: controller.gridStepY,
+                            canvasWidth: _canvasWidth,
+                            canvasHeight: _canvasHeight,
+                            bgColor: Colors.white,
+                            squareColor: Colors.blueAccent,
+                            scaleFactor: scaleFactor,
+                            child: item,
+                            selected: selectedId == item.id,
+                          ),
+                        );
 
-                    visibleWidgets.add(
-                      _ItemUpdateScope(
-                        itemId: item.id,
-                        updatedItemIds: updatedItemIds,
-                        child: ValueListenableBuilder<String?>(
-                          valueListenable: controller.selectedIdNotifier,
-                          builder: (context, selectedId, _) {
-                            return ResizableDraggableWidget(
-                              key: ValueKey(item.id),
-                              position: Offset(dx, dy),
-                              initWidth: w == 0 ? _canvasWidth : w,
-                              initHeight: h == 0 ? 30 : h,
-                              cellWidth: cellWidth / 2,
-                              cellHeight: cellHeight / 2,
-                              canvasWidth: _canvasWidth,
-                              canvasHeight: _canvasHeight,
-                              bgColor: Colors.white,
-                              squareColor: Colors.blueAccent,
-                              scaleFactor: scaleFactor,
-                              child: item,
-                              selected: selectedId == item.id,
-                            );
-                          },
+                        if (selectedId == item.id) {
+                          selectedWidget = widgetItem;
+                        } else {
+                          nonSelected.add(widgetItem);
+                        }
+                      }
+
+                      final children = <Widget>[
+                        Positioned.fill(
+                          child: GridBackgroundBuilder(
+                            quad: quad,
+                            cellHeight: cellHeight,
+                            cellWidth: cellWidth,
+                            canvasWidth: _canvasWidth,
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                        ...nonSelected,
+                        if (selectedWidget != null) selectedWidget,
+                      ];
 
-                  return Stack(
-                    children: [
-                      Positioned.fill(
-                        child: GridBackgroundBuilder(
-                          quad: quad,
-                          cellHeight: cellHeight,
-                          cellWidth: cellWidth,
-                          canvasWidth: _canvasWidth,
-                        ),
-                      ),
-                      ...visibleWidgets,
-                      // Debug overlay
-                      if (debugMode)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            color: Colors.black.withAlpha(160),
-                            child: DefaultTextStyle(
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'scaleFactor: ${scaleFactor.toStringAsFixed(2)}',
-                                  ),
-                                  Text(
-                                    'viewport: ${viewport.width.toStringAsFixed(0)}x${viewport.height.toStringAsFixed(0)}',
-                                  ),
-                                  Text(
-                                    'rendered items: $_renderedItemCount / ${items.length}',
-                                  ),
-                                ],
+                      // Debug overlay stays on top of everything
+                      if (debugMode) {
+                        children.add(
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              color: Colors.black.withAlpha(160),
+                              child: DefaultTextStyle(
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'scaleFactor: ${scaleFactor.toStringAsFixed(2)}',
+                                    ),
+                                    Text(
+                                      'viewport: ${viewport.width.toStringAsFixed(0)}x${viewport.height.toStringAsFixed(0)}',
+                                    ),
+                                    Text(
+                                      'rendered items: $_renderedItemCount / ${items.length}',
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      // ...templateWidgets,
-                    ],
+                        );
+                      }
+
+                      return Stack(children: children);
+                    },
                   );
                 },
               ),
@@ -282,14 +294,13 @@ class _ItemUpdateScope extends StatelessWidget {
     final shouldUpdate = updatedItemIds.contains(itemId);
     // Отметим как обработанный после перерисовки
     if (shouldUpdate) {
-      print('ItemUpdateScope: Marking item $itemId as handled');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         controller.markItemAsHandled(itemId);
       });
 
-      // Перерисовываем — данные изменились
       return child;
     }
+    // Не трогай нах
     // Здесь RepaintBoundary помогает избежать лишней перерисовки,
     // если это просто был ChangeItem, но не относящийся к этому item
     final last = controller.lastEvent;
