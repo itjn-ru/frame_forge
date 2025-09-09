@@ -76,19 +76,34 @@ class CustomBorderStyle {
   Map<String, dynamic> toMap() {
     return {
       'width': width,
-      'color': color.toARGB32().toRadixString(16).toUpperCase(),
-      'side': side,
+      // store as 8-hex AARRGGBB
+      'color': color.value.toRadixString(16).padLeft(8, '0').toUpperCase(),
+      // store enum as string for stable round-trip
+      'side': side.toString(),
     };
   }
 
   factory CustomBorderStyle.fromMap(Map<String, dynamic> map) {
+    final dynamic widthRaw = map['width'];
+    final double widthVal = widthRaw is num
+        ? widthRaw.toDouble()
+        : double.tryParse(widthRaw?.toString() ?? '') ?? 0.0;
+
+    final dynamic colorRaw = map['color'];
+    final int argb = colorRaw is int
+        ? colorRaw
+        : int.tryParse(colorRaw?.toString() ?? '', radix: 16) ?? 0x00000000;
+
+    final dynamic sideRaw = map['side'];
+    final CustomBorderSide sideVal = CustomBorderSide.values.firstWhere(
+      (e) => e.toString() == sideRaw?.toString(),
+      orElse: () => CustomBorderSide.none,
+    );
+
     return CustomBorderStyle(
-      double.parse(map['width']),
-      Color(int.tryParse(map['color'], radix: 16) ?? 0),
-      CustomBorderSide.values.firstWhere(
-        (e) => e.toString() == map['side'],
-        orElse: () => CustomBorderSide.none,
-      ),
+      widthVal,
+      Color(argb),
+      sideVal,
     );
   }
 }
