@@ -300,7 +300,7 @@ class _ItemUpdateScope extends StatelessWidget {
 
       return child;
     }
-    // Не трогай нах
+    // Не трогай 
     // Здесь RepaintBoundary помогает избежать лишней перерисовки,
     // если это просто был ChangeItem, но не относящийся к этому item
     final last = controller.lastEvent;
