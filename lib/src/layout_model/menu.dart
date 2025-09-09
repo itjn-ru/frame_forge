@@ -138,11 +138,11 @@ class ComponentAndSourceMenu {
     } else {
       var component = controller.layoutModel.getComponentByItem(target);
 
-      if ( /*layoutModel.curC*/ component == null) {
+      if (component == null) {
         return ComponentAndSourceMenu(controller, target, onChanged: onChanged);
       }
 
-      switch ( /*layoutModel.curC*/ component.runtimeType) {
+      switch (component.runtimeType) {
         case const (ComponentTable):
           return ComponentTableMenu(controller, target, onChanged: onChanged);
         case const (SourceTable):
@@ -164,14 +164,14 @@ class ComponentAndSourceMenu {
       const MenuHeader(text: "Редактирование"),
       MenuItem(
         label: 'Копировать',
-        icon: Icons.delete,
+        icon: Icons.copy,
         onSelected: () {
           controller.clipboard.copySelection();
         },
       ),
       MenuItem(
         label: 'Вставить',
-        icon: Icons.delete,
+        icon: Icons.content_paste,
         onSelected: () {
           controller.clipboard.pasteSelection(parent: target);
         },
@@ -188,7 +188,12 @@ class ComponentAndSourceMenu {
         label: 'Удалить',
         icon: Icons.delete,
         onSelected: () {
-          controller.layoutModel.deleteItem(target);
+          // Use undoable delete instead of direct model manipulation
+          final itemToDelete = controller.getItemById(target.id);
+          if (itemToDelete != null) {
+            controller.select(target.id);
+            controller.deleteSelected();
+          }
           onChanged!(RemoveItemEvent(id: target.id));
         },
       ),

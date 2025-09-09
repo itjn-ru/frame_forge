@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'events.dart';
 
-/// Класс, который действует как шина событий.
-///
-/// Этот класс отвечает за обработку и отправку событий, связанных
-/// с [LayoutModelController]. Он позволяет различным частям приложения
-/// взаимодействовать друг с другом путем отправки и получения событий.
-///
 /// Events can object instances should extend the [NodeEditorEvent] class.
+/// A class that acts as an event bus.
+/// This class is responsible for handling and dispatching events related
+/// to the [LayoutModelController]. It allows different parts of the application
+/// to communicate with each other by sending and receiving events.
+/// Events should be instances of classes that extend the [LayoutModelEvent] class.
 class LayoutModelEventBus {
+  /// Underlying stream controller for broadcasting events.
   final _streamController = StreamController<LayoutModelEvent>.broadcast();
 
   /// Emits an event to the event bus.
@@ -22,5 +22,6 @@ class LayoutModelEventBus {
     _streamController.close();
   }
 
+  /// Provides a stream of events for listeners to subscribe to.
   Stream<LayoutModelEvent> get events => _streamController.stream;
 }

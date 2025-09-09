@@ -1,7 +1,20 @@
 # Changelog
 
+## [1.1.0] - 2025-09-10
+
+- fix borderRadius error in new stylePage
+- remove border attributes from componentGroup
+- fix menu actions: copy, cut
+- add controller for resize and move
+- add show the selected item on top
+- add service-oriented architecture with dependency injection
+- implement global keyboard handler with international layout support  
+- add undo/redo system
+- add comprehensive interface abstractions
+- update documentation with detailed features
+- fix Russian keyboard layout compatibility (Ctrl+Z -> Ctrl+Я)
+
 ## [1.0.2] - 2025-09-08
-### Documentation
 - fix switch between ComponentPage
 - fix textAlignt in ComponentText
 - add to Style "BorderSide" (LTRB)

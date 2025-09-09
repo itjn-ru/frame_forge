@@ -261,10 +261,8 @@ class LayoutModel with FromMapToMap {
         type: String,
       );
       stylePage.items.insert(0, basicElement);
-      //curItemOnPage[StylePage] = basicElement;
       _setPageForItem(stylePage, basicElement);
     }
-    //добавляем базовый стиль
   }
 
   /// Мапа для складирования properties для проверки на уникальность
@@ -341,6 +339,22 @@ class LayoutModel with FromMapToMap {
       'items': itemsToMap(root),
     };
     return map['layout'];
+  }
+
+  /// Direct item addition for undo operations
+  /// Bypasses complex logic and directly inserts item at specified index
+  void addItemDirect(Item parent, Item item, {int? index}) {
+    final actualIndex = index ?? parent.items.length;
+    parent.items.insert(actualIndex, item);
+    
+    // Restore page/component mappings
+    final page = getPageByItem(parent);
+    _setPageForItem(page, item);
+    
+    final component = getComponentByItem(parent);
+    if (component != null) {
+      _setComponentForItem(component, item);
+    }
   }
 
   void addItem(Item parent, Item item, {int? index}) {

@@ -71,7 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
       );
   @override
   void initState() {
+    //listen to controller events to update UI
     _layoutModelController.eventBus.events.listen(_handleControllerEvents);
+    // Register global keyboard handler
+    HardwareKeyboard.instance.addHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
     super.initState();
   }
 
@@ -83,6 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    // Remove global keyboard handler
+    HardwareKeyboard.instance.removeHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
     _layoutModelController.dispose();
     super.dispose();
   }

@@ -8,11 +8,38 @@
 This package provides a visual editor for designing and rendering user interfaces.
 Its core concept is using XML as the structure definition for UI. Originally built for documents and structured data, it is well suited for applications following the BDUI (Backend-Driven UI) architecture.
 
-Features:
-📌 XML markup defines UI components and their properties.
-📌 UI designer to visually compose UI and export it as XML.
-📌 Dynamic rendering — the interface is generated from server-provided data without updating the client app.
-📌 Ideal for applications where the UI changes frequently and must be controlled by the server.
+## Features
+
+### Visual UI Designer
+- **Drag & Drop Interface** - Intuitive visual editor for composing layouts
+- **Real-time Preview** - See changes instantly as you design
+- **Multi-screen Support** - Design for mobile, tablet, and desktop simultaneously
+- **Grid-based Layout** - Precise positioning with snap-to-grid functionality
+
+### Architecture & Integration
+- **XML-based Structure** - Clean, readable markup defines UI components and properties
+- **BDUI (Backend-Driven UI)** - Server controls the UI without client app updates
+- **Dynamic Rendering** - Interface generated from server-provided data at runtime
+- **Service-oriented Architecture** - Modular design with dependency injection
+
+### Developer Experience
+- **Undo/Redo System** - Full history management with keyboard shortcuts (Ctrl+Z/Ctrl+Y)
+- **Copy/Paste Operations** - Duplicate components and layouts efficiently
+- **Global Keyboard Handlers** - International keyboard layout support
+- **Project Management** - Save/load projects with custom serialization
+
+### Advanced Features
+- **Component Library** - Rich set of pre-built UI components achieved through flexible style application system
+- **Data Binding** - Connect UI elements to dynamic data sources
+- **Style Management** - Centralized styling with theme support
+- **Process Workflows** - Define complex UI interactions and flows
+- **Responsive Design** - Adaptive layouts for different screen sizes
+
+### Performance & Reliability
+- **Efficient Rendering** - Optimized widget tree updates
+- **Memory Management** - Smart cleanup and resource management  
+- **Error Handling** - Robust error recovery and validation
+- **Cross-platform** - Works seamlessly on Web, Mobile, and Desktop
 
 ## Motivation
 
@@ -54,6 +81,19 @@ dependencies:
           return utf8.decode(file.bytes! as List<int>);
         },
       );
+
+```
+
+If you want to use copy/past/undo/redo from keyboard initialize HardwareKeyboard instance
+
+```dart
+void initState() {
+    //listen to controller events to update UI
+    _layoutModelController.eventBus.events.listen(_handleControllerEvents);
+    // Register global keyboard handler
+    HardwareKeyboard.instance.addHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
+    super.initState();
+  }
 ```
 
 ### Main Components

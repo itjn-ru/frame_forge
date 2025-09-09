@@ -56,6 +56,7 @@ class _MainCanvasState extends State<MainCanvas> {
   bool debugMode = false;
   // Count of items actually rendered in last build
   int _renderedItemCount = 0;
+  final FocusNode _focusNode = FocusNode(debugLabel: 'MainCanvasFocus');
   @override
   void initState() {
     oldConstraints = widget.constraints;
@@ -70,6 +71,12 @@ class _MainCanvasState extends State<MainCanvas> {
     screenSize = ScreenSizeProvider.of(context);
     layoutModel = controller.layoutModel;
     _recalculateScale();
+    // Ensure canvas can receive keyboard focus
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_focusNode.hasFocus) {
+        _focusNode.requestFocus();
+      }
+    });
   }
 
   @override
@@ -99,19 +106,20 @@ class _MainCanvasState extends State<MainCanvas> {
   void dispose() {
     _transform.dispose();
     _panDebounce?.cancel();
+  _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Container(
-        color: Colors.grey.shade50,
-        margin: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          color: Colors.grey.shade50,
+          margin: const EdgeInsets.all(10),
         child: InteractiveViewer.builder(
           panEnabled: true,
           transformationController: _transform,
@@ -268,6 +276,8 @@ class _MainCanvasState extends State<MainCanvas> {
     }
   }
 
+
+
   void _schedulePanEndEmit() {
     _panDebounce?.cancel();
     _panDebounce = Timer(const Duration(milliseconds: 120), () {
@@ -276,6 +286,8 @@ class _MainCanvasState extends State<MainCanvas> {
       } catch (_) {}
     });
   }
+
+
 }
 
 class _ItemUpdateScope extends StatelessWidget {
@@ -300,7 +312,7 @@ class _ItemUpdateScope extends StatelessWidget {
 
       return child;
     }
-    // Не трогай нах
+    // Не трогай
     // Здесь RepaintBoundary помогает избежать лишней перерисовки,
     // если это просто был ChangeItem, но не относящийся к этому item
     final last = controller.lastEvent;

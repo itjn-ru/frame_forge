@@ -239,7 +239,7 @@ final class PanEnd extends LayoutModelEvent {
 /// Abstract base for change events (move, resize, attributes, etc.)
 sealed class ChangeEvent extends LayoutModelEvent {
   final String? itemId;
-  const ChangeEvent({required super.id, required this.itemId});
+  const ChangeEvent({required super.id, required this.itemId, super.isUndoable});
 }
 
 /// Backward compatible generic change event
@@ -256,7 +256,7 @@ final class MoveEvent extends ChangeEvent {
     required super.itemId,
     required this.delta,
     required this.newPosition,
-  });
+  }) : super(isUndoable: true);
 }
 
 /// Emitted when an item is resized in model coordinates
@@ -266,7 +266,17 @@ final class ResizeEvent extends ChangeEvent {
     required super.id,
     required super.itemId,
     required this.newSize,
-  });
+  }) : super(isUndoable: true);
+}
+
+/// Emitted after an undo operation is performed
+final class UndoPerformed extends LayoutModelEvent {
+  const UndoPerformed({required super.id});
+}
+
+/// Emitted after a redo operation is performed
+final class RedoPerformed extends LayoutModelEvent {
+  const RedoPerformed({required super.id});
 }
 
 /// Emitted when item's attributes (non-geometry) change

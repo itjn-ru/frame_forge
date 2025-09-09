@@ -12,6 +12,15 @@ import 'clipboard.dart';
 import 'event_bus.dart';
 import 'events.dart';
 import 'project.dart';
+import 'undo.dart';
+import 'keyboard_handler.dart';
+import 'interfaces/undo_redo_service.dart';
+import 'interfaces/canvas_view_service.dart';
+import 'interfaces/transformation_service.dart';
+import 'services/undo_redo_service_impl.dart';
+import 'services/canvas_view_service_impl.dart';
+import 'services/transformation_service_impl.dart';
+
 
 /// Controller for managing layout model operations and state.
 ///
@@ -41,6 +50,12 @@ class LayoutModelController {
 
   late final LayoutModelClipboard clipboard;
   late final LayoutModelEditorProject project;
+  late final GlobalKeyboardHandler keyboardHandler;
+  
+  /// Services for di
+  late final UndoRedoService undoRedoService;
+  late final CanvasViewService canvasViewService;
+  late final TransformationService transformationService;
 
   LayoutModelEvent? lastEvent;
 
@@ -71,6 +86,12 @@ class LayoutModelController {
       projectLoader: projectLoader,
       projectCreator: projectCreator,
     );
+    keyboardHandler = GlobalKeyboardHandler(this);
+    
+    // Initialize services
+    canvasViewService = CanvasViewServiceImpl(this.eventBus);
+    undoRedoService = UndoRedoServiceImpl(this.eventBus);
+    transformationService = TransformationServiceImpl(canvasViewService, this);
   }
 
   /// Selects an item by its [itemId].
@@ -91,7 +112,6 @@ class LayoutModelController {
   void _listenToEvents() {
     eventBus.events.listen((event) {
       lastEvent = event;
-      debugPrint('Got event: $event');
       if (event is ChangeEvent) {
         changedItems.value = {...changedItems.value, event.itemId};
       }
@@ -237,81 +257,189 @@ class LayoutModelController {
     return await filePickerService.pickImageFile();
   }
 
-  // --- Трансформации ---
-  double _snapToGrid(double value, {double step = 5.0}) =>
-      (value / step).round() * step;
+  // --- Undo/Redo (delegated to service) ---
+  bool get canUndo => undoRedoService.canUndo;
+  bool get canRedo => undoRedoService.canRedo;
 
-  /// Сдвинуть элемент на delta (в координатах модели, без scale).
-  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
-  void move(
-    Item element,
-    Offset delta, {
-    bool snap = false,
-    double step = 5.0,
+  void undo() {
+    (undoRedoService as UndoRedoServiceImpl).executeUndo((action) => action.revert(this));
+  }
+
+  void redo() {
+    (undoRedoService as UndoRedoServiceImpl).executeRedo((action) => action.apply(this));
+  }
+
+  void _pushAction(UndoableAction action) {
+    undoRedoService.pushAction(action);
+  }
+
+  // --- Public methods for creating undo actions (used by ResizableDraggableController) ---
+  void pushMoveAction(String itemId, {required Offset from, required Offset to}) {
+    _pushAction(MoveAction(itemId: itemId, from: from, to: to));
+  }
+
+  void pushResizeAction(String itemId, {required Size from, required Size to}) {
+    _pushAction(ResizeAction(itemId: itemId, from: from, to: to));
+  }
+
+  void pushResizeMoveAction(
+    String itemId, {
+    required Size fromSize,
+    required Size toSize,
+    required Offset fromPos,
+    required Offset toPos,
   }) {
-    final current =
-        (element.properties["position"]?.value as Offset?) ?? Offset.zero;
+    _pushAction(ResizeMoveAction(
+      itemId: itemId,
+      fromSize: fromSize,
+      toSize: toSize,
+      fromPos: fromPos,
+      toPos: toPos,
+    ));
+  }
+  
+  /// Simple move by ID for keyboard handler (arrows)
+  void moveItemById(String? itemId, Offset delta, {bool snap = false, double step = 5.0}) {
+    final item = getItemById(itemId);
+    if (item == null) return;
+    
+    final current = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
     var next = current + delta;
     if (snap) {
+      double snapToGrid(double value, {double step = 5.0}) => (value / step).round() * step;
       next = Offset(
-        _snapToGrid(next.dx, step: step),
-        _snapToGrid(next.dy, step: step),
+        snapToGrid(next.dx, step: step),
+        snapToGrid(next.dy, step: step),
       );
     }
 
-    element.properties["position"]?.value = next;
+    // Push undo action and apply
+    _pushAction(MoveAction(itemId: item.id, from: current, to: next));
+    applyPosition(item.id, next, emitDelta: delta);
+  }
+
+  
+  // --- Internal direct apply helpers used by undo/redo and actions ---
+  void applyPosition(String itemId, Offset next, {Offset? emitDelta}) {
+    final item = getItemById(itemId);
+    if (item == null) return;
+    final prev = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
+    item.properties["position"]?.value = next;
     updateProperty("position", Property("положение", next, type: Offset));
     final id = const Uuid().v4();
-    eventBus.emit(ChangeItem(id: id, itemId: element.id));
+    eventBus.emit(ChangeItem(id: id, itemId: itemId));
     eventBus.emit(
-      MoveEvent(id: id, itemId: element.id, delta: delta, newPosition: next),
+      MoveEvent(
+        id: id,
+        itemId: itemId,
+        delta: emitDelta ?? (next - prev),
+        newPosition: next,
+      ),
     );
   }
 
-  /// Сдвинуть элемент по id.
-  void moveById(
-    String? itemId,
-    Offset delta, {
-    bool snap = false,
-    double step = 5.0,
-  }) {
+  void applySize(String itemId, Size size) {
     final item = getItemById(itemId);
     if (item == null) return;
-    move(item, delta, snap: snap, step: step);
-  }
-
-  /// Задать новый размер (в координатах модели, без scale).
-  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
-  void resize(
-    Item element,
-    Size newSize, {
-    bool snap = false,
-    double step = 5.0,
-  }) {
-    var size = newSize;
-    if (snap) {
-      size = Size(
-        _snapToGrid(newSize.width, step: step),
-        _snapToGrid(newSize.height, step: step),
-      );
-    }
-
-    element.properties["size"]?.value = size;
+    item.properties["size"]?.value = size;
     updateProperty("size", Property("размер", size, type: Size));
     final id = const Uuid().v4();
-    eventBus.emit(ChangeItem(id: id, itemId: element.id));
-    eventBus.emit(ResizeEvent(id: id, itemId: element.id, newSize: size));
+    eventBus.emit(ChangeItem(id: id, itemId: itemId));
+    eventBus.emit(ResizeEvent(id: id, itemId: itemId, newSize: size));
   }
 
-  /// Задать новый размер по id.
-  void resizeById(
-    String? itemId,
-    Size newSize, {
-    bool snap = false,
-    double step = 5.0,
-  }) {
+  // --- Deletion helpers and keyboard API ---
+  void deleteSelected() {
+    final id = selectedId;
+    if (id == null) return;
+    final item = getItemById(id);
+    if (item == null) return;
+  // Find immediate parent and index for undo
+  final parent = layoutModel.findParentById(layoutModel.root, item.id);
+  if (parent == null) return;
+  final index = parent.items.indexOf(item);
+    // Push undo and apply delete
+    _pushAction(DeleteAction(
+      itemId: id,
+      parent: parent,
+      index: index,
+      snapshot: item,
+    ));
+    applyDelete(id);
+  }
+
+  void applyDelete(String itemId) {
     final item = getItemById(itemId);
     if (item == null) return;
-    resize(item, newSize, snap: snap, step: step);
+  final parent = layoutModel.findParentById(layoutModel.root, item.id);
+  if (parent == null) return;
+  parent.items.remove(item);
+  select(parent.id);
+  eventBus.emit(RemoveItemEvent(id: itemId));
+  }
+
+  void applyInsert(Item parent, Item item, {int? index}) {
+    // Check if parent can have children
+    if (parent.mayBeParent) {
+      // Use direct insertion for undo operations to bypass complex addItem logic
+      layoutModel.addItemDirect(parent, item, index: index);
+    } else {
+      // Find the real parent and insert after the selected item
+      final realParent = layoutModel.findParentById(layoutModel.root, parent.id);
+      if (realParent != null) {
+        final selectedIndex = realParent.items.indexOf(parent);
+        final insertIndex = selectedIndex + 1;
+        layoutModel.addItemDirect(realParent, item, index: insertIndex);
+      }
+    }
+    eventBus.emit(AddItemEvent(id: item.id));
+  }
+
+  /// Direct insert for undo operations - restores item to exact original location
+  void applyInsertDirect(Item parent, Item item, {int? index}) {
+    layoutModel.addItemDirect(parent, item, index: index);
+    eventBus.emit(AddItemEvent(id: item.id));
+  }
+
+  // --- Clipboard with undo wrappers ---
+  void pasteItem(Item parent, Item item, {int? index}) {
+    // Determine the actual parent and index for insertion
+    Item actualParent;
+    int? actualIndex;
+    
+    if (parent.mayBeParent) {
+      actualParent = parent;
+      actualIndex = index;
+    } else {
+      // Find the real parent and calculate insertion index
+      final realParent = layoutModel.findParentById(layoutModel.root, parent.id);
+      if (realParent != null) {
+        actualParent = realParent;
+        final selectedIndex = realParent.items.indexOf(parent);
+        actualIndex = selectedIndex + 1;
+      } else {
+        actualParent = parent; // Fallback
+        actualIndex = index;
+      }
+    }
+    
+    _pushAction(InsertAction(parent: actualParent, snapshot: item, index: actualIndex));
+    applyInsert(parent, item, index: index);
+  }
+
+  Future<void> cutSelected() async {
+    final id = selectedId;
+    if (id == null) return;
+    final item = getItemById(id);
+    if (item == null) return;
+    final parent = layoutModel.findParentById(layoutModel.root, item.id);
+    if (parent == null) return;
+    _pushAction(DeleteAction(
+      itemId: id,
+      parent: parent,
+      index: parent.items.indexOf(item),
+      snapshot: item,
+    ));
+    applyDelete(id);
   }
 }

@@ -20,15 +20,16 @@ class ResizableDraggableController extends ChangeNotifier {
     required this.canvasHeight,
     this.cellWidth = 10.0,
     this.cellHeight = 10.0,
-  }) : _snapPolicy = GridSnapPolicy(stepX: cellWidth, stepY: cellHeight, enabled: true),
-       _boundsPolicy = BoundsPolicy(
-         minWidth: 20.0,
-         minHeight: 20.0,
-         maxRight: canvasWidth,
-         maxBottom: canvasHeight,
-       );
+  })  : _snapPolicy =
+            GridSnapPolicy(stepX: cellWidth, stepY: cellHeight, enabled: true),
+        _boundsPolicy = BoundsPolicy(
+          minWidth: 20.0,
+          minHeight: 20.0,
+          maxRight: canvasWidth,
+          maxBottom: canvasHeight,
+        );
 
-/// Target item and visual options
+  /// Target item and visual options
   final LayoutModelController layoutController;
 
   /// scale of canvas constraints to real size
@@ -42,10 +43,13 @@ class ResizableDraggableController extends ChangeNotifier {
 
   /// width of each cell in the grid
   final double cellWidth;
+
   /// height of each cell in the grid
   final double cellHeight;
+
   /// Policies for snapping
   SnapPolicy _snapPolicy;
+
   /// Policy for bounding within canvas
   BoundsPolicy _boundsPolicy;
 
@@ -75,7 +79,7 @@ class ResizableDraggableController extends ChangeNotifier {
     if (_snapToGridEnabled == v) return;
     _snapToGridEnabled = v;
     if (_snapPolicy is GridSnapPolicy) {
-      _snapPolicy = ( _snapPolicy as GridSnapPolicy).copyWith(enabled: v);
+      _snapPolicy = (_snapPolicy as GridSnapPolicy).copyWith(enabled: v);
     }
     notifyListeners();
   }
@@ -105,13 +109,13 @@ class ResizableDraggableController extends ChangeNotifier {
   void initFromItem({required Item? item, required Offset position}) {
     child = item;
 
-  // Initial position: snap in model space via SnapPolicy if enabled
-  final leftM0 = position.dx / scaleFactor;
-  final topM0 = position.dy / scaleFactor;
-  final leftM = _snapToGridEnabled ? _snapPolicy.snapX(leftM0) : leftM0;
-  final topM = _snapToGridEnabled ? _snapPolicy.snapY(topM0) : topM0;
-  _trW = leftM * scaleFactor;
-  _trH = topM * scaleFactor;
+    // Initial position: snap in model space via SnapPolicy if enabled
+    final leftM0 = position.dx / scaleFactor;
+    final topM0 = position.dy / scaleFactor;
+    final leftM = _snapToGridEnabled ? _snapPolicy.snapX(leftM0) : leftM0;
+    final topM = _snapToGridEnabled ? _snapPolicy.snapY(topM0) : topM0;
+    _trW = leftM * scaleFactor;
+    _trH = topM * scaleFactor;
 
     // Get real sizes from the component
     final componentSize = item?.properties["size"]?.value as Size?;
@@ -142,7 +146,8 @@ class ResizableDraggableController extends ChangeNotifier {
       return ResizeDirection.topRight;
     } else if (x <= _resizeEdgeWidth && y >= height - _resizeEdgeWidth) {
       return ResizeDirection.bottomLeft;
-    } else if (x >= width - _resizeEdgeWidth && y >= height - _resizeEdgeWidth) {
+    } else if (x >= width - _resizeEdgeWidth &&
+        y >= height - _resizeEdgeWidth) {
       return ResizeDirection.bottomRight;
     } else if (y <= _resizeEdgeWidth) {
       return ResizeDirection.top;
@@ -182,7 +187,7 @@ class ResizableDraggableController extends ChangeNotifier {
 
     if (_currentResizeDirection != ResizeDirection.none) {
       _isResizing = true;
-  _startResizeSession();
+      _startResizeSession();
     } else {
       // Begin a move session in model space
       _startMoveSession();
@@ -203,31 +208,39 @@ class ResizableDraggableController extends ChangeNotifier {
     if (!selected || child == null) return;
 
     if (_isResizing) {
-      _endResizeSession();
       // Final size in model coordinates with grid snapping (separate X/Y) in model space
       final modelW = _dynamicW / scaleFactor;
       final modelH = _dynamicH / scaleFactor;
-  final snappedW = _snapPolicy.snapX(modelW);
-  final snappedH = _snapPolicy.snapY(modelH);
+      final snappedW = _snapPolicy.snapX(modelW);
+      final snappedH = _snapPolicy.snapY(modelH);
       final finalSizeModel = Size(snappedW, snappedH);
 
-      // Apply to layout controller
-      layoutController.resize(child!, finalSizeModel, snap: false);
+      // Capture the size before resize started for accurate undo
+      final startSize = _resizeSession != null
+          ? Size(_resizeSession!.startWidthM, _resizeSession!.startHeightM)
+          : (child?.properties["size"]?.value as Size? ??
+              Size(_dynamicW / scaleFactor, _dynamicH / scaleFactor));
 
-      // If resizing from left/top edges, position may change too
-      // Snap absolute position to grid (separate X/Y steps) in model space
-      final absScaled = Offset(_updateMoveOffset.dx + _trW, _updateMoveOffset.dy + _trH);
-      final absModel = Offset(absScaled.dx / scaleFactor, absScaled.dy / scaleFactor);
+      // Compute new absolute position (snapped) in model space
+      final absScaled =
+          Offset(_updateMoveOffset.dx + _trW, _updateMoveOffset.dy + _trH);
+      final absModel =
+          Offset(absScaled.dx / scaleFactor, absScaled.dy / scaleFactor);
       final snappedModelPos = Offset(
-  _snapPolicy.snapX(absModel.dx),
-  _snapPolicy.snapY(absModel.dy),
+        _snapPolicy.snapX(absModel.dx),
+        _snapPolicy.snapY(absModel.dy),
       );
+
+      // Apply both size and potential position change as one undoable action
       final currentModelPos =
           (child?.properties["position"]?.value as Offset?) ?? Offset.zero;
-      final deltaPos = snappedModelPos - currentModelPos;
-      if (deltaPos.dx != 0 || deltaPos.dy != 0) {
-        layoutController.move(child!, deltaPos, snap: false);
-      }
+      resizeAndMaybeMove(
+        child!,
+        finalSizeModel,
+        snappedModelPos,
+        fromSize: startSize,
+        fromAbsPos: currentModelPos,
+      );
 
       // Sync local dynamic sizes to snapped values
       _dynamicW = finalSizeModel.width * scaleFactor;
@@ -246,8 +259,9 @@ class ResizableDraggableController extends ChangeNotifier {
       _currentResizeDirection = ResizeDirection.none;
 
       notifyListeners();
-  _moveSession = null;
-  } else {
+      _moveSession = null;
+      _endResizeSession();
+    } else {
       // Final position in model coordinates with grid snapping
       final finalAbsScaled = Offset(
         _updateMoveOffset.dx + _trW,
@@ -268,7 +282,7 @@ class ResizableDraggableController extends ChangeNotifier {
       final delta = snappedModelPos - currentModelPos;
 
       // Apply to controller (emits ChangeItem and updates properties)
-      layoutController.move(child!, delta, snap: false);
+      moveItem(child!, delta, snap: false);
 
       // Update local state to the snapped scaled position
       final scaled = Offset(
@@ -279,7 +293,7 @@ class ResizableDraggableController extends ChangeNotifier {
       _updateMoveOffset = relative;
 
       notifyListeners();
-  _moveSession = null;
+      _moveSession = null;
     }
 
     layoutController.eventBus.emit(PanEnd(id: child!.id));
@@ -345,19 +359,19 @@ class ResizableDraggableController extends ChangeNotifier {
     final dxM = details.delta.dx / scaleFactor;
     final dyM = details.delta.dy / scaleFactor;
 
-  _accumulateResize(dxM, dyM);
+    _accumulateResize(dxM, dyM);
 
     // Bounds and min in model space
-  // bounds are enforced via _boundsPolicy below
+    // bounds are enforced via _boundsPolicy below
 
     // Apply snapping for display if enabled and Alt not pressed
-  final altPressed = _isAltPressed();
-  final s = _resizeSession!;
-  double leftM = s.leftM;
-  double topM = s.topM;
-  double rightM = s.rightM;
-  double bottomM = s.bottomM;
-  if (_snapToGridEnabled && !altPressed) {
+    final altPressed = _isAltPressed();
+    final s = _resizeSession!;
+    double leftM = s.leftM;
+    double topM = s.topM;
+    double rightM = s.rightM;
+    double bottomM = s.bottomM;
+    if (_snapToGridEnabled && !altPressed) {
       switch (_currentResizeDirection) {
         case ResizeDirection.right:
           rightM = _snapPolicy.snapX(rightM);
@@ -393,10 +407,10 @@ class ResizableDraggableController extends ChangeNotifier {
     }
 
     // Re-apply clamps after snap
-  leftM = _boundsPolicy.clampLeft(leftM);
-  topM = _boundsPolicy.clampTop(topM);
-  rightM = _boundsPolicy.clampRight(leftM, rightM);
-  bottomM = _boundsPolicy.clampBottom(topM, bottomM);
+    leftM = _boundsPolicy.clampLeft(leftM);
+    topM = _boundsPolicy.clampTop(topM);
+    rightM = _boundsPolicy.clampRight(leftM, rightM);
+    bottomM = _boundsPolicy.clampBottom(topM, bottomM);
 
     // Compose scaled outcome
     _dynamicW = (rightM - leftM) * scaleFactor;
@@ -404,14 +418,7 @@ class ResizableDraggableController extends ChangeNotifier {
     _trW = leftM * scaleFactor - _updateMoveOffset.dx;
     _trH = topM * scaleFactor - _updateMoveOffset.dy;
 
-    // Update component sizes in real time during resize
-    if (child?.properties["size"] != null) {
-      final newComponentSize = Size(
-  _dynamicW / scaleFactor,
-  _dynamicH / scaleFactor,
-      );
-      child?.properties["size"]?.value = newComponentSize;
-    }
+    // Don't mutate model during live resize; commit on pan end
 
     notifyListeners();
   }
@@ -430,6 +437,8 @@ class ResizableDraggableController extends ChangeNotifier {
       rightM: rightM,
       bottomM: bottomM,
       direction: _currentResizeDirection,
+      startWidthM: _dynamicW / scaleFactor,
+      startHeightM: _dynamicH / scaleFactor,
     );
   }
 
@@ -489,5 +498,64 @@ class ResizableDraggableController extends ChangeNotifier {
     return keys.contains(LogicalKeyboardKey.altLeft) ||
         keys.contains(LogicalKeyboardKey.altRight) ||
         keys.contains(LogicalKeyboardKey.alt);
+  }
+
+  // --- Transformation methods (moved from LayoutModelController) ---
+
+  /// Сдвинуть элемент на delta (в координатах модели, без scale).
+  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
+  void moveItem(
+    Item element,
+    Offset delta, {
+    bool snap = false,
+    double step = 5.0,
+  }) {
+    // Delegate to transformation service
+    layoutController.transformationService
+        .moveItem(element, delta, snap: snap, step: step);
+  }
+
+  /// Сдвинуть элемент по id.
+  void moveItemById(
+    String? itemId,
+    Offset delta, {
+    bool snap = false,
+    double step = 5.0,
+  }) {
+    // Delegate to transformation service
+    layoutController.transformationService
+        .moveItemById(itemId, delta, snap: snap, step: step);
+  }
+
+  /// Задать новый размер (в координатах модели, без scale).
+  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
+  void resizeItem(
+    Item element,
+    Size newSize, {
+    bool snap = false,
+    double step = 5.0,
+    Size? fromSize,
+  }) {
+    // Delegate to transformation service
+    layoutController.transformationService.resizeItem(element, newSize,
+        snap: snap, step: step, fromSize: fromSize);
+  }
+
+  /// Apply a combined resize and optional position change as a single undoable action.
+  void resizeAndMaybeMove(
+    Item element,
+    Size newSize,
+    Offset? newAbsPos, {
+    Size? fromSize,
+    Offset? fromAbsPos,
+  }) {
+    // Delegate to transformation service
+    layoutController.transformationService.resizeAndMaybeMove(
+      element,
+      newSize,
+      newAbsPos,
+      fromSize: fromSize,
+      fromPosition: fromAbsPos,
+    );
   }
 }

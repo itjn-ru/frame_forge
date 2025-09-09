@@ -11,25 +11,22 @@ import 'events.dart';
 import 'helpers/snackbar.dart';
 import 'layout_model_controller.dart';
 
-///Класс, который управляет операциями буфера обмена
-///
-/// Операции с буфером обмена включают копирование, вставку и вырезание
+/// Class that manages clipboard operations.
 class LayoutModelClipboard with FromMapToMap {
+  ///Controller for clipboard operations.
   final LayoutModelController controller;
 
+  ///Event bus for emitting clipboard-related events.
   LayoutModelEventBus get eventBus => controller.eventBus;
 
+  ///Getter for the currently selected item.
   Item? get item => controller.getCurrentItem();
 
-  ComponentAndSourcePage? get page => item == null ? null : controller.layoutModel.getPageByItem(item!);
+  ComponentAndSourcePage? get page =>
+      item == null ? null : controller.layoutModel.getPageByItem(item!);
 
   LayoutModelClipboard(this.controller);
 
-  /// Копирует выбранные элементы в буфер обмена.
-  ///
-  /// Скопированный [Item] сериализуется, а затем кодируются в Base64
-  /// (во избежание прямого вмешательства в данные JSON),
-  /// а затем копируются в буфер обмена.
   Future<String> copySelection() async {
     if (item == null) {
       showNodeEditorSnackbar(
@@ -62,11 +59,7 @@ class LayoutModelClipboard with FromMapToMap {
     return base64Data;
   }
 
-  /// Вставляет элементы из буфера обмена в редактор.
-  ///
-  /// Данные буфера обмена декодируются из base64, а затем из JSON.
-  /// Данные JSON затем используются для создания экземпляров [Item].
-  /// Затем присваевается новый идентификатор и добавляется в редактор.
+  
   void pasteSelection({required Item parent}) async {
     final clipboardData = await Clipboard.getData('text/plain');
     if (clipboardData == null || clipboardData.text!.isEmpty) return;
@@ -91,12 +84,8 @@ class LayoutModelClipboard with FromMapToMap {
       ..properties.addAll(newItem.properties)
       ..items.addAll(newItem.items);
     pasteItem.properties['id']?.value = const Uuid().v4();
-    final page = controller.layoutModel.getPageByItem(parent);
-    if (parent.mayBeParent) {
-      controller.layoutModel.addItem(parent, pasteItem);
-    } else {
-      controller.layoutModel.addItemToParent(page, parent, pasteItem);
-    }
+    // Insert via controller to make it undoable
+    controller.pasteItem(parent, pasteItem);
     eventBus.emit(
       PasteSelectionEvent(id: const Uuid().v4(), clipboardData.text!),
     );
@@ -108,9 +97,7 @@ class LayoutModelClipboard with FromMapToMap {
   /// После чего элемент удаляется из редактора, и выделение очищается.
   void cutSelection() async {
     final clipboardContent = await copySelection();
-
-    controller.layoutModel.deleteItem(item!);
-
+    await controller.cutSelected();
     eventBus.emit(CutSelectionEvent(id: const Uuid().v4(), clipboardContent));
   }
 }
