@@ -1,0 +1,40 @@
+name: Build & Deploy Flutter Web
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.24.0'
+
+      - name: Enable web support
+        run: flutter config --enable-web
+
+      - name: Install dependencies (example/)
+        working-directory: example
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        working-directory: example
+        run: flutter build web --release
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: example/build/web
+          publish_branch: gh-pages
+          force_orphan: true
