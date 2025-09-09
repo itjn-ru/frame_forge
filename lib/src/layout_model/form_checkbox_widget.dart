@@ -10,7 +10,7 @@ class FormCheckboxWidget extends ComponentWidget {
   Widget buildWidget(BuildContext context) {
     final controller = LayoutModelControllerProvider.of(context);
     final layoutModel = controller.layoutModel;
-    var style =
+    StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
         StyleElement("стиль");
     final double fontSize = style['fontSize'];

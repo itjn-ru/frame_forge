@@ -19,7 +19,7 @@ class ComponentTextWidget extends ComponentWidget {
     String text = component["text"];
     final controller = LayoutModelControllerProvider.of(context);
     final layoutModel = controller.layoutModel;
-    var style =
+    StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
         StyleElement("стиль");
     final alignment = component['alignment'];

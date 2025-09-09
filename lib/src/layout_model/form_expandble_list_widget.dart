@@ -47,7 +47,7 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
 
   late final modelController = LayoutModelControllerProvider.of(context);
   late final layoutModel = modelController.layoutModel;
-  late var style =
+  late StyleElement style =
       layoutModel.getStyleElementById(widget.component['style'].id) ??
       StyleElement("стиль");
   late final border = style['borderRadius'];

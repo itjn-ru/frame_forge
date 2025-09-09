@@ -30,7 +30,7 @@ class ComponentDecorationWidget extends StatelessWidget {
         StyleElement("стиль");
     final  CustomBorderRadius borderRadiusValue = style.properties['borderRadius']?.value;
 
-    final BorderRadius? border = (borderRadiusValue == null || borderRadiusValue is Type)
+    final BorderRadius? border = (borderRadiusValue is Type)
         ? null
         : borderRadiusValue.borderRadius(scaleFactor);
     final List<dynamic> padding = style['padding'] ?? [0, 0, 0, 0];

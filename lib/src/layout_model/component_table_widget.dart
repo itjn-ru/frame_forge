@@ -47,7 +47,7 @@ class ComponentTableWidget extends ComponentWidget {
           }
           final controller = LayoutModelControllerProvider.of(context);
           final layoutModel = controller.layoutModel;
-          var style =
+          StyleElement style =
               layoutModel.getStyleElementById(cell['style'].id) ??
               StyleElement("стиль");
 
@@ -162,7 +162,7 @@ class ComponentTableWidget extends ComponentWidget {
             cellText = cell["text"] ?? "";
           }
 
-          var style = layoutModel.getStyleElementById(cell['style'].id) ??
+          StyleElement style = layoutModel.getStyleElementById(cell['style'].id) ??
               StyleElement("стиль");
 
           tableCells.add(pw.TableCellVerticalAlignment(
@@ -243,7 +243,7 @@ class ComponentTableWidget extends ComponentWidget {
           if (cellText.isEmpty) {
             cellText = cell["text"] ?? "";
           }
-          var style = layoutModel.getStyleElementById(cell['style'].id) ??
+          StyleElement style = layoutModel.getStyleElementById(cell['style'].id) ??
               StyleElement("стиль");
           final double fontSize= style['fontSize'];
           late bool softWrap;

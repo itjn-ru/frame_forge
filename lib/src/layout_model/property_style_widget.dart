@@ -9,9 +9,9 @@ class PropertyStyleWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final  property = controller.getCurrentItem()?.properties[propertyKey]!;
 
-    var styles = controller.layoutModel.styles;
+    List<Style> styles = controller.layoutModel.styles;
 
     if (!styles.contains(property?.value)) {
       property?.value = Style.basic;
