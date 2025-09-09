@@ -15,7 +15,7 @@ import 'item.dart';
 ///
 /// Returns a formatted XML string representation of the layout model.
 String saveMap(Map root) {
-  final builder = XmlBuilder();
+  final XmlBuilder builder = XmlBuilder();
   builder.processing("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 
   builder.element(
@@ -26,7 +26,7 @@ String saveMap(Map root) {
     },
   );
 
-  final document = builder.buildDocument();
+  final XmlDocument document = builder.buildDocument();
   return document.toXmlString(pretty: true);
 }
 
@@ -87,8 +87,8 @@ _saveMapItems(XmlBuilder builder, List items) {
 ///
 /// Returns a map representation of the layout model.
 Map<String, dynamic> readMap(String layout) {
-  final xml = XmlDocument.parse(layout);
-  final xmlRoot = xml.rootElement;
+  final XmlDocument xml = XmlDocument.parse(layout);
+  final XmlElement xmlRoot = xml.rootElement;
 
   final Map<String, dynamic> root = {};
   root['properties'] = _readMapProperties(xmlRoot.getElement("properties"));
@@ -102,8 +102,8 @@ Map<String, dynamic> readMap(String layout) {
 /// [xmlProperties] The XML element containing properties to parse
 ///
 /// Returns a map of property names to their values.
-Map _readMapProperties(XmlElement? xmlProperties) {
-  final Map properties = {};
+Map<String, dynamic> _readMapProperties(XmlElement? xmlProperties) {
+  final Map<String, dynamic> properties = {};
 
   if (xmlProperties == null) {
     return properties;
@@ -114,13 +114,13 @@ Map _readMapProperties(XmlElement? xmlProperties) {
   }
 
   for (final XmlElement xmlProperty in xmlProperties.childElements) {
-    final xmlValue = xmlProperty.children;
-    final propertyKey = xmlProperty.localName;
+    final List<XmlNode> xmlValue = xmlProperty.children;
+    final String propertyKey = xmlProperty.localName;
     dynamic propertyValue;
 
     if (xmlProperty.attributes.isNotEmpty) {
-      propertyValue = {
-        for (final attribute in xmlProperty.attributes)
+      propertyValue = <String, String>{
+        for (final XmlAttribute attribute in xmlProperty.attributes)
           attribute.localName: attribute.value,
       };
     } else if (xmlValue.isNotEmpty) {
@@ -148,8 +148,8 @@ Map _readMapProperties(XmlElement? xmlProperties) {
   return properties;
 }
 
-List _readMapItems(XmlElement? xmlItems) {
-  final List items = [];
+List<Map<String, dynamic>> _readMapItems(XmlElement? xmlItems) {
+  final List<Map<String, dynamic>> items = [];
 
   if (xmlItems == null) {
     return items;
@@ -160,7 +160,7 @@ List _readMapItems(XmlElement? xmlItems) {
   }
 
   for (final XmlElement xmlItem in xmlItems.childElements) {
-    final item = {
+    final Map<String, dynamic> item = <String, dynamic>{
       'type': xmlItem.localName,
       'properties': _readMapProperties(xmlItem.getElement("properties")),
       'items': _readMapItems(xmlItem.getElement("items")),
@@ -172,7 +172,7 @@ List _readMapItems(XmlElement? xmlItems) {
 }
 
 String save(Root root) {
-  final builder = XmlBuilder();
+  final XmlBuilder builder = XmlBuilder();
   builder.processing("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 
   builder.element(
@@ -183,7 +183,7 @@ String save(Root root) {
     },
   );
 
-  final document = builder.buildDocument();
+  final XmlDocument document = builder.buildDocument();
 
   return document.toXmlString(pretty: true);
 }
@@ -192,7 +192,7 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
   builder.element(
     "properties",
     nest: () {
-      properties.forEach((key, property) {
+      properties.forEach((String key, Property property) {
         builder.element(
           key,
           nest: () {
@@ -237,7 +237,7 @@ _saveItems(XmlBuilder builder, List<Item> items) {
   builder.element(
     "items",
     nest: () {
-      for (final element in items) {
+      for (final Item element in items) {
         builder.element(
           element.type,
           nest: () {
@@ -251,10 +251,10 @@ _saveItems(XmlBuilder builder, List<Item> items) {
 }
 
 Root read(String layout) {
-  final xml = XmlDocument.parse(layout);
-  final xmlRoot = xml.rootElement;
+  final XmlDocument xml = XmlDocument.parse(layout);
+  final XmlElement xmlRoot = xml.rootElement;
 
-  final properties = _readProperties(xmlRoot.getElement("properties"));
+  final Map<String, Property> properties = _readProperties(xmlRoot.getElement("properties"));
 
   final Root root = Root(properties["name"]);
   root.properties = properties;

@@ -137,7 +137,7 @@ Column(
 ```
 
 Вывод вьюшки, как страница выглядит
-Обязательно указать размер экрана из [enum ScreenSizeEnum]
+Обязательно указать размер экрана из [ScreenSizeEnum]
 ```dart
 LayoutBuilder(
     builder: (context, constraints) {

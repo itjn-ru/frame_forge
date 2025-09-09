@@ -147,7 +147,7 @@ Column(
 ```
 
 Output preview - how the page looks
-Make sure to specify screen size from [enum ScreenSizeEnum]
+Make sure to specify screen size from [ScreenSizeEnum]
 ```dart
 LayoutBuilder(
     builder: (context, constraints) {

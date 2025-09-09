@@ -1,3 +1,6 @@
+import 'package:vector_math/vector_math_64.dart' as quad;
+
+import '../page.dart';
 import 'screensize_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart' show DeepCollectionEquality;
@@ -22,8 +25,8 @@ class MainCanvas extends StatefulWidget {
 }
 
 class _MainCanvasState extends State<MainCanvas> {
-  List<Widget> templateWidgets = [];
-  List<Item> items = [];
+  List<Widget> templateWidgets = <Widget>[];
+  List<Item> items = <Item>[];
   double wrappedWidth = 0;
   double wrappedHeight = 0;
   Offset position = const Offset(0, 0);
@@ -95,8 +98,8 @@ class _MainCanvasState extends State<MainCanvas> {
     _canvasHeight = widget.constraints.maxHeight - 20;
     scaleFactor = _canvasWidth / screenSize.width;
   // Grid step is stored in model units; convert to pixels for drawing
-  final modelStepX = controller.gridStepX; // default 20
-  final modelStepY = controller.gridStepY; // default 20
+  final double modelStepX = controller.gridStepX; // default 20
+  final double modelStepY = controller.gridStepY; // default 20
   cellWidth = modelStepX * scaleFactor;
   cellHeight = modelStepY * scaleFactor;
     viewport = Rect.fromLTRB(0, 0, _canvasWidth, _canvasHeight);
@@ -123,13 +126,13 @@ class _MainCanvasState extends State<MainCanvas> {
         child: InteractiveViewer.builder(
           panEnabled: true,
           transformationController: _transform,
-          onInteractionStart: (details) {},
-          onInteractionUpdate: (details) {
+          onInteractionStart: (ScaleStartDetails details) {},
+          onInteractionUpdate: (ScaleUpdateDetails details) {
             _onPanUpdate(details.focalPointDelta);
             // Debounce emitting PanEnd to avoid spamming event bus on each frame
             _schedulePanEndEmit();
           },
-          onInteractionEnd: (scaleEndDetails) {
+          onInteractionEnd: (ScaleEndDetails details) {
             scaleZoom = _transform.value.getMaxScaleOnAxis();
             controller.viewportZoom = scaleZoom;
             // Cancel any pending debounce and emit final PanEnd immediately
@@ -138,45 +141,45 @@ class _MainCanvasState extends State<MainCanvas> {
           },
           minScale: 1,
           maxScale: 8,
-          builder: (BuildContext context, quad) {
+          builder: (BuildContext context, quad.Quad quad) {
             return SizedBox.fromSize(
-              key: ValueKey('${_canvasWidth}_${_canvasHeight}'),
+              key: ValueKey<String>('${_canvasWidth}_$_canvasHeight'),
               // key: UniqueKey(),
               size: viewport.size,
               child: ValueListenableBuilder<Set<String?>>(
                 valueListenable: controller.changedItems,
-                builder: (context, updatedItemIds, _) {
+                builder: (BuildContext context, Set<String?> updatedItemIds, _) {
                   // Rebuild ordering when selection changes so selected is on top
                   return ValueListenableBuilder<String?>(
                     valueListenable: controller.selectedIdNotifier,
-                    builder: (context, selectedId, __) {
-                      final curPage = controller.getCurrentPage();
+                    builder: (BuildContext context, String? selectedId, __) {
+                      final ComponentAndSourcePage curPage = controller.getCurrentPage();
                       // Simple view culling: render only items that intersect the viewport
-                      final expandedViewport = viewport.inflate(200);
-                      final items = curPage.items;
-                      final nonSelected = <Widget>[];
+                      final Rect expandedViewport = viewport.inflate(200);
+                      final List<Item> items = curPage.items;
+                      final List<Widget> nonSelected = <Widget>[];
                       Widget? selectedWidget;
                       _renderedItemCount = 0;
 
-                      for (var i = 0; i < items.length; i++) {
-                        final item = items[i];
-                        final dx = (item["position"]?.dx ?? 0) * scaleFactor;
-                        final dy = (item["position"]?.dy ?? 0) * scaleFactor;
-                        final w =
+                      for (int i = 0; i < items.length; i++) {
+                        final Item item = items[i];
+                        final double dx = (item["position"]?.dx ?? 0) * scaleFactor;
+                        final double dy = (item["position"]?.dy ?? 0) * scaleFactor;
+                        final double w =
                             (item["size"]?.width ?? _canvasWidth) * scaleFactor;
-                        final h = (item["size"]?.height ?? 30) * scaleFactor;
+                        final double h = (item["size"]?.height ?? 30) * scaleFactor;
 
-                        final itemRect = Rect.fromLTWH(dx, dy, w, h);
+                        final Rect itemRect = Rect.fromLTWH(dx, dy, w, h);
                         if (!itemRect.overlaps(expandedViewport)) {
                           continue;
                         }
 
                         _renderedItemCount++;
-                        final widgetItem = _ItemUpdateScope(
+                        final Widget widgetItem = _ItemUpdateScope(
                           itemId: item.id,
                           updatedItemIds: updatedItemIds,
                           child: ResizableDraggableWidget(
-                            key: ValueKey(item.id),
+                            key: ValueKey<String>(item.id),
                             position: Offset(dx, dy),
                             initWidth: w == 0 ? _canvasWidth : w,
                             initHeight: h == 0 ? 30 : h,
@@ -200,7 +203,7 @@ class _MainCanvasState extends State<MainCanvas> {
                         }
                       }
 
-                      final children = <Widget>[
+                      final List<Widget> children = <Widget>[
                         Positioned.fill(
                           child: GridBackgroundBuilder(
                             quad: quad,
@@ -229,7 +232,7 @@ class _MainCanvasState extends State<MainCanvas> {
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
+                                  children: <Widget>[
                                     Text(
                                       'scaleFactor: ${scaleFactor.toStringAsFixed(2)}',
                                     ),
@@ -302,8 +305,8 @@ class _ItemUpdateScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = LayoutModelControllerProvider.of(context);
-    final shouldUpdate = updatedItemIds.contains(itemId);
+    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final bool shouldUpdate = updatedItemIds.contains(itemId);
     // Отметим как обработанный после перерисовки
     if (shouldUpdate) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -315,9 +318,9 @@ class _ItemUpdateScope extends StatelessWidget {
     // Не трогай
     // Здесь RepaintBoundary помогает избежать лишней перерисовки,
     // если это просто был ChangeItem, но не относящийся к этому item
-    final last = controller.lastEvent;
+    final LayoutModelEvent? last = controller.lastEvent;
 
-    final isIsolated = (last is ChangeEvent && last.itemId == itemId);
+    final bool isIsolated = (last is ChangeEvent && last.itemId == itemId);
     return isIsolated ? RepaintBoundary(child: child) : child;
   }
 }

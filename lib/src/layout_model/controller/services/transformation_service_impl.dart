@@ -13,8 +13,8 @@ class TransformationServiceImpl implements TransformationService {
 
   @override
   void moveItem(Item element, Offset delta, {bool snap = false, double step = 5.0}) {
-    final current = (element.properties["position"]?.value as Offset?) ?? Offset.zero;
-    var next = current + delta;
+    final Offset current = (element.properties["position"]?.value as Offset?) ?? Offset.zero;
+    Offset next = current + delta;
     if (snap) {
       next = Offset(
         snapToGrid(next.dx, step: step),
@@ -29,15 +29,15 @@ class TransformationServiceImpl implements TransformationService {
 
   @override
   void moveItemById(String? itemId, Offset delta, {bool snap = false, double step = 5.0}) {
-    final item = _layoutController.getItemById(itemId);
+    final Item? item = _layoutController.getItemById(itemId);
     if (item == null) return;
     moveItem(item, delta, snap: snap, step: step);
   }
 
   @override
   void resizeItem(Item element, Size newSize, {bool snap = false, double step = 5.0, Size? fromSize}) {
-    final current = (element.properties["size"]?.value as Size?) ?? Size.zero;
-    var next = Size(
+    final Size current = (element.properties["size"]?.value as Size?) ?? Size.zero;
+    Size next = Size(
       max(newSize.width, 10), // Minimum width
       max(newSize.height, 10), // Minimum height
     );
@@ -55,10 +55,10 @@ class TransformationServiceImpl implements TransformationService {
 
   @override
   void resizeAndMaybeMove(Item element, Size newSize, Offset? newPosition, {Size? fromSize, Offset? fromPosition}) {
-    final currentSize = (element.properties["size"]?.value as Size?) ?? Size.zero;
-    final currentPosition = (element.properties["position"]?.value as Offset?) ?? Offset.zero;
-    
-    var finalSize = Size(
+    final Size currentSize = (element.properties["size"]?.value as Size?) ?? Size.zero;
+    final Offset currentPosition = (element.properties["position"]?.value as Offset?) ?? Offset.zero;
+
+    Size finalSize = Size(
       max(newSize.width, 10),
       max(newSize.height, 10),
     );

@@ -11,7 +11,7 @@ class ScreenSizeProvider extends InheritedWidget {
   });
 
   static ScreenSizeEnum of(BuildContext context) {
-    final provider = context
+    final ScreenSizeProvider? provider = context
         .dependOnInheritedWidgetOfExactType<ScreenSizeProvider>();
     assert(provider != null, 'No ScreenSizeProvider found in context');
     return provider!.screenSize;

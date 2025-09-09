@@ -4,7 +4,7 @@ import 'constants.dart';
 
 /// Извлекает глобальный offset виджета с помощью [GlobalKey].
 Offset? getOffsetFromGlobalKey(GlobalKey key) {
-  final renderObject = key.currentContext?.findRenderObject();
+  final RenderObject? renderObject = key.currentContext?.findRenderObject();
   if (renderObject is RenderBox) {
     return renderObject.localToGlobal(Offset.zero);
   }
@@ -13,8 +13,8 @@ Offset? getOffsetFromGlobalKey(GlobalKey key) {
 
 /// Извлекает глобальный offset виджета относительно другого виджета.
 Offset? getOffsetFromGlobalKeyRelativeTo(GlobalKey key, GlobalKey relativeTo) {
-  final renderObject = key.currentContext?.findRenderObject();
-  final relativeRenderObject = relativeTo.currentContext?.findRenderObject();
+  final RenderObject? renderObject = key.currentContext?.findRenderObject();
+  final RenderObject? relativeRenderObject = relativeTo.currentContext?.findRenderObject();
   if (renderObject is RenderBox && relativeRenderObject is RenderBox) {
     return renderObject.localToGlobal(
       Offset.zero,
@@ -26,7 +26,7 @@ Offset? getOffsetFromGlobalKeyRelativeTo(GlobalKey key, GlobalKey relativeTo) {
 
 /// Извлекает размер виджета с помощью [GlobalKey].
 Size? getSizeFromGlobalKey(GlobalKey key) {
-  final renderObject = key.currentContext?.findRenderObject();
+  final RenderObject? renderObject = key.currentContext?.findRenderObject();
   if (renderObject is RenderBox) {
     return renderObject.size;
   }
@@ -49,8 +49,8 @@ Rect? getNodeBoundsInWorld(Item item) {
 }
 
 Rect? getEditorBoundsInScreen(GlobalKey key) {
-  final size = getSizeFromGlobalKey(key);
-  final offset = getOffsetFromGlobalKey(key);
+  final Size? size = getSizeFromGlobalKey(key);
+  final Offset? offset = getOffsetFromGlobalKey(key);
   if (size != null && offset != null) {
     return Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height);
   }
@@ -60,15 +60,15 @@ Rect? getEditorBoundsInScreen(GlobalKey key) {
 /// Преобразует положение экрана в положение canvas.
 Offset? screenToWorld(Offset screenPosition, Offset offset, double zoom) {
   // Получить доступ к границам виджета редактора на экране
-  final nodeEditorBounds = getEditorBoundsInScreen(kNodeEditorWidgetKey);
+  final Rect? nodeEditorBounds = getEditorBoundsInScreen(kNodeEditorWidgetKey);
   if (nodeEditorBounds == null) return null;
-  final size = nodeEditorBounds.size;
+  final Size size = nodeEditorBounds.size;
 
   // Подогнать положение экрана относительно левого верхнего угла редактора
-  final adjustedScreenPosition = screenPosition - nodeEditorBounds.topLeft;
+  final Offset adjustedScreenPosition = screenPosition - nodeEditorBounds.topLeft;
 
   // Вычислить прямоугольник viewport в canvas
-  final viewport = Rect.fromLTWH(
+  final Rect viewport = Rect.fromLTWH(
     -size.width / 2 / zoom - offset.dx,
     -size.height / 2 / zoom - offset.dy,
     size.width / zoom,
@@ -76,9 +76,9 @@ Offset? screenToWorld(Offset screenPosition, Offset offset, double zoom) {
   );
 
   // Вычислить положение canvas, соответствующее положению экрана
-  final canvasX =
+  final double canvasX =
       viewport.left + (adjustedScreenPosition.dx / size.width) * viewport.width;
-  final canvasY =
+  final double canvasY =
       viewport.top +
       (adjustedScreenPosition.dy / size.height) * viewport.height;
 

@@ -55,8 +55,8 @@ class CanvasViewServiceImpl implements CanvasViewService {
 
   @override
   void setGridSteps({double? stepX, double? stepY}) {
-    final newX = stepX ?? _gridStepX;
-    final newY = stepY ?? _gridStepY;
+    final double newX = stepX ?? _gridStepX;
+    final double newY = stepY ?? _gridStepY;
     if (newX == _gridStepX && newY == _gridStepY) return;
     _gridStepX = newX;
     _gridStepY = newY;

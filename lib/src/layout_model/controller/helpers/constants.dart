@@ -1,3 +1,3 @@
 import 'package:flutter/material.dart';
 
-final kNodeEditorWidgetKey = GlobalKey();
+final GlobalKey kNodeEditorWidgetKey = GlobalKey();

@@ -35,12 +35,12 @@ class LayoutModelClipboard with FromMapToMap {
       );
       return '';
     }
-    final selectedItem = item!.toMap();
+    final Map<String, dynamic> selectedItem = item!.toMap();
 
     late final String base64Data;
 
     try {
-      final itemJsonData = jsonEncode(selectedItem);
+      final String itemJsonData = jsonEncode(selectedItem);
       base64Data = base64Encode(utf8.encode(itemJsonData));
     } catch (e) {
       showNodeEditorSnackbar(
@@ -61,12 +61,12 @@ class LayoutModelClipboard with FromMapToMap {
 
   
   void pasteSelection({required Item parent}) async {
-    final clipboardData = await Clipboard.getData('text/plain');
+    final ClipboardData? clipboardData = await Clipboard.getData('text/plain');
     if (clipboardData == null || clipboardData.text!.isEmpty) return;
 
     late final Item newItem;
     try {
-      final base64Data = utf8.decode(base64Decode(clipboardData.text!));
+      final String base64Data = utf8.decode(base64Decode(clipboardData.text!));
       final Map<String, dynamic> itemJson =
           jsonDecode(base64Data) as Map<String, dynamic>;
       newItem = Item('item', 'item').fromMap(itemJson);
@@ -96,7 +96,7 @@ class LayoutModelClipboard with FromMapToMap {
   /// Выбранный элемент копируется в буфер обмена, а затем удаляется из редактора.
   /// После чего элемент удаляется из редактора, и выделение очищается.
   void cutSelection() async {
-    final clipboardContent = await copySelection();
+    final String clipboardContent = await copySelection();
     await controller.cutSelected();
     eventBus.emit(CutSelectionEvent(id: const Uuid().v4(), clipboardContent));
   }

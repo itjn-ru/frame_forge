@@ -16,14 +16,14 @@ void createAndShowContextMenu(
 
   isContextMenuVisible = true;
 
-  final menu = ContextMenu(
+  final ContextMenu menu = ContextMenu(
     clipBehavior: Clip.hardEdge,
     entries: entries,
     position: position,
     padding: const EdgeInsets.all(8),
   );
 
-  final copiedValue = await showContextMenu(context, contextMenu: menu).then((
+  final String? copiedValue = await showContextMenu(context, contextMenu: menu).then((
     value,
   ) {
     isContextMenuVisible = false;

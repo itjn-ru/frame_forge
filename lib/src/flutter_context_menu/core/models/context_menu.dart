@@ -51,7 +51,7 @@ class ContextMenu {
   }) : padding = padding ?? const EdgeInsets.all(4.0),
        maxWidth = maxWidth ?? 350.0,
        clipBehavior = clipBehavior ?? Clip.antiAlias,
-       shortcuts = shortcuts ?? const {};
+       shortcuts = shortcuts ?? const <ShortcutActivator, VoidCallback>{};
 
   /// A shortcut method to show the context menu.
   ///

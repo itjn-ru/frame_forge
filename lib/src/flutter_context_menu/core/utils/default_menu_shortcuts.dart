@@ -4,15 +4,15 @@ import 'package:flutter/widgets.dart';
 import '../../widgets/context_menu_state.dart';
 import '../models/context_menu_item.dart';
 
-Map<ShortcutActivator, VoidCallback> defaultMenuShortcuts(
+Map<ShortcutActivator, VoidCallback> defaultMenuShortcuts<T>(
   BuildContext context,
-  ContextMenuItem item,
+  ContextMenuItem<T> item,
   ContextMenuState menuState,
 ) {
-  return {
+  return <ShortcutActivator, VoidCallback>{
     const SingleActivator(LogicalKeyboardKey.arrowRight): () {
       final bool isSubmenuOpen = menuState.isSubmenuOpen;
-      final focusedItemIsNotTheSelectedItem =
+      final bool focusedItemIsNotTheSelectedItem =
           menuState.focusedEntry != menuState.selectedItem;
       if (item.isSubmenuItem &&
           !isSubmenuOpen &&

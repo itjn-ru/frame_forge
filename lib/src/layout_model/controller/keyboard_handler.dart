@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../item.dart';
 import 'layout_model_controller.dart';
 
 /// Global keyboard handler that processes shortcuts at the application level.
@@ -15,9 +16,9 @@ class GlobalKeyboardHandler {
     // Only process key down events
     if (event is! KeyDownEvent) return false;
 
-    final isCtrl = HardwareKeyboard.instance.isControlPressed;
-    final isShift = HardwareKeyboard.instance.isShiftPressed;
-    final isAlt = HardwareKeyboard.instance.isAltPressed;
+    final bool isCtrl = HardwareKeyboard.instance.isControlPressed;
+    final bool isShift = HardwareKeyboard.instance.isShiftPressed;
+    final bool isAlt = HardwareKeyboard.instance.isAltPressed;
 
     // Undo / Redo
     if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyZ) {
@@ -41,8 +42,8 @@ class GlobalKeyboardHandler {
     }
     
     if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyV) {
-      final selId = controller.selectedId;
-      final parent = selId != null
+      final String? selId = controller.selectedId;
+      final Item? parent = selId != null
           ? controller.getItemById(selId)
           : controller.getCurrentPage();
       if (parent != null) {
@@ -66,13 +67,13 @@ class GlobalKeyboardHandler {
     }
 
     // Arrow keys for movement
-    final selectedId = controller.selectedId;
+    final String? selectedId = controller.selectedId;
     if (selectedId != null) {
-      final baseStepX = isAlt ? 1.0 : controller.gridStepX;
-      final baseStepY = isAlt ? 1.0 : controller.gridStepY;
-      final multiplier = isShift ? 5.0 : 1.0;
-      final stepX = baseStepX * multiplier;
-      final stepY = baseStepY * multiplier;
+      final double baseStepX = isAlt ? 1.0 : controller.gridStepX;
+      final double baseStepY = isAlt ? 1.0 : controller.gridStepY;
+      final double multiplier = isShift ? 5.0 : 1.0;
+      final double stepX = baseStepX * multiplier;
+      final double stepY = baseStepY * multiplier;
 
       Offset? delta;
       if (event.physicalKey == PhysicalKeyboardKey.arrowLeft) {

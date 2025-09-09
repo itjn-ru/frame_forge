@@ -10,7 +10,7 @@ import 'events.dart';
 /// Events should be instances of classes that extend the [LayoutModelEvent] class.
 class LayoutModelEventBus {
   /// Underlying stream controller for broadcasting events.
-  final _streamController = StreamController<LayoutModelEvent>.broadcast();
+  final StreamController<LayoutModelEvent> _streamController = StreamController<LayoutModelEvent>.broadcast();
 
   /// Emits an event to the event bus.
   void emit(LayoutModelEvent event) {

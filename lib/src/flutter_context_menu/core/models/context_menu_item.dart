@@ -58,7 +58,7 @@ abstract base class ContextMenuItem<T> extends ContextMenuEntry {
   /// If the item has subitems, it toggles the submenu's visibility.
   /// Otherwise, it pops the current context menu and returns the [value].
   void handleItemSelection(BuildContext context) {
-    final menuState = ContextMenuState.of(context);
+    final ContextMenuState menuState = ContextMenuState.of(context);
 
     if (isSubmenuItem) {
       _toggleSubmenu(context, menuState);

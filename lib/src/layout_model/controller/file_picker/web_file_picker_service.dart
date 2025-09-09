@@ -8,35 +8,35 @@ import 'file_picker_service.dart';
 class WebFilePickerService implements FilePickerService {
   @override
   Future<Uint8List?> pickImageFile() async {
-    final completer = Completer<Uint8List?>();
+    final Completer<Uint8List?> completer = Completer<Uint8List?>();
 
-    final input = web.HTMLInputElement();
+    final web.HTMLInputElement input = web.HTMLInputElement();
     input.type = 'file';
     input.accept = 'image/*';
 
     input.addEventListener(
       'change',
       (web.Event event) {
-        final files = input.files;
+        final web.FileList? files = input.files;
         if (files == null || files.length == 0) {
           completer.complete(null);
           return;
         }
 
-        final file = files.item(0);
+        final web.File? file = files.item(0);
         if (file == null) {
           completer.complete(null);
           return;
         }
 
-        final reader = web.FileReader();
+        final web.FileReader reader = web.FileReader();
         reader.addEventListener(
           'loadend',
           (web.Event event) {
-            final result = reader.result;
+            final JSAny? result = reader.result;
             if (result != null && result.isA<JSArrayBuffer>()) {
-              final buffer = (result as JSArrayBuffer).toDart;
-              final bytes = buffer.asUint8List();
+              final ByteBuffer buffer = (result as JSArrayBuffer).toDart;
+              final Uint8List bytes = buffer.asUint8List();
               completer.complete(bytes);
             } else {
               completer.complete(null);
@@ -57,12 +57,12 @@ class WebFilePickerService implements FilePickerService {
     required String content,
     required String filename,
   }) async {
-    final bytes = Uint8List.fromList(content.codeUnits);
-    final arrayParts = <JSUint8Array>[bytes.toJS];
-    final blob = web.Blob(arrayParts.toJS);
-    final url = web.URL.createObjectURL(blob);
+    final Uint8List bytes = Uint8List.fromList(content.codeUnits);
+    final List<JSUint8Array> arrayParts = <JSUint8Array>[bytes.toJS];
+    final web.Blob blob = web.Blob(arrayParts.toJS);
+    final String url = web.URL.createObjectURL(blob);
 
-    final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
+    final web.HTMLAnchorElement anchor = web.document.createElement('a') as web.HTMLAnchorElement;
     anchor.href = url;
     anchor.download = filename;
     anchor.click();

@@ -110,30 +110,30 @@ class LayoutModelController {
   String? get selectedId => selectedIdNotifier.value;
 
   void _listenToEvents() {
-    eventBus.events.listen((event) {
+    eventBus.events.listen((LayoutModelEvent event) {
       lastEvent = event;
       if (event is ChangeEvent) {
-        changedItems.value = {...changedItems.value, event.itemId};
+        changedItems.value = <String?>{...changedItems.value, event.itemId};
       }
     });
   }
 
   void updateProperty(String key, Property value) {
     // Update notifier for UI widgets
-    propertiesNotifier.value = {...propertiesNotifier.value, key: value};
+    propertiesNotifier.value = <String, Property>{...propertiesNotifier.value, key: value};
   }
 
   void markItemAsHandled(String itemId) {
-    changedItems.value = {...changedItems.value}..remove(itemId);
+    changedItems.value = <String?>{...changedItems.value}..remove(itemId);
   }
 
   Item? getItemById(String? id) {
     if (id == null) return null;
 
     Item? searchInItems(List<Item> items) {
-      for (final item in items) {
+      for (final Item item in items) {
         if (item.id == id) return item;
-        final found = searchInItems(item.items);
+        final Item? found = searchInItems(item.items);
         if (found != null) return found;
       }
       return null;
@@ -146,7 +146,7 @@ class LayoutModelController {
 
   /// Returns the current page based on the current item and page type.
   ComponentAndSourcePage getCurrentPage() {
-    final currentItem = getCurrentItem();
+    final Item? currentItem = getCurrentItem();
     if (currentItem == null) {
       return layoutModel.root.items
           .whereType<ComponentAndSourcePage>()
@@ -168,7 +168,7 @@ class LayoutModelController {
 
     // Ищем родительскую страницу, обходя дерево элементов
     ComponentAndSourcePage? searchInItems(List<Item> items, Item target) {
-      for (final currentItem in items) {
+      for (final Item currentItem in items) {
         // Проверяем, есть ли target в дочерних элементах currentItem
         if (currentItem.items.contains(target)) {
           // Если currentItem является Page, возвращаем его
@@ -180,8 +180,8 @@ class LayoutModelController {
         }
 
         // Рекурсивно ищем в дочерних элементах
-        final found = searchInItems(currentItem.items, target);
-        if (found != null) return found;
+        final Item? found = searchInItems(currentItem.items, target);
+        if (found != null) return found as ComponentAndSourcePage?;
       }
       return null;
     }
@@ -208,8 +208,8 @@ class LayoutModelController {
 
   /// Update grid steps (in model units). Pass null to keep current.
   void setGridSteps({double? stepX, double? stepY}) {
-    final newX = stepX ?? _gridStepX;
-    final newY = stepY ?? _gridStepY;
+    final double newX = stepX ?? _gridStepX;
+    final double newY = stepY ?? _gridStepY;
     if (newX == _gridStepX && newY == _gridStepY) return;
     _gridStepX = newX;
     _gridStepY = newY;
@@ -262,11 +262,11 @@ class LayoutModelController {
   bool get canRedo => undoRedoService.canRedo;
 
   void undo() {
-    (undoRedoService as UndoRedoServiceImpl).executeUndo((action) => action.revert(this));
+    (undoRedoService as UndoRedoServiceImpl).executeUndo((UndoableAction action) => action.revert(this));
   }
 
   void redo() {
-    (undoRedoService as UndoRedoServiceImpl).executeRedo((action) => action.apply(this));
+    (undoRedoService as UndoRedoServiceImpl).executeRedo((UndoableAction action) => action.apply(this));
   }
 
   void _pushAction(UndoableAction action) {
@@ -300,11 +300,11 @@ class LayoutModelController {
   
   /// Simple move by ID for keyboard handler (arrows)
   void moveItemById(String? itemId, Offset delta, {bool snap = false, double step = 5.0}) {
-    final item = getItemById(itemId);
+    final Item? item = getItemById(itemId);
     if (item == null) return;
-    
-    final current = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
-    var next = current + delta;
+
+    final Offset current = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
+    Offset next = current + delta;
     if (snap) {
       double snapToGrid(double value, {double step = 5.0}) => (value / step).round() * step;
       next = Offset(
@@ -321,12 +321,12 @@ class LayoutModelController {
   
   // --- Internal direct apply helpers used by undo/redo and actions ---
   void applyPosition(String itemId, Offset next, {Offset? emitDelta}) {
-    final item = getItemById(itemId);
+    final Item? item = getItemById(itemId);
     if (item == null) return;
-    final prev = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
+    final Offset prev = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
     item.properties["position"]?.value = next;
     updateProperty("position", Property("положение", next, type: Offset));
-    final id = const Uuid().v4();
+    final String id = const Uuid().v4();
     eventBus.emit(ChangeItem(id: id, itemId: itemId));
     eventBus.emit(
       MoveEvent(
@@ -339,25 +339,25 @@ class LayoutModelController {
   }
 
   void applySize(String itemId, Size size) {
-    final item = getItemById(itemId);
+    final Item? item = getItemById(itemId);
     if (item == null) return;
     item.properties["size"]?.value = size;
     updateProperty("size", Property("размер", size, type: Size));
-    final id = const Uuid().v4();
+    final String id = const Uuid().v4();
     eventBus.emit(ChangeItem(id: id, itemId: itemId));
     eventBus.emit(ResizeEvent(id: id, itemId: itemId, newSize: size));
   }
 
   // --- Deletion helpers and keyboard API ---
   void deleteSelected() {
-    final id = selectedId;
+    final String? id = selectedId;
     if (id == null) return;
-    final item = getItemById(id);
+    final Item? item = getItemById(id);
     if (item == null) return;
   // Find immediate parent and index for undo
-  final parent = layoutModel.findParentById(layoutModel.root, item.id);
+  final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
   if (parent == null) return;
-  final index = parent.items.indexOf(item);
+  final int index = parent.items.indexOf(item);
     // Push undo and apply delete
     _pushAction(DeleteAction(
       itemId: id,
@@ -369,9 +369,9 @@ class LayoutModelController {
   }
 
   void applyDelete(String itemId) {
-    final item = getItemById(itemId);
+    final Item? item = getItemById(itemId);
     if (item == null) return;
-  final parent = layoutModel.findParentById(layoutModel.root, item.id);
+  final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
   if (parent == null) return;
   parent.items.remove(item);
   select(parent.id);
@@ -385,10 +385,10 @@ class LayoutModelController {
       layoutModel.addItemDirect(parent, item, index: index);
     } else {
       // Find the real parent and insert after the selected item
-      final realParent = layoutModel.findParentById(layoutModel.root, parent.id);
+      final Item? realParent = layoutModel.findParentById(layoutModel.root, parent.id);
       if (realParent != null) {
-        final selectedIndex = realParent.items.indexOf(parent);
-        final insertIndex = selectedIndex + 1;
+        final int selectedIndex = realParent.items.indexOf(parent);
+        final int insertIndex = selectedIndex + 1;
         layoutModel.addItemDirect(realParent, item, index: insertIndex);
       }
     }
@@ -412,10 +412,10 @@ class LayoutModelController {
       actualIndex = index;
     } else {
       // Find the real parent and calculate insertion index
-      final realParent = layoutModel.findParentById(layoutModel.root, parent.id);
+      final Item? realParent = layoutModel.findParentById(layoutModel.root, parent.id);
       if (realParent != null) {
         actualParent = realParent;
-        final selectedIndex = realParent.items.indexOf(parent);
+        final int selectedIndex = realParent.items.indexOf(parent);
         actualIndex = selectedIndex + 1;
       } else {
         actualParent = parent; // Fallback
@@ -428,11 +428,11 @@ class LayoutModelController {
   }
 
   Future<void> cutSelected() async {
-    final id = selectedId;
+    final String? id = selectedId;
     if (id == null) return;
-    final item = getItemById(id);
+    final Item? item = getItemById(id);
     if (item == null) return;
-    final parent = layoutModel.findParentById(layoutModel.root, item.id);
+    final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
     if (parent == null) return;
     _pushAction(DeleteAction(
       itemId: id,

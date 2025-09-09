@@ -89,7 +89,7 @@ class LayoutModelEditorProject {
 
     if (map.isEmpty) return;
 
-    final hasSaved = await projectSaver?.call(map);
+    final bool? hasSaved = await projectSaver?.call(map);
     if (hasSaved == false) return;
 
     _isSaved = true;

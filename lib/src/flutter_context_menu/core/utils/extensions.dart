@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 
 extension BuildContextExtensions on BuildContext {
   Rect? getWidgetBounds() {
-    final widgetRenderBox = findRenderObject() as RenderBox?;
+    final RenderBox? widgetRenderBox = findRenderObject() as RenderBox?;
     if (widgetRenderBox == null) return null;
-    final RenderBox overlay =
-        Overlay.of(this).context.findRenderObject() as RenderBox;
-    final widgetPosition = widgetRenderBox.localToGlobal(
+    final RenderBox? overlay = Overlay.of(this).context.findRenderObject() as RenderBox?;
+    final Offset widgetPosition = widgetRenderBox.localToGlobal(
       Offset.zero,
       ancestor: overlay,
     );
-    final widgetSize = widgetRenderBox.size;
+    final Size widgetSize = widgetRenderBox.size;
     return widgetPosition & widgetSize;
   }
 

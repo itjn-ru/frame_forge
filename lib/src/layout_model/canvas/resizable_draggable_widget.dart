@@ -1,3 +1,4 @@
+import '../controller/layout_model_controller.dart';
 import 'layout_model_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -88,7 +89,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
   void didUpdateWidget(covariant ResizableDraggableWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Recreate our own controller if critical inputs changed and no external controller is provided
-    final inputsChanged = oldWidget.scaleFactor != widget.scaleFactor ||
+    final bool inputsChanged = oldWidget.scaleFactor != widget.scaleFactor ||
         oldWidget.canvasWidth != widget.canvasWidth ||
         oldWidget.canvasHeight != widget.canvasHeight ||
         oldWidget.cellWidth != widget.cellWidth ||
@@ -105,7 +106,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
   void _ensureController({required String createdBy}) {
     if (widget.rdController != null) return; // using external controller
-  final layoutCtrl = LayoutModelControllerProvider.of(context);
+  final LayoutModelController layoutCtrl = LayoutModelControllerProvider.of(context);
     _ownController = ResizableDraggableController(
       layoutController: layoutCtrl,
       scaleFactor: widget.scaleFactor,
@@ -131,12 +132,12 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final layoutCtrl = LayoutModelControllerProvider.of(context);
-    final bg = widget.bgColor ?? Colors.amber;
+    final LayoutModelController layoutCtrl = LayoutModelControllerProvider.of(context);
+    final Color bg = widget.bgColor ?? Colors.amber;
 
     Widget getResizeable() {
       return MouseRegion(
-        onHover: (event) => _ctrl.onHover(event.localPosition, selected: widget.selected),
+        onHover: (PointerHoverEvent event) => _ctrl.onHover(event.localPosition, selected: widget.selected),
         cursor: _getCursorForDirection(_ctrl.currentResizeDirection),
         child: Container(
           decoration: BoxDecoration(
@@ -179,7 +180,7 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
 
     return AnimatedBuilder(
       animation: _ctrl,
-      builder: (context, _) {
+      builder: (BuildContext context, _) {
         return Transform.translate(
           offset: _ctrl.translateOffset,
           child: GestureDetector(
@@ -187,8 +188,8 @@ class _ResizableDraggableWidgetState extends State<ResizableDraggableWidget> {
             onTap: () => _ctrl.onTap(selected: widget.selected),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onPanStart: (details) => _ctrl.onPanStart(details, selected: widget.selected),
-              onPanUpdate: (details) => _ctrl.onPanUpdate(details, selected: widget.selected),
+              onPanStart: (DragStartDetails details) => _ctrl.onPanStart(details, selected: widget.selected),
+              onPanUpdate: (DragUpdateDetails details) => _ctrl.onPanUpdate(details, selected: widget.selected),
               onPanEnd: (_) => _ctrl.onPanEnd(selected: widget.selected),
               child: getResizeable(),
             ),

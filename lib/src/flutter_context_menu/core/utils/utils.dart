@@ -15,9 +15,9 @@ import '../utils/extensions.dart';
   AlignmentGeometry spawnAlignment,
   bool isSubmenu,
 ) {
-  final screenSize = MediaQuery.of(context).size;
-  final safeScreenRect = (Offset.zero & screenSize).deflate(8.0);
-  final menuRect = context.getWidgetBounds()!;
+  final Size screenSize = MediaQuery.of(context).size;
+  final Rect safeScreenRect = (Offset.zero & screenSize).deflate(8.0);
+  final Rect menuRect = context.getWidgetBounds()!;
   AlignmentGeometry nextSpawnAlignment = spawnAlignment;
 
   // final parentRect = menu.parentItemRect;
@@ -33,10 +33,10 @@ import '../utils/extensions.dart';
 
   if (isWidthExceed()) {
     if (isSubmenu && parentRect != null) {
-      final toRightSide = parentRect.right + menu.padding.left;
-      final toLeftSide = parentRect.left - menuRect.width - menu.padding.right;
-      final maxRight = safeScreenRect.right - menuRect.width;
-      final maxLeft = safeScreenRect.left;
+      final double toRightSide = parentRect.right + menu.padding.left;
+      final double toLeftSide = parentRect.left - menuRect.width - menu.padding.right;
+      final double maxRight = safeScreenRect.right - menuRect.width;
+      final double maxLeft = safeScreenRect.left;
 
       if (spawnAlignment == AlignmentDirectional.topEnd) {
         if (currentRect().right > safeScreenRect.right) {
@@ -123,7 +123,7 @@ bool hasSameFocusNodeId(String line1, String line2) {
 }
 
 Rect getScreenRect(BuildContext context) {
-  final size = MediaQueryData.fromView(
+  final Size size = MediaQueryData.fromView(
     WidgetsBinding.instance.platformDispatcher.views.first,
   ).size;
   return Offset.zero & size;

@@ -36,7 +36,7 @@ abstract base class LayoutModelEvent {
   });
 
   /// Converts this event to a JSON representation using the provided [dataHandlers].
-  Map<String, dynamic> toJson(Map<String, DataHandler> dataHandlers) => {
+  Map<String, dynamic> toJson(Map<String, DataHandler> dataHandlers) => <String, dynamic>{
     'id': id,
     'isHandled': isHandled,
     'isUndoable': isUndoable,
@@ -100,7 +100,7 @@ final class DragSelectionStartEvent extends LayoutModelEvent {
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<String, DataHandler> dataHandlers) => <String, dynamic>{
     ...super.toJson(dataHandlers),
     'nodeIds': nodeIds.toList(),
     'position': [position.dx, position.dy],
@@ -128,7 +128,7 @@ final class DragSelectionEvent extends LayoutModelEvent {
   }) : super(isUndoable: true);
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<String, DataHandler> dataHandlers) => {
     ...super.toJson(dataHandlers),
     'nodeIds': nodeIds.toList(),
     'delta': [delta.dx, delta.dy],
@@ -156,7 +156,7 @@ final class DragSelectionEndEvent extends LayoutModelEvent {
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<String, DataHandler> dataHandlers) => {
     ...super.toJson(dataHandlers),
     'position': [position.dx, position.dy],
     'nodeIds': nodeIds.toList(),
@@ -285,7 +285,7 @@ final class AttributeChangeEvent extends ChangeEvent {
   const AttributeChangeEvent({
     required super.id,
     required super.itemId,
-    this.changes = const {},
+    this.changes = const <String, dynamic>{},
   });
 }
 

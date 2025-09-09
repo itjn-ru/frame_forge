@@ -7,8 +7,8 @@ import '../interfaces/undo_redo_service.dart';
 /// Implementation of UndoRedoService
 class UndoRedoServiceImpl implements UndoRedoService {
   final LayoutModelEventBus _eventBus;
-  final List<UndoableAction> _undoStack = [];
-  final List<UndoableAction> _redoStack = [];
+  final List<UndoableAction> _undoStack = <UndoableAction>[];
+  final List<UndoableAction> _redoStack = <UndoableAction>[];
 
   UndoRedoServiceImpl(this._eventBus);
 
@@ -47,7 +47,7 @@ class UndoRedoServiceImpl implements UndoRedoService {
   /// Internal access for controller to execute actions
   void executeUndo(void Function(UndoableAction) callback) {
     if (!canUndo) return;
-    final action = _undoStack.removeLast();
+    final UndoableAction action = _undoStack.removeLast();
     callback(action);
     _redoStack.add(action);
     _eventBus.emit(UndoPerformed(id: const Uuid().v4()));
@@ -55,7 +55,7 @@ class UndoRedoServiceImpl implements UndoRedoService {
 
   void executeRedo(void Function(UndoableAction) callback) {
     if (!canRedo) return;
-    final action = _redoStack.removeLast();
+    final UndoableAction action = _redoStack.removeLast();
     callback(action);
     _undoStack.add(action);
     _eventBus.emit(RedoPerformed(id: const Uuid().v4()));

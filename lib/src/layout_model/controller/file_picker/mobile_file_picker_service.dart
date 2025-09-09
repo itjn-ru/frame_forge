@@ -25,7 +25,7 @@ class MobileFilePickerService implements FilePickerService {
   }) async {
     // Basic file save for desktop platforms
     try {
-      final file = File(filename);
+      final File file = File(filename);
       await file.writeAsString(content);
     } catch (e) {
       // Fallback - show in console

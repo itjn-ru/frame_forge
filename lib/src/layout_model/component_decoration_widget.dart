@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'canvas/layout_model_provider.dart';
 import 'component.dart';
+import 'controller/layout_model_controller.dart';
+import 'custom_border_radius.dart';
+import 'layout_model.dart';
 import 'style_element.dart';
 
 /// A widget that applies decorations like borders, background color, padding, and margin
@@ -20,18 +23,18 @@ class ComponentDecorationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = LayoutModelControllerProvider.of(context);
-    final layoutModel = controller.layoutModel;
-    var style =
+    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final LayoutModel layoutModel = controller.layoutModel;
+    final StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
         StyleElement("стиль");
-    final borderRadiusValue = style.properties['borderRadius']?.value;
+    final  CustomBorderRadius borderRadiusValue = style.properties['borderRadius']?.value;
 
-    final border = (borderRadiusValue == null || borderRadiusValue is Type)
+    final BorderRadius? border = (borderRadiusValue == null || borderRadiusValue is Type)
         ? null
         : borderRadiusValue.borderRadius(scaleFactor);
-    final padding = style['padding'] ?? [0, 0, 0, 0];
-    final margin = style['margin'] ?? [0, 0, 0, 0];
+    final List<dynamic> padding = style['padding'] ?? [0, 0, 0, 0];
+    final List<dynamic> margin = style['margin'] ?? [0, 0, 0, 0];
     return Container(
       decoration: BoxDecoration(
         border: _buildBorder(style),

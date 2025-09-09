@@ -5,6 +5,7 @@ import 'component.dart';
 import 'component_decoration_widget.dart';
 import 'component_widget.dart';
 import 'controller/events.dart';
+import 'controller/layout_model_controller.dart';
 import 'item.dart';
 
 class ComponentGroupWidget extends ComponentWidget {
@@ -17,9 +18,9 @@ class ComponentGroupWidget extends ComponentWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-    final List<Item> items = List.generate(
+    final List<Item> items = List<Item>.generate(
       component.items.length,
-      (index) => component.items[index],
+      (int index) => component.items[index],
     );
     return ComponentDecorationWidget(
       component: component,
@@ -42,22 +43,22 @@ class GroupCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = LayoutModelControllerProvider.of(context);
+    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
 
     return ValueListenableBuilder<Set<String?>>(
       valueListenable: controller.changedItems,
-      builder: (context, updatedItemIds, _) {
-        final list = [];
-        for (final item in items) {
+      builder: (BuildContext context, Set<String?> updatedItemIds, _) {
+        final List<Widget> list = <Widget>[];
+        for (final Item item in items) {
           list.add(
             _ItemUpdateScope(
               itemId: item.id,
               updatedItemIds: updatedItemIds,
               child: ValueListenableBuilder<String?>(
                 valueListenable: controller.selectedIdNotifier,
-                builder: (context, selectedId, _) {
+                builder: (BuildContext context, String? selectedId, _) {
                   return ResizableDraggableWidget(
-                    key: ValueKey(item.id),
+                    key: ValueKey<String>(item.id),
                     position: Offset(
                       item["position"]?.dx * scale ?? 0,
                       item["position"]?.dy * scale ?? 0,
@@ -100,8 +101,8 @@ class _ItemUpdateScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = LayoutModelControllerProvider.of(context);
-    final shouldUpdate = updatedItemIds.contains(itemId);
+    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final bool shouldUpdate = updatedItemIds.contains(itemId);
     // Mark as handled after repaint
     if (shouldUpdate) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -113,9 +114,9 @@ class _ItemUpdateScope extends StatelessWidget {
     }
     // Here RepaintBoundary helps avoid unnecessary redrawing,
     // if it was just a ChangeItem, but not related to this item
-    final last = controller.lastEvent;
+    final LayoutModelEvent? last = controller.lastEvent;
 
-    final isIsolated = last is ChangeItem;
+    final bool isIsolated = last is ChangeItem;
     return isIsolated ? RepaintBoundary(child: child) : child;
   }
 }

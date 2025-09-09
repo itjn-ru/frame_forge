@@ -19,11 +19,11 @@ Future<T?> showContextMenu<T>(
   bool allowSnapshotting = true,
   bool maintainState = false,
 }) async {
-  final menuState = ContextMenuState(menu: contextMenu);
+  final ContextMenuState menuState = ContextMenuState(menu: contextMenu);
   return await Navigator.push<T>(
     context,
     PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) {
+      pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
         return Stack(children: [ContextMenuWidget(menuState: menuState)]);
       },
       settings: routeSettings ?? const RouteSettings(name: "context-menu"),
@@ -42,10 +42,10 @@ Future<T?> showContextMenu<T>(
 }
 
 Widget _defaultTransitionsBuilder(
-  context,
-  animation,
-  secondaryAnimation,
-  child,
+  BuildContext context,
+  Animation<double> animation,
+  Animation<double> secondaryAnimation,
+  Widget child,
 ) {
   return child;
 }
