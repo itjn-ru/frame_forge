@@ -5,8 +5,11 @@
 
 ## Description
 
-This package provides a visual editor for designing and rendering user interfaces.
-Its core concept is using XML as the structure definition for UI. Originally built for documents and structured data, it is well suited for applications following the BDUI (Backend-Driven UI) architecture.
+This package offers a visual editor for designing and rendering user interfaces.  
+At its core, it uses XML to define the UI structure, making it ideal for applications that rely on structured documents. Originally developed for document-centric workflows, it seamlessly supports Backend-Driven UI (BDUI) architectures, enabling dynamic UI generation from backend data.
+
+## Demo
+[Check it out here](https://itjn-ru.github.io/frame_forge/)
 
 ## Features
 
