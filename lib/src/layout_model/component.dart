@@ -21,11 +21,11 @@ class LayoutComponent extends LayoutComponentAndSource {
   /// - style: basic style
   LayoutComponent(super.type, super.name) {
     properties["position"] = Property(
-      "положение",
+      "position",
       const Offset(0, 0),
       type: Offset,
     );
-    properties["size"] = Property("размер", const Size(360, 30), type: Size);
-    properties["style"] = Property("стиль", Style.basic, type: Style);
+    properties["size"] = Property("size", const Size(360, 30), type: Size);
+    properties["style"] = Property("style", Style.basic, type: Style);
   }
 }

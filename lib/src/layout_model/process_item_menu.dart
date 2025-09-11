@@ -10,15 +10,15 @@ class ProcessItemMenu extends ComponentAndSourceMenu {
   List<PopupMenuEntry<Item>> getComponentMenu(void Function(Item)? onChanged) {
     return [
       PopupMenuItem(
-        child: const Text("Добавить событие"),
+        child: const Text("Add Event"),
         onTap: () {
-          var item = ProcessElement("Событие");
+          final ProcessElement item = ProcessElement("Event");
           controller.layoutModel.addItem(target, item);
           onChanged!(item);
         },
       ),
       PopupMenuItem(
-        child: const Text("Удалить процесс"),
+        child: const Text("Delete Process"),
         onTap: () {
           controller.layoutModel.deleteItem(controller.layoutModel.curItem);
           onChanged!(controller.layoutModel.curItem);

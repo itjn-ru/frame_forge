@@ -27,7 +27,7 @@ class ComponentDecorationWidget extends StatelessWidget {
     final LayoutModel layoutModel = controller.layoutModel;
     final StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
-        StyleElement("стиль");
+        StyleElement("style");
     final  CustomBorderRadius borderRadiusValue = style.properties['borderRadius']?.value;
 
     final BorderRadius? border = (borderRadiusValue is Type)

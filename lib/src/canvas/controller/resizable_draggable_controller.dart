@@ -500,10 +500,6 @@ class ResizableDraggableController extends ChangeNotifier {
         keys.contains(LogicalKeyboardKey.alt);
   }
 
-  // --- Transformation methods (moved from LayoutModelController) ---
-
-  /// Сдвинуть элемент на delta (в координатах модели, без scale).
-  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
   void moveItem(
     Item element,
     Offset delta, {
@@ -527,8 +523,6 @@ class ResizableDraggableController extends ChangeNotifier {
         .moveItemById(itemId, delta, snap: snap, step: step);
   }
 
-  /// Задать новый размер (в координатах модели, без scale).
-  /// По умолчанию без снэппинга; включите snap=true чтобы привязывать к сетке.
   void resizeItem(
     Item element,
     Size newSize, {
@@ -536,12 +530,10 @@ class ResizableDraggableController extends ChangeNotifier {
     double step = 5.0,
     Size? fromSize,
   }) {
-    // Delegate to transformation service
     layoutController.transformationService.resizeItem(element, newSize,
         snap: snap, step: step, fromSize: fromSize);
   }
 
-  /// Apply a combined resize and optional position change as a single undoable action.
   void resizeAndMaybeMove(
     Item element,
     Size newSize,
@@ -549,7 +541,6 @@ class ResizableDraggableController extends ChangeNotifier {
     Size? fromSize,
     Offset? fromAbsPos,
   }) {
-    // Delegate to transformation service
     layoutController.transformationService.resizeAndMaybeMove(
       element,
       newSize,

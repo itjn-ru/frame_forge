@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
+import 'property.dart';
 import 'property_widget.dart';
 
 /// Widget for editing padding properties
@@ -20,7 +21,7 @@ class PropertySizeWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller
+    final Property? property = controller
         .getItemById(controller.selectedId)
         ?.properties[propertyKey];
     final Size size = property?.value ?? Size.zero;
@@ -34,8 +35,8 @@ class PropertySizeWidget extends PropertyWidget {
     }
 
     return DualPropertyTextField(
-      firstLabel: "Ш",
-      secondLabel: "В",
+      firstLabel: "Width",
+      secondLabel: "Height",
       firstValue: size.width.toString(),
       secondValue: size.height.toString(),
       onFirstChanged: updateWidth,

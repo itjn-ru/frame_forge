@@ -2,151 +2,38 @@ import 'package:flutter/material.dart';
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'component.dart';
 import 'controller/events.dart';
+import 'item.dart';
 import 'menu.dart';
 import 'component_table.dart';
-import 'item.dart';
 
 class ComponentTableMenu extends ComponentAndSourceMenu {
   ComponentTableMenu(super.controller, super.target, {super.onChanged});
-
-  List<PopupMenuEntry<Item>> getComponentMenu(void Function(Item?)? onChanged) {
-    if (target is LayoutComponent) {
-      return [
-        PopupMenuItem(
-          child: const Text('Добавить колонку'),
-          onTap: () {
-            var item = ComponentTableColumn('колонка');
-            controller.layoutModel.addItem(target, item);
-            onChanged!(item);
-          },
-        ),
-        PopupMenuItem(
-          child: const Text('Добавить группу строк'),
-          onTap: () {
-            var item = ComponentTableRowGroup('группа строк');
-            controller.layoutModel.addItem(target, item);
-            onChanged!(item);
-          },
-          //value: ComponentTable("Таблица"),
-        ),
-        PopupMenuItem(
-          child: const Text('Удалить таблицу'),
-          onTap: () {
-            controller.layoutModel.deleteItem(target);
-
-            //            controller.layoutModel.curPage.items.remove(controller.layoutModel.curItem);
-            //            controller.layoutModel.curItem = controller.layoutModel.curPage;
-
-            onChanged!(target);
-          },
-        ),
-      ];
-    } else {
-      switch (target.runtimeType) {
-        case const (ComponentTableColumn):
-          return [
-            PopupMenuItem(
-              onTap:
-                  controller.layoutModel
-                          .getComponentByItem(target)!
-                          .items
-                          .whereType<ComponentTableColumn>()
-                          .length >
-                      1
-                  ? () {
-                      controller.layoutModel.deleteItem(target);
-                      onChanged!(target);
-                    }
-                  : null,
-              child: const Text('Удалить колонку'),
-            ),
-          ];
-        case const (ComponentTableRowGroup):
-          return [
-            PopupMenuItem(
-              child: const Text('Добавить строку'),
-              onTap: () {
-                var item = ComponentTableRow('строка');
-                controller.layoutModel.addItem(target, item);
-                onChanged!(item);
-              },
-            ),
-            PopupMenuItem(
-              onTap:
-                  controller.layoutModel
-                      .getComponentByItem(target)!
-                      .items
-                      .whereType<ComponentTableRowGroup>()
-                      .isNotEmpty
-                  ? () {
-                      controller.layoutModel.deleteItem(target);
-                      onChanged!(target);
-                    }
-                  : null,
-              child: const Text('Удалить группу строк'),
-            ),
-          ];
-
-        case const (ComponentTableRow):
-          //Ищем группу строк, владеющую этой строкой
-          ComponentTableRowGroup? foundGroup;
-          controller.layoutModel
-              .getComponentByItem(target)!
-              .items
-              .whereType<ComponentTableRowGroup>()
-              .forEach((rowGroup) {
-                if (rowGroup.items.where((row) => row == target).isNotEmpty) {
-                  foundGroup = rowGroup;
-                }
-              });
-
-          if (foundGroup == null) {
-            return [];
-          }
-
-          return [
-            PopupMenuItem(
-              onTap: foundGroup!.items.whereType<ComponentTableRow>().length > 1
-                  ? () {
-                      controller.layoutModel.deleteItem(target);
-                      onChanged!(target);
-                    }
-                  : null,
-              child: const Text('Удалить строку'),
-            ),
-          ];
-
-        default:
-          return [];
-      }
-    }
-  }
 
   @override
   List<ContextMenuEntry> getContextMenu(
     void Function(LayoutModelEvent event)? onChanged,
   ) {
     if (target is LayoutComponent) {
-      return [
-        const MenuHeader(text: "Редактирование"),
+      return <ContextMenuEntry>[
+        const MenuHeader(text: "Editing"),
         MenuItem.submenu(
-          label: 'Добавить',
+          label: 'Add',
           icon: Icons.add,
           items: [
             MenuItem(
-              label: 'Колонку',
+              label: 'Column',
               icon: Icons.view_column_outlined,
               onSelected: () {
-                var item = ComponentTableColumn('колонка');
+                final ComponentTableColumn item = ComponentTableColumn('column');
                 controller.layoutModel.addItem(target, item);
                 onChanged!(AddItemEvent(id: item.id));
               },
             ),
             MenuItem(
-              label: 'Группу строк',
+              label: 'Row Group',
               icon: Icons.table_rows,
               onSelected: () {
-                var item = ComponentTableRowGroup('группа строк');
+                final ComponentTableRowGroup item = ComponentTableRowGroup('row group');
                 controller.layoutModel.addItem(target, item);
                 onChanged!(AddItemEvent(id: item.id));
               },
@@ -155,28 +42,28 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
         ),
         const MenuDivider(),
         MenuItem(
-          label: 'Копировать',
-          icon: Icons.delete,
+          label: 'Copy',
+          icon: Icons.copy,
           onSelected: () {
             controller.clipboard.copySelection();
           },
         ),
         MenuItem(
-          label: 'Вставить',
-          icon: Icons.delete,
+          label: 'Paste',
+          icon: Icons.paste,
           onSelected: () {
             controller.clipboard.pasteSelection(parent: target);
           },
         ),
         MenuItem(
-          label: 'Вырезать',
+          label: 'Cut',
           icon: Icons.content_cut,
           onSelected: () {
             controller.clipboard.cutSelection();
           },
         ),
         MenuItem(
-          label: 'Удалить',
+          label: 'Delete',
           icon: Icons.delete,
           onSelected: () {
             controller.layoutModel.deleteItem(target);
@@ -187,10 +74,10 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
     } else {
       switch (target.runtimeType) {
         case const (ComponentTableColumn):
-          return [
-            const MenuHeader(text: "Редактирование"),
+          return <ContextMenuEntry>[
+            const MenuHeader(text: "Editing"),
             MenuItem(
-              label: 'Удалить колонку',
+              label: 'Delete column',
               icon: Icons.delete,
               onSelected:
                   controller.layoutModel
@@ -208,19 +95,19 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
           ];
         case const (ComponentTableRowGroup):
           return [
-            const MenuHeader(text: "Редактирование"),
+            const MenuHeader(text: "Editing"),
             MenuItem(
-              label: 'Добавить строку',
+              label: 'Add Row',
               icon: Icons.add,
               onSelected: () {
-                var item = ComponentTableRow('строка');
+                final ComponentTableRow item = ComponentTableRow('row');
                 controller.layoutModel.addItem(target, item);
 
                 onChanged!(AddItemEvent(id: target.id));
               },
             ),
             MenuItem(
-              label: 'Удалить группу строк',
+              label: 'Delete group of rows',
               icon: Icons.delete,
               onSelected:
                   controller.layoutModel
@@ -242,19 +129,19 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               .getComponentByItem(target)!
               .items
               .whereType<ComponentTableRowGroup>()
-              .forEach((rowGroup) {
-                if (rowGroup.items.where((row) => row == target).isNotEmpty) {
+              .forEach((ComponentTableRowGroup rowGroup) {
+                if (rowGroup.items.where((Item row) => row == target).isNotEmpty) {
                   foundGroup = rowGroup;
                 }
               });
 
           if (foundGroup == null) {
-            return [];
+            return <ContextMenuEntry>[];
           }
-          return [
-            const MenuHeader(text: "Редактирование"),
+          return <ContextMenuEntry>[
+            const MenuHeader(text: "Editing"),
             MenuItem(
-              label: 'Удалить строку',
+              label: 'Delete row',
               icon: Icons.delete,
               onSelected:
                   foundGroup!.items.whereType<ComponentTableRow>().length > 1
@@ -267,6 +154,6 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
           ];
       }
     }
-    return [];
+    return <ContextMenuEntry>[];
   }
 }

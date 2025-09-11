@@ -23,106 +23,106 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
   ) {
     // Removed unused variable pageCount
     return [
-      const MenuHeader(text: "Редактирование"),
+      const MenuHeader(text: "Editing"),
       MenuItem.submenu(
-        label: 'Добавить',
+        label: 'Add',
         icon: Icons.add,
         items: [
           MenuItem(
-            label: 'Добавить группу',
+            label: 'Group',
             icon: Icons.widgets,
             onSelected: () {
-              var item = ComponentGroup("группа");
+              final ComponentGroup item = ComponentGroup("group");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить список',
+            label: 'List',
             icon: Icons.widgets,
             onSelected: () {
-              var item = FormExpandbleList("список");
+              final FormExpandbleList item = FormExpandbleList("list");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить слайдер',
+            label: 'Slider',
             icon: Icons.smart_button,
             onSelected: () {
-              var item = FormSliderButton("слайдер");
+              final FormSliderButton item = FormSliderButton("slider");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить текст',
+            label: 'Text',
             icon: Icons.text_snippet,
             onSelected: () {
-              var item = ComponentText("текст");
+              final ComponentText item = ComponentText("text");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить таблицу',
+            label: 'Table',
             icon: Icons.table_chart,
             onSelected: () {
-              var item = ComponentTable("таблица");
+              final ComponentTable item = ComponentTable("table");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить текстовое поле',
+            label: 'Text Field',
             icon: Icons.text_snippet,
             onSelected: () {
-              var item = FormTextField("текстовое поле");
+              final FormTextField item = FormTextField("text field");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить радиокнопку',
+            label: 'Radio Button',
             icon: Icons.radio_button_checked,
             onSelected: () {
-              var item = FormRadio("радиокнопка");
+              final FormRadio item = FormRadio("radio button");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить флажок',
+            label: 'Checkbox',
             icon: Icons.check_box,
             onSelected: () {
-              var item = FormCheckbox("флажок");
+              final FormCheckbox item = FormCheckbox("checkbox");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить скрытое поле',
+            label: 'Hidden Field',
             icon: Icons.text_fields,
             onSelected: () {
-              var item = FormHiddenField("скрытое поле");
+              final FormHiddenField item = FormHiddenField("hidden field");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить раскрывающийся список',
+            label: 'Expandable List',
             icon: Icons.list_rounded,
             onSelected: () {
-              var item = FormExpandbleList("список");
+              final FormExpandbleList item = FormExpandbleList("list");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Добавить картинку',
+            label: 'Image',
             icon: Icons.picture_in_picture,
             onSelected: () {
-              var item = FormImage("картинка");
+              final FormImage item = FormImage("image");
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
@@ -131,21 +131,21 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Копировать',
+        label: 'Copy',
         icon: Icons.delete,
         onSelected: () {
           controller.clipboard.copySelection();
         },
       ),
       MenuItem(
-        label: 'Вставить',
+        label: 'Paste',
         icon: Icons.delete,
         onSelected: () {
           controller.clipboard.pasteSelection(parent: target);
         },
       ),
       MenuItem(
-        label: 'Вырезать',
+        label: 'Cut',
         icon: Icons.content_cut,
         onSelected: () {
           controller.clipboard.cutSelection();
@@ -153,7 +153,7 @@ class ComponentPageMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Удалить',
+        label: 'Delete',
         icon: Icons.delete,
         onSelected: () {
           controller.layoutModel.deleteItem(target);

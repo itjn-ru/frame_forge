@@ -55,7 +55,7 @@ class LayoutModel with FromMapToMap {
   /// Returns the currently selected component item or a default
   /// ComponentPage if none is set.
   Item get curComponentItem {
-    return _curComponentItem ?? ComponentPage('страница');
+    return _curComponentItem ?? ComponentPage('page');
   }
 
   /// Sets the current component item
@@ -70,7 +70,7 @@ class LayoutModel with FromMapToMap {
   /// Returns the currently selected source item or a default
   /// SourcePage if none is set.
   Item get curSourceItem {
-    return _curSourceItem ?? SourcePage('страница данных');
+    return _curSourceItem ?? SourcePage('source page');
   }
 
   /// Sets the current source item
@@ -92,13 +92,13 @@ class LayoutModel with FromMapToMap {
   /// Returns a list of [Style] objects extracted from the style page.
   /// Each style contains an ID and display name.
   List<Style> get styles {
-    final styleList = <Style>[];
+    final List<Style> styleList = <Style>[];
 
-    final stylePage = root.items.whereType<StylePage>().first;
+    final StylePage stylePage = root.items.whereType<StylePage>().first;
 
-    final list = stylePage.items.whereType<StyleElement>();
+    final Iterable<StyleElement> list = stylePage.items.whereType<StyleElement>();
 
-    for (final style in list) {
+    for (final StyleElement style in list) {
       styleList.add(Style(style['id'], style['name']));
     }
     return styleList;
@@ -110,21 +110,21 @@ class LayoutModel with FromMapToMap {
   ///
   /// Returns the [StyleElement] with the specified ID, or null if not found.
   StyleElement? getStyleElementById(String id) {
-    final stylePage = root.items.whereType<StylePage>().first;
+    final StylePage stylePage = root.items.whereType<StylePage>().first;
 
-    final list = stylePage.items.whereType<StyleElement>();
+    final Iterable<StyleElement> list = stylePage.items.whereType<StyleElement>();
 
-    return list.where((element) => element['id'] == id).firstOrNull;
+    return list.where((StyleElement element) => element['id'] == id).firstOrNull;
   }
 
   /// Maps items to their containing pages
-  final Map<Item, ComponentAndSourcePage> _itemsOnPage = {};
+  final Map<Item, ComponentAndSourcePage> _itemsOnPage = <Item, ComponentAndSourcePage>{};
 
   /// Maps items to their layout components
-  final Map<Item, LayoutComponentAndSource> _itemsOnComponent = {};
+  final Map<Item, LayoutComponentAndSource> _itemsOnComponent = <Item, LayoutComponentAndSource>{};
 
   /// Maps page types to their current items
-  final Map<Type, Item> curItemOnPage = {};
+  final Map<Type, Item> curItemOnPage = <Type, Item>{};
 
   /// Gets the layout component containing the specified item
   ///
@@ -167,34 +167,33 @@ class LayoutModel with FromMapToMap {
   /// Creates the root item and default pages (component, source, style, process).
   /// Sets up basic style elements and establishes page relationships.
   void init() {
-    root = Root('макет');
+    root = Root('template');
 
-    var curPage = ComponentPage('страница');
+    ComponentPage curPage = ComponentPage('page');
     curPageType = ComponentPage;
     curItemOnPage[ComponentPage] = root;
     root.items.add(curPage);
 
-    final sourcePage = SourcePage('страница данных');
+    final SourcePage sourcePage = SourcePage('source page');
 
     root.items.add(sourcePage);
     curItemOnPage[SourcePage] = sourcePage;
 
-    final stylePage = StylePage('страница стилей');
+    final StylePage stylePage = StylePage('style page');
     root.items.add(stylePage);
     curItemOnPage[StylePage] = stylePage;
 
-    final processPage = ProcessPage('процессы');
+    final ProcessPage processPage = ProcessPage('processes');
     root.items.add(processPage);
     curItemOnPage[ProcessPage] = processPage;
 
-    final StyleElement basicElement = StyleElement('базовый стиль');
+    final StyleElement basicElement = StyleElement('basic style');
     basicElement.properties['id'] = Property(
       'идентификатор',
       UuidNil,
       type: String,
     );
     stylePage.items.add(basicElement);
-    //curItemOnPage[StylePage] = basicElement;
     _setPageForItem(stylePage, basicElement);
   }
 
@@ -247,14 +246,14 @@ class LayoutModel with FromMapToMap {
       curItemOnPage[ProcessPage] = processPage;
     }
 
-    //добавляем базовый стиль, если отсутствует в файле
+    //добавляем basic style, если отсутствует в файле
     final stylePage = root.items.whereType<StylePage>().first;
 
     if (stylePage.items
         .whereType<StyleElement>()
         .where((element) => element['id'] == UuidNil)
         .isEmpty) {
-      final StyleElement basicElement = StyleElement('базовый стиль');
+      final StyleElement basicElement = StyleElement('basic style');
       basicElement.properties['id'] = Property(
         'идентификатор',
         UuidNil,
@@ -449,14 +448,12 @@ class LayoutModel with FromMapToMap {
 
   Item? findParentById(Item _root, String targetId) {
     for (final child in _root.items) {
-      // Проверяем, есть ли у текущего элемента properties с нужным id
-      final hasTargetId = child.properties['id']?.value == targetId;
+      final bool hasTargetId = child.properties['id']?.value == targetId;
 
       if (hasTargetId) {
-        return _root; // Возвращаем текущий элемент как родителя
+        return _root; 
       }
 
-      // Рекурсивный поиск вглубь
       final found = findParentById(child, targetId);
       if (found != null) {
         return found;

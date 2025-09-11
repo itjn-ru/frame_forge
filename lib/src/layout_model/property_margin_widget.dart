@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
+import 'property.dart';
 import 'property_widget.dart';
 
 /// Widget for editing margin properties
@@ -20,32 +21,32 @@ class PropertyMarginWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller
+    final Property? property = controller
         .getItemById(controller.selectedId)
         ?.properties[propertyKey];
     final List<int> values = List<int>.from(
       (property?.value is List)
-          ? (property!.value as List)
-                .map((e) => int.tryParse(e.toString()) ?? 0)
+          ? (property!.value as List<dynamic>)
+                .map((dynamic e) => int.tryParse(e.toString()) ?? 0)
                 .toList()
-          : const [0, 0, 0, 0],
+          : const <int>[0, 0, 0, 0],
     );
 
     void updateIndex(int index, String value) {
-      final list = List<int>.from(values);
+      final List<int> list = List<int>.from(values);
       list[index] = int.tryParse(value) ?? 0;
       property?.value = list;
     }
 
     return Column(
-      children: [
+      children: <Widget>[
         Row(
-          children: [
-            const Text("Внешний край\n слева: "),
+          children: <Widget>[
+            const Text("Margin left: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[0].toString(),
-                onChanged: (v) => updateIndex(0, v),
+                onChanged: (String v) => updateIndex(0, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,
@@ -53,11 +54,11 @@ class PropertyMarginWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Внешний край\n справа: "),
+            const Text("Margin right: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[2].toString(),
-                onChanged: (v) => updateIndex(2, v),
+                onChanged: (String v) => updateIndex(2, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,
@@ -68,12 +69,12 @@ class PropertyMarginWidget extends PropertyWidget {
         ),
         const SizedBox(height: 8),
         Row(
-          children: [
-            const Text("Внешний край\n сверху: "),
+          children: <Widget>[
+            const Text("Margin top: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[1].toString(),
-                onChanged: (v) => updateIndex(1, v),
+                onChanged: (String v) => updateIndex(1, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,
@@ -81,11 +82,11 @@ class PropertyMarginWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Внешний край\n снизу: "),
+            const Text("Margin bottom: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[3].toString(),
-                onChanged: (v) => updateIndex(3, v),
+                onChanged: (String v) => updateIndex(3, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,

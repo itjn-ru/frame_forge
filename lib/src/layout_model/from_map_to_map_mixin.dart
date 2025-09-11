@@ -90,106 +90,106 @@ mixin FromMapToMap {
           key,
           switch (key) {
             'margin' => Property(
-                'отступ',
+                'Margin',
                 value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
                 type: CustomMargin,
               ),
             'padding' => Property(
-                'отступ',
+                'Padding',
                 value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
                 type: List<int>,
               ),
             'borderRadius' => Property(
-                'закругление',
+                'Border Radius',
                 CustomBorderRadius.fromJson(value),
                 type: CustomBorderRadius,
               ),
             'processType' => Property(
-                'тип процесса',
-                value ?? 'параллельно',
+                'Process Type',
+                value ?? 'Parallelly',
                 type: String,
               ),
             'statusId' => Property('Status Id', value, type: String),
-            'title' => Property('title', value, type: String),
+            'title' => Property('Title', value, type: String),
             'creatorTitle' => Property('Creator Title', value, type: String),
             'Uint8List' =>
               // Property('картинка', Uint8List.fromList(value.codeUnits), type: Uint8List ),
-              Property('картинка', base64.decode(value), type: Uint8List),
+              Property('Image', base64.decode(value), type: Uint8List),
             'horizontalAlignment' => Property(
-                'горизонтальное выравнивание',
+                'Horizontal Alignment',
                 double.tryParse(value.toString()),
                 type: double,
               ),
             'verticalAlignment' => Property(
-                'вертикальное выравнивание',
+                'Vertical Alignment',
                 double.tryParse(value.toString()),
                 type: double,
               ),
             'stylefontSize' => Property(
-                'размер шрифта',
+                'Font Size',
                 double.tryParse(value.toString()) ?? '9',
                 type: double,
               ),
             'isItalic' => Property(
-                'Курсив',
+                'Italic',
                 value == 'true' ? true : false,
                 type: bool,
               ),
             'topBorder' => Property(
-                'Верхняя граница',
+                'Top border',
                 value.runtimeType == CustomBorderStyle
                     ? value
                     : CustomBorderStyle.fromMap(value),
                 type: CustomBorderStyle,
               ),
             'leftBorder' => Property(
-                'Левая граница',
+                'Left Border',
                 value.runtimeType == CustomBorderStyle
                     ? value
                     : CustomBorderStyle.fromMap(value),
                 type: CustomBorderStyle,
               ),
             'rightBorder' => Property(
-                'Правая граница',
+                'Right Border',
                 value.runtimeType == CustomBorderStyle
                     ? value
                     : CustomBorderStyle.fromMap(value),
                 type: CustomBorderStyle,
               ),
             'bottomBorder' => Property(
-                'Нижняя граница',
+                'Bottom Border',
                 value.runtimeType == CustomBorderStyle
                     ? value
                     : CustomBorderStyle.fromMap(value),
                 type: CustomBorderStyle,
               ),
             'colspan' => Property(
-                'объединение строк',
+                'Column Span',
                 int.tryParse(value.toString()) ?? 0,
                 type: int,
               ),
             'rowspan' => Property(
-                'объединение колонок',
+                'Row Span',
                 int.tryParse(value.toString()) ?? 0,
                 type: int,
               ),
             'width' => Property(
-                'ширина',
+                'Width',
                 double.tryParse(value.toString()),
                 type: double,
               ),
             'height' => Property(
-                'высота',
+                'Height',
                 double.tryParse(value.toString()),
                 type: double,
               ),
             'radius' => Property(
-                'радиус',
+                'Radius',
                 double.tryParse(value.toString()),
                 type: double,
               ),
             'fontWeight' => Property(
-                "насыщенность шрифта",
+                "Font Weight",
                 FontWeight.values[((int.tryParse(value) ?? 400) ~/ 100) - 1],
                 type: FontWeight,
               ),
@@ -204,7 +204,7 @@ mixin FromMapToMap {
                   Property('кол-во объединения колонок', int.tryParse(value)??-1, type: int),
 */
             'position' => Property(
-                'положение',
+                'Position',
                 Offset(
                   double.tryParse(value['left'].toString()) ?? 0,
                   double.tryParse(value['top'].toString()) ?? 0,
@@ -212,46 +212,46 @@ mixin FromMapToMap {
                 type: Offset,
               ),
             'size' => Property(
-                'размер',
+                'Size',
                 Size(
                   double.tryParse(value['width'].toString()) ?? 0,
                   double.tryParse(value['height'].toString()) ?? 0,
                 ),
                 type: Size,
               ),
-            'id' => Property('идентификатор', value, type: String),
+            'id' => Property('Id', value, type: String),
             'color' => Property(
-                'цвет',
+                'Color',
                 Color(int.tryParse(value.toString(), radix: 16) ?? 0),
                 type: Color,
               ),
             'activeColor' => Property(
-                'activeColor',
+                'Active Color',
                 Color(int.tryParse(value.toString(), radix: 16) ?? 1),
                 type: Color,
               ),
             'inactiveColor' => Property(
-                'inactiveColor',
+                'Inactive Color',
                 Color(int.tryParse(value.toString(), radix: 16) ?? 1),
                 type: Color,
               ),
             'thumbColor' => Property(
-                'thumbColor',
+                'Thumb Color',
                 Color(int.tryParse(value.toString(), radix: 16) ?? 1),
                 type: Color,
               ),
             'backgroundColor' => Property(
-                'цвет фона',
+                'Background Color',
                 Color(int.tryParse(value.toString(), radix: 16) ?? 0),
                 type: Color,
               ),
             'style' => Property(
-                'стиль',
-                Style(value['id'] ?? UuidNil, value['name'] ?? 'базовый стиль'),
+                'Style',
+                Style(value['id'] ?? UuidNil, value['name'] ?? 'basic style'),
                 type: Style,
               ),
             'textStyle' => Property(
-                'стиль текста',
+                'Text Style',
                 TextStyle(
                   fontSize: double.tryParse(value['fontSize'].toString()) ?? 0,
                   fontWeight: switch (
@@ -271,7 +271,7 @@ mixin FromMapToMap {
                 type: TextStyle,
               ),
             'alignment' => Property(
-                'выравнивание',
+                'Alignment',
                 Alignment(
                   double.tryParse(value['x'].toString()) ?? 0,
                   double.tryParse(value['y'].toString()) ?? 0,
@@ -284,13 +284,13 @@ mixin FromMapToMap {
     return properties;
   }
 
-  List<Item> itemsFromMap(Item parent, List list) {
+  List<Item> itemsFromMap(Item parent, List<Map<String, dynamic>> list) {
     final List<Item> items = [];
 
-    for (final element in list) {
+    for (final Map<String, dynamic> element in list) {
       Item item = switchItem(element, parent);
 
-      final itemProperties = propertiesFromMap(element['properties']);
+      final Map<String, Property> itemProperties = propertiesFromMap(element['properties']);
 
       item.properties.forEach((key, value) {
         if (itemProperties.containsKey(key)) {

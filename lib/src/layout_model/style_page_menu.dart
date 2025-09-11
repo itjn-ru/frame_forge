@@ -11,14 +11,13 @@ class StylePageMenu extends ComponentAndSourceMenu {
   List<ContextMenuEntry> getContextMenu(
     void Function(LayoutModelEvent event)? onChanged,
   ) {
-    return [
-      const MenuHeader(text: "Редактирование"),
-
+    return <ContextMenuEntry>[
+      const MenuHeader(text: "Editing"),
       MenuItem(
-        label: 'Добавить стиль',
+        label: 'Add style',
         icon: Icons.add,
         onSelected: () {
-          var item = StyleElement("стиль");
+          final StyleElement item = StyleElement("style");
           controller.layoutModel.addItem(target, item);
           onChanged!(AddItemEvent(id: item.id));
         },

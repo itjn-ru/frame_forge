@@ -59,16 +59,15 @@ final class MenuItem<T> extends ContextMenuItem<T> {
   ]) {
     bool isFocused = menuState.focusedEntry == this;
 
-    final background = context.colorScheme.surface;
-    final normalTextColor = Color.alphaBlend(
+    final Color background = context.colorScheme.surface;
+    final Color normalTextColor = Color.alphaBlend(
       context.colorScheme.onSurface.withAlpha(160),
       background,
     );
-    final focusedTextColor = context.colorScheme.onSurface;
-    final foregroundColor = isFocused ? focusedTextColor : normalTextColor;
-    final textStyle = TextStyle(color: foregroundColor, height: 1.0);
+    final Color focusedTextColor = context.colorScheme.onSurface;
+    final Color foregroundColor = isFocused ? focusedTextColor : normalTextColor;
+    final TextStyle textStyle = TextStyle(color: foregroundColor, height: 1.0);
 
-    // ~~~~~~~~~~ //
 
     return ConstrainedBox(
       constraints: constraints ?? const BoxConstraints.expand(height: 32.0),
@@ -82,7 +81,7 @@ final class MenuItem<T> extends ContextMenuItem<T> {
           child: DefaultTextStyle(
             style: textStyle,
             child: Row(
-              children: [
+              children: <Widget>[
                 SizedBox.square(
                   dimension: 32.0,
                   child: Icon(icon, size: 16.0, color: foregroundColor),

@@ -17,7 +17,7 @@ class FormSliderButtonWidget extends ComponentWidget {
       scaleFactor: scaleFactor,
       child: Slider(
         value: 1,
-        onChanged: (value) {},
+        onChanged: (double value) {},
         activeColor: component['activeColor'],
         inactiveColor: component['inactiveColor'],
         thumbColor: component['thumbColor'],

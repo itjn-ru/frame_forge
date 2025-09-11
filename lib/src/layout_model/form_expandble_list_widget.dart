@@ -10,6 +10,8 @@ import 'component.dart';
 import 'component_group.dart';
 import 'component_widget.dart';
 import 'controller/events.dart';
+import 'controller/layout_model_controller.dart';
+import 'layout_model.dart';
 import 'style_element.dart';
 
 class FormExpandbleListWidget extends ComponentWidget {
@@ -41,29 +43,29 @@ class ExpandbleComponent extends StatefulWidget {
 class _ExpandbleComponentState extends State<ExpandbleComponent> {
   final ExpandableController controller = ExpandableControllerImpl();
   double? expandedHeight;
-  late final size = widget.component['size'] ?? const Size(360, 30);
+  late final Size size = widget.component['size'] ?? const Size(360, 30);
 
   final NumberFormat numberFormat = NumberFormat(',##0.00', 'ru_RU');
 
-  late final modelController = LayoutModelControllerProvider.of(context);
-  late final layoutModel = modelController.layoutModel;
+  late final LayoutModelController modelController = LayoutModelControllerProvider.of(context);
+  late final LayoutModel layoutModel = modelController.layoutModel;
   late StyleElement style =
       layoutModel.getStyleElementById(widget.component['style'].id) ??
-      StyleElement("стиль");
-  late final border = style['borderRadius'];
-  late final items = List.generate(
+      StyleElement("style");
+  late final  border = style['borderRadius'];
+  late final List<Widget> items = List<Widget>.generate(
     widget.component.items.length - 1,
-    (index) => SizedBox(
+    (int index) => SizedBox(
       height: widget.component.items[index + 1]['size'].height,
       child: ComponentWidget(
         component: widget.component.items[index + 1] as LayoutComponent,
       ),
     ),
   );
-  late final header = widget.component.items.whereType<ComponentGroup>().first;
-  late var headerStyle =
+  late final ComponentGroup header = widget.component.items.whereType<ComponentGroup>().first;
+  late final StyleElement headerStyle =
       layoutModel.getStyleElementById(header['style'].id) ??
-      StyleElement("стиль");
+      StyleElement("style");
   late final TextStyle textStyle = TextStyle(
     color: style['color'],
     fontSize: style['fontSize'],
@@ -92,7 +94,7 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
         );
       } else if (expandedHeight != null) {
         widget.component.properties['expandble']?.value = value;
-        final collapsedSize =
+        final Size? collapsedSize =
             widget.component.properties['expandedSize']?.value;
         widget.component.properties['expandedSize']?.value = size;
         widget.component.properties['size']?.value = collapsedSize;

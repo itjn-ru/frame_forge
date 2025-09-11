@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'property.dart';
 import 'property_widget.dart';
 
 class PropertyUuidWidget extends PropertyWidget {
@@ -6,8 +7,8 @@ class PropertyUuidWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller.layoutModel.curItem.properties[propertyKey]!;
+    final Property? property = controller.layoutModel.curItem.properties[propertyKey]!;
 
-    return Text(property.value.toString());
+    return Text(property?.value.toString() ?? '');
   }
 }

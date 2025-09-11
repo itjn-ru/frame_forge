@@ -24,13 +24,13 @@ class ComponentsAndSources extends StatelessWidget {
       child: LayoutModelControllerProvider(
         controller: controller,
         child: Builder(
-          builder: (context) {
+          builder: (BuildContext context) {
             final ComponentAndSourcePage curPage = controller.getCurrentPage();
             if (curPage is StylePage) {
               return Column(
                 children: List.generate(
                   curPage.items.length, //widget._items.length,
-                  (index) =>
+                  (int index) =>
                       StyleWidget.create(curPage.items[index] as LayoutStyle),
                 ),
               );

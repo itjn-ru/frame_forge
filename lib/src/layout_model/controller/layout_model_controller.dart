@@ -59,7 +59,6 @@ class LayoutModelController {
 
   LayoutModelEvent? lastEvent;
 
-  /// Вместо хранения текущего item, можно использовать id
   late final ValueNotifier<String?> selectedIdNotifier;
 
   /// Creates a [LayoutModelController] with the specified [layoutModel].
@@ -161,25 +160,24 @@ class LayoutModelController {
 
   /// Finds the nearest parent page for the given item
   ComponentAndSourcePage? _findParentPage(Item item) {
-    // Если сам item является Page, возвращаем его
     if (item is ComponentAndSourcePage) {
       return item;
     }
 
-    // Ищем родительскую страницу, обходя дерево элементов
+    // Search for the parent page by traversing the item tree
     ComponentAndSourcePage? searchInItems(List<Item> items, Item target) {
       for (final Item currentItem in items) {
-        // Проверяем, есть ли target в дочерних элементах currentItem
+        // Check if the target is in the children of the currentItem
         if (currentItem.items.contains(target)) {
-          // Если currentItem является Page, возвращаем его
+          // If currentItem is a Page, return it
           if (currentItem is ComponentAndSourcePage) {
             return currentItem;
           }
-          // Иначе продолжаем поиск вверх по дереву
+          // Otherwise continue searching up the tree
           return _findParentPage(currentItem);
         }
 
-        // Рекурсивно ищем в дочерних элементах
+        // Recursively search in children
         final Item? found = searchInItems(currentItem.items, target);
         if (found != null) return found as ComponentAndSourcePage?;
       }
@@ -325,7 +323,7 @@ class LayoutModelController {
     if (item == null) return;
     final Offset prev = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
     item.properties["position"]?.value = next;
-    updateProperty("position", Property("положение", next, type: Offset));
+    updateProperty("position", Property("position", next, type: Offset));
     final String id = const Uuid().v4();
     eventBus.emit(ChangeItem(id: id, itemId: itemId));
     eventBus.emit(

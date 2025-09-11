@@ -16,7 +16,7 @@ class MaketPagePropertiesColumn extends StatelessWidget {
             height: 25,
             child: Padding(
               padding: EdgeInsets.only(top: 5),
-              child: Text('cвойства'),
+              child: Text('Properties', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
           Expanded(child: ListView(children: [Properties(controller)])),

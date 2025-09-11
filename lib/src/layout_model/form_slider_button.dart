@@ -4,9 +4,9 @@ import 'component.dart';
 import 'property.dart';
 
 class FormSliderButton extends LayoutComponent {
-  FormSliderButton(name) : super("sliderButton", name) {
-    properties["text"] = Property("текст", "");
-    properties["source"] = Property("источник", "");
+  FormSliderButton(String name) : super("sliderButton", name) {
+    properties["text"] = Property("text", "");
+    properties["source"] = Property("source", "");
     properties['activeColor'] = Property(
       "activeColor",
       const Color(0xFF6200EE),

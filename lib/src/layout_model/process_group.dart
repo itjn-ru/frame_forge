@@ -3,12 +3,12 @@ import 'property.dart';
 import 'style.dart';
 
 class ProcessGroup extends LayoutComponent {
-  ProcessGroup(name) : super("processGroup", name) {
+  ProcessGroup(String name) : super("processGroup", name) {
     properties["processType"] = Property(
-      "тип процесса",
-      'параллельно',
+      "process type",
+      'parallelly',
       type: String,
     );
-    properties["style"] = Property("стиль", Style.basic, type: Style);
+    properties["style"] = Property("style", Style.basic, type: Style);
   }
 }

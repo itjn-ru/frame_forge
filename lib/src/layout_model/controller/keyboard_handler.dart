@@ -35,7 +35,7 @@ class GlobalKeyboardHandler {
       return true;
     }
 
-    // Copy / Paste / Cut (только если не редактируем текстовое поле)
+    // Copy / Paste / Cut (only if not editing a text field)
     if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyC && !_isTextFieldFocused()) {
       controller.clipboard.copySelection();
       return true;
@@ -57,7 +57,6 @@ class GlobalKeyboardHandler {
       return true;
     }
 
-    // Delete (только если не редактируем текстовое поле)
     if (event.physicalKey == PhysicalKeyboardKey.delete ||
         event.physicalKey == PhysicalKeyboardKey.backspace) {
       if (controller.selectedId != null && !_isTextFieldFocused()) {

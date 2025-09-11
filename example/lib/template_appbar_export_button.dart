@@ -14,7 +14,7 @@ class TemplateAppbarExportButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
         onPressed: () async => controller.project.save(),
-        child: const Text('Экспорт', style: TextStyle(color: Colors.black)),
+        child: const Text('Export', style: TextStyle(color: Colors.black)),
       ),
     );
   }

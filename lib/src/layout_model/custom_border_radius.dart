@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 
 enum CustomBorderRadiusEnum {
-  none(BorderRadiusNone(), 'Нет радиуса'),
-  all(BorderRadiusAll(0), 'Все углы'),
-  top(BorderRadiusTop(0), 'Только верхние'),
-  bottom(BorderRadiusBottom(0), 'Только нижние');
+  none(BorderRadiusNone(), 'None radius'),
+  all(BorderRadiusAll(0), 'All corners'),
+  top(BorderRadiusTop(0), 'Top corners only'),
+  bottom(BorderRadiusBottom(0), 'Bottom corners only');
 
   final CustomBorderRadius type;
   final String title;
@@ -32,7 +32,7 @@ sealed class CustomBorderRadius {
   BorderRadius borderRadius(double scale);
 
   factory CustomBorderRadius.fromJson(Map<String, dynamic> json) {
-    final discriminator = json['type'] as String;
+    final String discriminator = json['type'] as String;
 
     switch (discriminator) {
       case 'BorderRadiusNone':
@@ -44,20 +44,20 @@ sealed class CustomBorderRadius {
       case 'BorderRadiusBottom':
         return BorderRadiusBottom.fromJson(json);
       default:
-        return BorderRadiusNone.fromJson({});
+        return BorderRadiusNone.fromJson(<String, dynamic>{});
       // throw Exception('Unknown class: $discriminator');
     }
   }
   static Map<String, dynamic> toJson(CustomBorderRadius obj) {
     switch (obj) {
       case BorderRadiusNone():
-        return {'type': 'BorderRadiusNone'};
+        return <String, dynamic>{'type': 'BorderRadiusNone'};
       case BorderRadiusAll():
-        return {'type': 'BorderRadiusAll', 'radius': obj.toJson()};
+        return <String, dynamic>{'type': 'BorderRadiusAll', 'radius': obj.toJson()};
       case BorderRadiusTop():
-        return {'type': 'BorderRadiusTop', 'radius': jsonEncode(obj.toJson())};
+        return <String, dynamic>{'type': 'BorderRadiusTop', 'radius': jsonEncode(obj.toJson())};
       case BorderRadiusBottom():
-        return {'type': 'BorderRadiusBottom', 'radius': obj.toJson()};
+        return <String, dynamic>{'type': 'BorderRadiusBottom', 'radius': obj.toJson()};
     }
   }
 }

@@ -36,7 +36,7 @@ class ComponentPage extends ComponentAndSourcePage {
   ///
   /// [name] The display name of the page
   /// [screenSize] The target screen size (defaults to mobile)
-  ComponentPage(name, [this.screenSize = ScreenSizeEnum.mobile])
+  ComponentPage(String name, [this.screenSize = ScreenSizeEnum.mobile])
     : super("componentPage", name);
 }
 
@@ -48,7 +48,7 @@ class SourcePage extends ComponentAndSourcePage {
   /// Creates a new source page
   ///
   /// [name] The display name of the page
-  SourcePage(name) : super("sourcePage", name);
+  SourcePage(String name) : super("sourcePage", name);
 }
 
 /// A page containing style definitions
@@ -59,7 +59,7 @@ class StylePage extends ComponentAndSourcePage {
   /// Creates a new style page
   ///
   /// [name] The display name of the page
-  StylePage(name) : super("stylePage", name);
+  StylePage(String name) : super("stylePage", name);
 }
 
 /// A page containing process definitions and workflows
@@ -71,13 +71,13 @@ class ProcessPage extends ComponentAndSourcePage {
   ///
   /// [name] The display name of the page
   /// [viewport] Optional viewport configuration for the process canvas
-  ProcessPage(name, {this.viewport}) : super("processPage", name);
+  ProcessPage(String name, {this.viewport}) : super("processPage", name);
 
   /// Viewport configuration for the process canvas
   ///
   /// Contains offset and zoom settings for the process editor view.
   Map<String, dynamic>? viewport = {
-    "offset": [0.0, 0.0],
+    "offset": <double>[0.0, 0.0],
     "zoom": 1.0,
   };
 }

@@ -51,9 +51,9 @@ class _MaketPageComponentsColumnState extends State<MaketPageComponentsColumn>
               setState(() {});
             },
             tabs: [
-              TabWidget(text: 'Страницы', active: _tabController.index == 0),
-              TabWidget(text: 'Данные', active: _tabController.index == 1),
-              TabWidget(text: 'Стили', active: _tabController.index == 2),
+              TabWidget(text: 'Pages', active: _tabController.index == 0),
+              TabWidget(text: 'Data', active: _tabController.index == 1),
+              TabWidget(text: 'Styles', active: _tabController.index == 2),
             ],
           ),
           const SizedBox(height: 5),

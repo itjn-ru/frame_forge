@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
+import 'property.dart';
 import 'property_widget.dart';
 
 /// Widget for editing padding properties
@@ -20,19 +21,19 @@ class PropertyPaddingWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller
+    final Property? property = controller
         .getItemById(controller.selectedId)
         ?.properties[propertyKey];
     final List<int> values = List<int>.from(
       (property?.value is List)
-          ? (property!.value as List)
-                .map((e) => int.tryParse(e.toString()) ?? 0)
+          ? (property!.value as List<dynamic>)
+                .map((dynamic e) => int.tryParse(e.toString()) ?? 0)
                 .toList()
-          : const [0, 0, 0, 0],
+          : const <int>[0, 0, 0, 0],
     );
 
     void updateIndex(int index, String value) {
-      final list = List<int>.from(values);
+      final List<int> list = List<int>.from(values);
       list[index] = int.tryParse(value) ?? 0;
       property?.value = list;
     }
@@ -41,7 +42,7 @@ class PropertyPaddingWidget extends PropertyWidget {
       children: [
         Row(
           children: [
-            const Text("Отступ слева: "),
+            const Text("Left Padding: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[0].toString(),
@@ -53,7 +54,7 @@ class PropertyPaddingWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Отступ справа: "),
+            const Text("Right Padding: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[2].toString(),
@@ -69,7 +70,7 @@ class PropertyPaddingWidget extends PropertyWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            const Text("Отступ сверху: "),
+            const Text("Top Padding: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[1].toString(),
@@ -81,7 +82,7 @@ class PropertyPaddingWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Отступ снизу: "),
+            const Text("Bottom Padding: "),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[3].toString(),

@@ -34,7 +34,7 @@ class ProcessItemsState extends State<ProcessItems>
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         return SizedBox(
           width: constraints.maxWidth,
           height: constraints.maxHeight,
@@ -47,14 +47,14 @@ class ProcessItemsState extends State<ProcessItems>
   Widget _buildItem(Item item, String? processType, double width) {
     Widget child;
     if (item.items.isNotEmpty) {
-      final children = <Widget>[];
+      final List<Widget> children = [];
 
-      final items = item.items;
+      final List<Item> items = item.items;
 
       children.addAll(
-        List.generate(
+        List<Widget>.generate(
           items.length,
-          (index) => SizedBox(
+          (int index) => SizedBox(
             //width: (width - 5) / (first ? 1 : items.length),
             child: Padding(
               padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
@@ -67,18 +67,18 @@ class ProcessItemsState extends State<ProcessItems>
           ),
         ),
       );
-      processType = item.properties['processType']?.value ?? 'последовательно';
+      processType = item.properties['processType']?.value ?? 'sequentially';
       child = Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(5),
             child: Text(item['name'], softWrap: true),
           ),
           Flex(
             mainAxisSize: MainAxisSize.min,
-            direction: processType != 'параллельно'
+            direction: processType != 'parallelly'
                 ? Axis.vertical
                 : Axis.horizontal,
             children: children,
@@ -133,7 +133,7 @@ class _ItemWrapperState extends State<ItemWrapper> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (event) {
+      onEnter: ( event) {
         setState(() {
           position = event.position;
         });

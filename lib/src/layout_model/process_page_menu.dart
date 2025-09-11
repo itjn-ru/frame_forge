@@ -15,27 +15,27 @@ class ProcessPageMenu extends ComponentAndSourceMenu {
     void Function(LayoutModelEvent event)? onChanged,
   ) {
     return [
-      const MenuHeader(text: "Редактирование"),
+      const MenuHeader(text: "Editing"),
       MenuItem.submenu(
-        label: 'Добавить группу процессов',
+        label: 'Add Process Group',
         icon: Icons.add,
-        items: [
+        items: <ContextMenuEntry>[
           MenuItem(
-            label: 'Параллельно',
+            label: 'Parallelly',
             icon: Icons.widgets,
             onSelected: () {
-              var item = ProcessGroup("Параллельный процесс");
-              item.properties['processType']?.value = 'параллельно';
+              final ProcessGroup item = ProcessGroup("Parallel Process");
+              item.properties['processType']?.value = 'parallelly';
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
           MenuItem(
-            label: 'Последовательно',
+            label: 'Sequentially',
             icon: Icons.widgets,
             onSelected: () {
-              var item = ProcessGroup("Последовательный процесс");
-              item.properties['processType']?.value = 'последовательно';
+              final ProcessGroup item = ProcessGroup("Sequential Process");
+              item.properties['processType']?.value = 'sequentially';
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
@@ -44,33 +44,32 @@ class ProcessPageMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Копировать',
+        label: 'Copy',
         icon: Icons.delete,
         onSelected: () {
           controller.clipboard.copySelection();
         },
       ),
       MenuItem(
-        label: 'Вставить',
+        label: 'Paste',
         icon: Icons.delete,
         onSelected: () {
           controller.clipboard.pasteSelection(parent: target);
         },
       ),
       MenuItem(
-        label: 'Вырезать',
+        label: 'Cut',
         icon: Icons.content_cut,
         onSelected: () {
           controller.clipboard.cutSelection();
         },
       ),
       MenuItem(
-        label: 'Удалить',
+        label: 'Delete',
         icon: Icons.delete,
         onSelected: () {
-          var item = ProcessElement("процесс");
           controller.layoutModel.deleteItem(controller.layoutModel.curItem);
-          onChanged!(RemoveItemEvent(id: item.id));
+          onChanged!(RemoveItemEvent(id: controller.layoutModel.curItem.id));
         },
       ),
     ];

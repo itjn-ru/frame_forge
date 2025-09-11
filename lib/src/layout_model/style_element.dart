@@ -8,61 +8,61 @@ import 'property.dart';
 import 'style.dart';
 
 class StyleElement extends LayoutStyle {
-  StyleElement(name) : super("styleElement", name) {
+  StyleElement(String name) : super("styleElement", name) {
     if (kDebugMode) {
       properties['id'] = Property(
-        "идентификатор",
+        "Id",
         const Uuid().v4(),
         type: String,
       );
     }
-    properties['color'] = Property("цвет", Colors.black, type: Color);
+    properties['color'] = Property("Color", Colors.black, type: Color);
     properties['backgroundColor'] = Property(
-      "цвет фона",
+      "Background Color",
       Colors.transparent,
       type: Color,
     );
     properties['alignment'] = Property(
-      "выравнивание",
+      "Alignment",
       Alignment.centerLeft,
       type: Alignment,
     );
-    properties['fontSize'] = Property("размер шрифта", 11, type: double);
+    properties['fontSize'] = Property("Font Size", 11, type: double);
     properties['fontWeight'] = Property(
-      "насыщенность шрифта",
+      "Font Weight",
       FontWeight.normal,
       type: FontWeight,
     );
 
     properties['borderRadius'] = Property(
-      'закругление',
+      'Border Radius',
       const BorderRadiusNone(),
       type: CustomBorderRadius,
     );
-    properties['padding'] = Property('отступ', [0, 0, 0, 0], type: List<int>);
-    properties['margin'] = Property('Внешний отступ', [
+    properties['padding'] = Property('Padding', [0, 0, 0, 0], type: List<int>);
+    properties['margin'] = Property('Margin', [
       0,
       0,
       0,
       0,
     ], type: CustomMargin);
     properties["topBorder"] = Property(
-      "верхняя граница",
+      "Top Border",
       CustomBorderStyle.init(),
       type: CustomBorderStyle,
     );
     properties["bottomBorder"] = Property(
-      "нижняя граница",
+      "Bottom Border",
       CustomBorderStyle.init(),
       type: CustomBorderStyle,
     );
     properties["leftBorder"] = Property(
-      "левая граница",
+      "Left Border",
       CustomBorderStyle.init(),
       type: CustomBorderStyle,
     );
     properties["rightBorder"] = Property(
-      "правая граница",
+      "Right Border",
       CustomBorderStyle.init(),
       type: CustomBorderStyle,
     );

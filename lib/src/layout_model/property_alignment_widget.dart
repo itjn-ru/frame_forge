@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'controller/events.dart';
+import 'property.dart';
 import 'property_widget.dart';
 
 class PropertyAlignmentWidget extends PropertyWidget {
@@ -12,17 +13,17 @@ class PropertyAlignmentWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller
+    final Property?  property = controller
         .getItemById(controller.selectedId)
         ?.properties[propertyKey]!;
     return Row(
-      children: [
+      children: <Widget>[
         Expanded(
           child: DropdownButton<Alignment>(
             value: property?.value,
             isExpanded: true,
             items:
-                [
+                <Alignment>[
                       Alignment.topLeft,
                       Alignment.topCenter,
                       Alignment.topRight,
@@ -34,18 +35,18 @@ class PropertyAlignmentWidget extends PropertyWidget {
                       Alignment.bottomRight,
                     ]
                     .map<DropdownMenuItem<Alignment>>(
-                      (alignment) => DropdownMenuItem(
+                      (Alignment alignment) => DropdownMenuItem(
                         value: alignment,
                         child: Text(switch (alignment) {
-                          Alignment.topLeft => "вверху слева",
-                          Alignment.topCenter => "вверху по центру",
-                          Alignment.topRight => "вверху справа",
-                          Alignment.centerLeft => "по центру слева",
-                          Alignment.center => "по центру",
-                          Alignment.centerRight => "по центру справа",
-                          Alignment.bottomLeft => "внизу слева",
-                          Alignment.bottomCenter => "внизу по центру",
-                          Alignment.bottomRight => "внизу справа",
+                          Alignment.topLeft => "Up left",
+                          Alignment.topCenter => "Up center",
+                          Alignment.topRight => "Up right",
+                          Alignment.centerLeft => "Center left",
+                          Alignment.center => "Center",
+                          Alignment.centerRight => "Center right",
+                          Alignment.bottomLeft => "Bottom left",
+                          Alignment.bottomCenter => "Bottom center",
+                          Alignment.bottomRight => "Bottom right",
                           _ => "",
                         }),
                       ),

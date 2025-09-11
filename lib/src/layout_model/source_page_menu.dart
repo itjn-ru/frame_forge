@@ -12,16 +12,16 @@ class SourcePageMenu extends ComponentAndSourceMenu {
     void Function(LayoutModelEvent event)? onChanged,
   ) {
     return [
-      const MenuHeader(text: "Редактирование"),
+      const MenuHeader(text: "Editing"),
       MenuItem.submenu(
-        label: 'Добавить',
+        label: 'Add',
         icon: Icons.add,
         items: [
           MenuItem(
-            label: 'Переменную',
+            label: 'Variable',
             icon: Icons.add,
             onSelected: () {
-              final item = SourceVariable('переменная');
+              final SourceVariable item = SourceVariable('variable');
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
@@ -39,21 +39,21 @@ class SourcePageMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Копировать',
-        icon: Icons.delete,
+        label: 'Copy',
+        icon: Icons.copy,
         onSelected: () {
           controller.clipboard.copySelection();
         },
       ),
       MenuItem(
-        label: 'Вставить',
-        icon: Icons.delete,
+        label: 'Paste',
+        icon: Icons.paste,
         onSelected: () {
           controller.clipboard.pasteSelection(parent: target);
         },
       ),
       MenuItem(
-        label: 'Вырезать',
+        label: 'Cut',
         icon: Icons.content_cut,
         onSelected: () {
           controller.clipboard.cutSelection();
@@ -61,7 +61,7 @@ class SourcePageMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Удалить',
+        label: 'Delete',
         icon: Icons.delete,
         onSelected: () {
           controller.layoutModel.deleteItem(target);

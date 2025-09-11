@@ -4,10 +4,10 @@ import 'component.dart';
 import 'property.dart';
 
 class ComponentText extends LayoutComponent {
-  ComponentText(name) : super('text', name) {
-    properties['text'] = Property('текст', '');
+  ComponentText(String name) : super('text', name) {
+    properties['text'] = Property('text', '');
     properties['alignment'] = Property(
-      'выравнивание',
+      'alignment',
       Alignment.centerLeft,
       type: Alignment,
     );

@@ -13,23 +13,23 @@ class ProcessElementMenu extends ComponentAndSourceMenu {
     void Function(LayoutModelEvent event)? onChanged,
   ) {
     return [
-      const MenuHeader(text: "Редактирование"),
+      const MenuHeader(text: "Editing"),
       MenuItem(
-        label: 'Копировать',
+        label: 'Copy',
         icon: Icons.delete,
         onSelected: () {
           controller.clipboard.copySelection();
         },
       ),
       MenuItem(
-        label: 'Вставить',
+        label: 'Paste',
         icon: Icons.delete,
         onSelected: () {
           controller.clipboard.pasteSelection(parent: target);
         },
       ),
       MenuItem(
-        label: 'Вырезать',
+        label: 'Cut',
         icon: Icons.content_cut,
         onSelected: () {
           controller.clipboard.cutSelection();
@@ -37,7 +37,7 @@ class ProcessElementMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Удалить',
+        label: 'Delete',
         icon: Icons.delete,
         onSelected: () {
           controller.layoutModel.deleteItem(target);

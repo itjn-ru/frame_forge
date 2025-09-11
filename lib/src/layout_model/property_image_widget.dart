@@ -10,7 +10,8 @@ class PropertyImageWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller.layoutModel.curItem.properties[propertyKey]!;
+    final Property? property =
+        controller.layoutModel.curItem.properties[propertyKey];
     return ShowImageProperty(property: property, controller: controller);
   }
 }
@@ -18,10 +19,10 @@ class PropertyImageWidget extends PropertyWidget {
 class ShowImageProperty extends StatefulWidget {
   const ShowImageProperty({
     super.key,
-    required this.property,
+    this.property,
     required this.controller,
   });
-  final Property property;
+  final Property? property;
   final LayoutModelController controller;
 
   @override
@@ -31,29 +32,24 @@ class ShowImageProperty extends StatefulWidget {
 class _ShowImagePropertyState extends State<ShowImageProperty> {
   Future<Uint8List>? images;
 
-  @override
-  initState() {
-    super.initState();
-  }
-
   Future<Uint8List> pickUploadFiles() async {
-    final bytes = await widget.controller.pickUploadFiles();
+    final Uint8List? bytes = await widget.controller.pickUploadFiles();
     if (bytes == null) {
       throw Exception(
         'No file selected or file picking not supported on this platform',
       );
     }
 
-    widget.property.value = bytes;
+    widget.property?.value = bytes;
     return bytes;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<Uint8List>(
       future: images,
-      builder: (context, snapshot) {
-        if (widget.property.value != null) {
+      builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
+        if (widget.property?.value != null) {
           return InkWell(
             onTap: () async {
               setState(() {
@@ -63,7 +59,7 @@ class _ShowImagePropertyState extends State<ShowImageProperty> {
             child: SizedBox(
               width: 128,
               height: 128,
-              child: Image.memory(widget.property.value!),
+              child: Image.memory(widget.property?.value!),
             ),
           );
         } else {

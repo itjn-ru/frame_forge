@@ -14,7 +14,7 @@ class TemplateAppbarImportButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
         onPressed: () async => controller.project.load(),
-        child: const Text('Импорт', style: TextStyle(color: Colors.black)),
+        child: const Text('Import', style: TextStyle(color: Colors.black)),
       ),
     );
   }
@@ -33,22 +33,22 @@ final data='''
 <layout>
   <properties>
     <id>838d44d2-2563-40be-a369-e6217dd1faec</id>
-    <name>макет</name>
-    <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+    <name>template</name>
+    <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
   </properties>
   <items>
     <componentPage>
       <properties>
         <id>356160eb-0f4d-46bc-a0ec-809571a53fec</id>
-        <name>страница</name>
-        <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+        <name>page</name>
+        <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
       </properties>
       <items>
         <text>
           <properties>
             <id>6f89e212-d7d7-4f98-9ffb-ceee05258995</id>
-            <name>текст</name>
-            <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+            <name>text</name>
+            <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
             <position left="60" top="140"/>
             <size width="260" height="140"/>
             <text>This&amp;#x20;is&amp;#x20;text</text>
@@ -61,23 +61,23 @@ final data='''
     <sourcePage>
       <properties>
         <id>3ad26552-52d1-4f7c-be6d-a34b1c38a407</id>
-        <name>страница&amp;#x20;данных</name>
-        <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+        <name>source&amp;#x20;page</name>
+        <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
       </properties>
       <items/>
     </sourcePage>
     <stylePage>
       <properties>
         <id>7cca7c5a-1ea5-4f97-b516-59ff53a22bf9</id>
-        <name>страница&amp;#x20;стилей</name>
-        <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+        <name>style&amp;#x20;page</name>
+        <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
       </properties>
       <items>
         <styleElement>
           <properties>
             <id>00000000-0000-0000-0000-000000000000</id>
-            <name>базовый&amp;#x20;стиль</name>
-            <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+            <name>basic&amp;#x20;style</name>
+            <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
             <color>FF000000</color>
             <backgroundColor>0</backgroundColor>
             <alignment x="-1" y="0"/>
@@ -98,8 +98,8 @@ final data='''
     <processPage>
       <properties>
         <id>31ceb76b-a262-418d-b159-bec60b0e11be</id>
-        <name>процессы</name>
-        <style id="00000000-0000-0000-0000-000000000000" name="базовый стиль"/>
+        <name>process</name>
+        <style id="00000000-0000-0000-0000-000000000000" name="basic style"/>
       </properties>
       <items/>
     </processPage>
@@ -113,7 +113,7 @@ return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
         onPressed: () async => controller.project.load(data: data),
-        child: const Text('Импорт примера', style: TextStyle(color: Colors.black)),
+        child: const Text('Example', style: TextStyle(color: Colors.black)),
       ),
     );
   }

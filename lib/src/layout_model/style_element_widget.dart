@@ -6,22 +6,14 @@ class StyleElementWidget extends StyleWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-    var cellText = style["name"] ?? "";
+    final String cellText = style["name"] ?? "";
 
-    return Container(
-      //height: row.height,
-      //decoration: BoxDecoration(
-      //  border: Border.all(),
-      //  color: column["color"],
-      //),
-      //alignment: column["alignment"],
-      child: Text(
+    return  Text(
         cellText,
         style: TextStyle(
           fontSize: style["fontSize"],
           fontWeight: style["fontWeight"],
         ),
-      ),
     );
 
     /*var columns = source.items.whereType<SourceTableColumn>();

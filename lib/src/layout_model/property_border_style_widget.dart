@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
+import 'property.dart';
 import 'property_widget.dart';
 import 'style.dart';
 
@@ -26,7 +27,7 @@ class PropertyBorderStyleWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final Property? property = controller.getCurrentItem()?.properties[propertyKey]!;
     final String widthValue = property?.value?.width.toString() ?? '';
 
     const List<CustomBorderSide> sides = CustomBorderSide.values;
@@ -37,14 +38,14 @@ class PropertyBorderStyleWidget extends PropertyWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Row(
-          children: [
-            const Text('Ширина: '),
+          children: <Widget>[
+            const Text('Width: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: widthValue,
-                onChanged: (value) {
+                onChanged: (String value) {
                   property?.value.width = double.tryParse(value) ?? 0;
                 },
                 onSubmitted: _emitChange,
@@ -66,7 +67,7 @@ class PropertyBorderStyleWidget extends PropertyWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Выберите цвет!'),
+                    title: const Text('Choose a color!'),
                     content: SingleChildScrollView(
                       child: BlockPicker(
                         pickerColor: property?.value?.color, //default color
@@ -81,7 +82,7 @@ class PropertyBorderStyleWidget extends PropertyWidget {
                 },
               );
             },
-            child: const Text('цвет'),
+            child: const Text('Color'),
           ),
         ),
         DropdownButton<CustomBorderSide>(
@@ -89,10 +90,10 @@ class PropertyBorderStyleWidget extends PropertyWidget {
           isExpanded: true,
           items: sides
               .map<DropdownMenuItem<CustomBorderSide>>(
-                (e) => DropdownMenuItem(value: e, child: Text(e.title)),
+                (CustomBorderSide e) => DropdownMenuItem<CustomBorderSide>(value: e, child: Text(e.title)),
               )
               .toList(),
-          onChanged: (value) {
+          onChanged: (CustomBorderSide? value) {
             property?.value.side = value ?? CustomBorderSide.none;
             _emitChange();
           },

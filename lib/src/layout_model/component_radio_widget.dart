@@ -45,7 +45,7 @@ class _CustomRadioButtonState extends State<CustomRadioButton> {
 
   @override
   void initState() {
-    options = ['Исправно', 'Не исправно'];
+    options = ['True', 'False'];
     super.initState();
   }
 
@@ -116,7 +116,7 @@ class _CustomRadioButtonState extends State<CustomRadioButton> {
                         // const Spacer(),
                         Transform.scale(
                           scale: 1.2,
-                          child: Radio(
+                          child:  Radio(
                             key: UniqueKey(),
                             toggleable: true,
                             fillColor: WidgetStateColor.resolveWith(

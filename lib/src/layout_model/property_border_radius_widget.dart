@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frame_forge/src/layout_model/property.dart';
 import 'package:uuid/uuid.dart';
 
 import '../ui_kit/ui_kit.dart';
@@ -26,19 +27,19 @@ class PropertyBorderRadiusWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final Property? property = controller.getCurrentItem()?.properties[propertyKey]!;
     final CustomBorderRadiusEnum selected = CustomBorderRadiusEnum.fromModel(
       property?.value,
     );
 
     double currentRadius = 0;
-    final val = property?.value;
+    final CustomBorderRadius? val = property?.value;
     if (val is BorderRadiusAll) currentRadius = val.radius;
     if (val is BorderRadiusTop) currentRadius = val.radius;
     if (val is BorderRadiusBottom) currentRadius = val.radius;
 
     void updateRadius(String value) {
-      final radius = double.tryParse(value) ?? 0;
+      final double radius = double.tryParse(value) ?? 0;
       switch (selected) {
         case CustomBorderRadiusEnum.none:
           property?.value = const BorderRadiusNone();

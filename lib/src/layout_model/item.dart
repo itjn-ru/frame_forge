@@ -29,9 +29,9 @@ class Item with FromMapToMap {
   ///
   /// - [mayBeParent]: Whether this item can contain children (defaults to false)
   Item(this.type, name, {this.mayBeParent = false}) {
-    properties['id'] = Property('идентификатор', itemId ?? const Uuid().v4());
-    properties['name'] = Property('имя', name);
-    properties['style'] = Property('стиль', Style.basic, type: Style);
+    properties['id'] = Property('Id', itemId ?? const Uuid().v4());
+    properties['name'] = Property('Name', name);
+    properties['style'] = Property('Style', Style.basic, type: Style);
   }
 
   /// Accesses a property value by [name].

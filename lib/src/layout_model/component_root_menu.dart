@@ -12,12 +12,12 @@ class ComponentRootMenu extends ComponentAndSourceMenu {
     void Function(LayoutModelEvent event)? onChanged,
   ) {
     return [
-      const MenuHeader(text: "Редактирование"),
+      const MenuHeader(text: "Editing"),
       MenuItem(
-        label: 'Добавить страницу',
+        label: 'Add Page',
         icon: Icons.add,
         onSelected: () {
-          final ComponentPage item = ComponentPage("страница");
+          final ComponentPage item = ComponentPage("page");
           controller.layoutModel.addItem(target, item);
           onChanged!(AddItemEvent(id: item.id));
         },

@@ -96,16 +96,16 @@ class InputTextPropertyWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultValue = property?.value?.toString() ?? '';
-    final isDouble = switch (property?.type) {
+    final String defaultValue = property?.value?.toString() ?? '';
+    final bool isDouble = switch (property?.type) {
       const (double) => true,
       _ => false,
     };
 
-    final field = isDouble
+    final Widget field = isDouble
         ? NumericPropertyTextField(
             defaultValue: defaultValue,
-            onChanged: (v) => property?.value = double.tryParse(v),
+            onChanged: (String v) => property?.value = double.tryParse(v),
             onSubmitted: _emitChange,
             onTapOutside: _emitChange,
             onTabPressed: _emitChange,
@@ -113,13 +113,13 @@ class InputTextPropertyWidget extends PropertyWidget {
           )
         : PropertyTextField(
             defaultValue: defaultValue,
-            onChanged: (v) => property?.value = v,
+            onChanged: (String v) => property?.value = v,
             onSubmitted: _emitChange,
             onTapOutside: _emitChange,
             onTabPressed: _emitChange,
             onFocusLost: _emitChange,
           );
 
-    return Row(children: [Expanded(child: field)]);
+    return Row(children: <Widget>[Expanded(child: field)]);
   }
 }

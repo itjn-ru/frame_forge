@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
+import 'property.dart';
 import 'property_widget.dart';
 
 /// Widget for editing offset properties
@@ -21,7 +22,7 @@ class PropertyOffsetWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final property = controller
+    final Property? property = controller
         .getItemById(controller.selectedId)
         ?.properties[propertyKey];
     final Offset offset = property?.value ?? Offset.zero;
@@ -35,8 +36,8 @@ class PropertyOffsetWidget extends PropertyWidget {
     }
 
     return DualPropertyTextField(
-      firstLabel: "Л",
-      secondLabel: "В",
+      firstLabel: "Left",
+      secondLabel: "Top",
       firstValue: offset.dx.toString(),
       secondValue: offset.dy.toString(),
       onFirstChanged: updateDx,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'component.dart';
+import 'component_and_source.dart';
 import 'component_group.dart';
 import 'component_table_menu.dart';
 import 'component_text.dart';
@@ -132,7 +133,7 @@ class ComponentAndSourceMenu {
           );
       }
     } else {
-      var component = controller.layoutModel.getComponentByItem(target);
+      final LayoutComponentAndSource? component = controller.layoutModel.getComponentByItem(target);
 
       if (component == null) {
         return ComponentAndSourceMenu(controller, target, onChanged: onChanged);
@@ -155,23 +156,23 @@ class ComponentAndSourceMenu {
     Function(LayoutModelEvent event)? onChanged,
   ) {
     return [
-      const MenuHeader(text: "Редактирование"),
+      const MenuHeader(text: "Editing"),
       MenuItem(
-        label: 'Копировать',
+        label: 'Copy',
         icon: Icons.copy,
         onSelected: () {
           controller.clipboard.copySelection();
         },
       ),
       MenuItem(
-        label: 'Вставить',
+        label: 'Paste',
         icon: Icons.content_paste,
         onSelected: () {
           controller.clipboard.pasteSelection(parent: target);
         },
       ),
       MenuItem(
-        label: 'Вырезать',
+        label: 'Cut',
         icon: Icons.content_cut,
         onSelected: () {
           controller.clipboard.cutSelection();
@@ -179,7 +180,7 @@ class ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Удалить',
+        label: 'Delete',
         icon: Icons.delete,
         onSelected: () {
           // Use undoable delete instead of direct model manipulation

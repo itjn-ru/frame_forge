@@ -26,7 +26,7 @@ class Style {
   String name;
 
   /// The default basic style used as fallback
-  static Style basic = Style(UuidNil, 'базовый стиль');
+  static Style basic = Style(UuidNil, 'basic style');
 
   /// Creates a new style
   ///
@@ -109,10 +109,10 @@ class CustomBorderStyle {
 }
 
 enum CustomBorderSide {
-  none('Нет'),
-  solid('Сплошная'),
-  dash('Тире'),
-  dot('Точка');
+  none('None'),
+  solid('Solid'),
+  dash('Dashed'),
+  dot('Dotted');
 
   final String title;
 
