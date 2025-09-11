@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2025-09-11
+
+- Fixed text alignment in components
+- Fixed keyboard handler to avoid conflicts with text field editing
+- Сhanged source component
+
 ## [1.1.0] - 2025-09-10
 
 - fix borderRadius error in new stylePage

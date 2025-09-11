@@ -35,13 +35,13 @@ class GlobalKeyboardHandler {
       return true;
     }
 
-    // Copy / Paste / Cut
-    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyC) {
+    // Copy / Paste / Cut (только если не редактируем текстовое поле)
+    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyC && !_isTextFieldFocused()) {
       controller.clipboard.copySelection();
       return true;
     }
     
-    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyV) {
+    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyV && !_isTextFieldFocused()) {
       final String? selId = controller.selectedId;
       final Item? parent = selId != null
           ? controller.getItemById(selId)
@@ -52,15 +52,15 @@ class GlobalKeyboardHandler {
       return true;
     }
     
-    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyX) {
+    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyX && !_isTextFieldFocused()) {
       controller.clipboard.cutSelection();
       return true;
     }
 
-    // Delete
+    // Delete (только если не редактируем текстовое поле)
     if (event.physicalKey == PhysicalKeyboardKey.delete ||
         event.physicalKey == PhysicalKeyboardKey.backspace) {
-      if (controller.selectedId != null) {
+      if (controller.selectedId != null && !_isTextFieldFocused()) {
         controller.deleteSelected();
         return true;
       }
@@ -93,5 +93,27 @@ class GlobalKeyboardHandler {
     }
 
     return false;
+  }
+
+  bool _isTextFieldFocused() {
+    final FocusNode? focusedNode = FocusManager.instance.primaryFocus;
+    if (focusedNode == null) return false;
+    
+    final BuildContext? context = focusedNode.context;
+    if (context == null) return false;
+    
+    bool isTextField = false;
+    context.visitAncestorElements((Element element) {
+      final Widget widget = element.widget;
+      if (widget is TextField || 
+          widget is TextFormField || 
+          widget is EditableText) {
+        isTextField = true;
+        return false;
+      }
+      return true;
+    });
+    
+    return isTextField;
   }
 }

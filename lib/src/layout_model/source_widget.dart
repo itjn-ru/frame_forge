@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'source.dart';
-import 'source_table.dart';
-import 'source_table_widget.dart';
 import 'source_variable.dart';
 import 'source_variable_widget.dart';
 
@@ -11,11 +9,9 @@ class SourceWidget extends StatelessWidget {
   const SourceWidget(this.source, {super.key});
 
   factory SourceWidget.create(LayoutSource source) {
-    switch (source.runtimeType) {
+    switch (source) {
       case SourceVariable _:
-        return SourceVariableWidget(source as SourceVariable);
-      case SourceTable _:
-        return SourceTableWidget(source as SourceTable);
+        return SourceVariableWidget(source);
 
       default:
         return SourceWidget(source);

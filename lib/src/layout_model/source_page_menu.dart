@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'controller/events.dart';
 import 'menu.dart';
-import 'source_table.dart';
 import 'source_variable.dart';
 
 class SourcePageMenu extends ComponentAndSourceMenu {
@@ -27,15 +26,15 @@ class SourcePageMenu extends ComponentAndSourceMenu {
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
-          MenuItem(
-            label: 'Таблицу',
-            icon: Icons.add,
-            onSelected: () {
-              final item = SourceTable('таблица');
-              controller.layoutModel.addItem(target, item);
-              onChanged!(AddItemEvent(id: item.id));
-            },
-          ),
+          // MenuItem(
+          //   label: 'Таблицу',
+          //   icon: Icons.add,
+          //   onSelected: () {
+          //     final item = SourceTable('таблица');
+          //     controller.layoutModel.addItem(target, item);
+          //     onChanged!(AddItemEvent(id: item.id));
+          //   },
+          // ),
         ],
       ),
       const MenuDivider(),

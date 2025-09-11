@@ -31,8 +31,6 @@ import 'style_page_menu.dart';
 import 'root.dart';
 import 'source.dart';
 import 'source_page_menu.dart';
-import 'source_table.dart';
-import 'source_table_menu.dart';
 import 'source_variable.dart';
 import 'source_variable_menu.dart';
 import 'component_group_menu.dart';
@@ -120,8 +118,6 @@ class ComponentAndSourceMenu {
           return StyleElementMenu(controller, target, onChanged: onChanged);
         case const (ProcessElement):
           return ProcessItemMenu(controller, target, onChanged: onChanged);
-        case const (SourceTable):
-          return SourceTableMenu(controller, target, onChanged: onChanged);
         case const (FormExpandbleList):
           return FormExpandbleListMenu(
             controller,
@@ -145,8 +141,6 @@ class ComponentAndSourceMenu {
       switch (component.runtimeType) {
         case const (ComponentTable):
           return ComponentTableMenu(controller, target, onChanged: onChanged);
-        case const (SourceTable):
-          return SourceTableMenu(controller, target, onChanged: onChanged);
         default:
           return ComponentAndSourceMenu(
             controller,

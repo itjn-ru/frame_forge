@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'canvas/layout_model_provider.dart';
-import 'canvas/resizable_draggable_widget.dart';
+import '../canvas/layout_model_provider.dart';
+import '../canvas/resizable_draggable_widget.dart';
 import 'component.dart';
 import 'component_decoration_widget.dart';
 import 'component_widget.dart';

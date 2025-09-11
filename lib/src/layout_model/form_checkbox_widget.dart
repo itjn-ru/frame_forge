@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'canvas/layout_model_provider.dart';
+import '../canvas/layout_model_provider.dart';
 import 'component_widget.dart';
 import 'style_element.dart';
 

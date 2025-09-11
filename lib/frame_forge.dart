@@ -36,7 +36,6 @@ export 'src/layout_model/items.dart';
 export 'src/layout_model/page.dart';
 export 'src/layout_model/components_and_sources.dart';
 export 'src/layout_model/component_widget.dart';
-export 'src/layout_model/source_table.dart';
 export 'src/layout_model/source_variable.dart';
 export 'src/layout_model/properties.dart';
 export 'src/layout_model/menu.dart';

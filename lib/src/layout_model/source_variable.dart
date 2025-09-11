@@ -1,3 +1,4 @@
+import 'property.dart';
 import 'source.dart';
 
 /// A variable data source in the layout model
@@ -9,5 +10,7 @@ class SourceVariable extends LayoutSource {
   /// Creates a new source variable
   ///
   /// [name] The name/identifier for this variable
-  SourceVariable(name) : super('variable', name);
+  SourceVariable(String name) : super('variable', name) {
+    properties["type"] = Property("type", '');
+  }
 }

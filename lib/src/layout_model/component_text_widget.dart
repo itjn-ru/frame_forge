@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frame_forge/src/layout_model/component_decoration_widget.dart';
-import 'canvas/layout_model_provider.dart';
+import '../canvas/layout_model_provider.dart';
 import 'component_widget.dart';
+import 'controller/layout_model_controller.dart';
+import 'layout_model.dart';
 import 'style_element.dart';
 
 /// A widget that displays text with styles defined in a StyleElement.
@@ -17,12 +19,12 @@ class ComponentTextWidget extends ComponentWidget {
   @override
   Widget buildWidget(BuildContext context) {
     String text = component["text"];
-    final controller = LayoutModelControllerProvider.of(context);
-    final layoutModel = controller.layoutModel;
+    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final LayoutModel layoutModel = controller.layoutModel;
     StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
         StyleElement("стиль");
-    final alignment = component['alignment'];
+    final Alignment alignment = component['alignment'];
 
     // Transform Alignment to TextAlign
     TextAlign getTextAlign(dynamic alignment) {
@@ -33,7 +35,6 @@ class ComponentTextWidget extends ComponentWidget {
       }
       return TextAlign.left; // default
     }
-
     final TextStyle textStyle = TextStyle(
       color: style['color'],
       fontSize: style['fontSize'] * scaleFactor,
@@ -43,12 +44,15 @@ class ComponentTextWidget extends ComponentWidget {
       component: component,
       scaleFactor: scaleFactor,
       child: Row(
-        children: [
+        children: <Widget>[
           Expanded(
-            child: Text(
-              text,
-              style: textStyle,
-              textAlign: getTextAlign(alignment),
+            child: Align(
+              alignment: alignment,
+              child: Text(
+                text,
+                style: textStyle,
+                textAlign: getTextAlign(alignment),
+              ),
             ),
           ),
         ],
@@ -56,3 +60,5 @@ class ComponentTextWidget extends ComponentWidget {
     );
   }
 }
+
+            

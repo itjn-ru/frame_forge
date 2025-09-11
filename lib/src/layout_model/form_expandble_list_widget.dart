@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../expandble_widget/expandble_widget_content.dart';
 import '../expandble_widget/expandble_widget_controller.dart';
-import 'canvas/layout_model_provider.dart';
+import '../canvas/layout_model_provider.dart';
 import 'component.dart';
 import 'component_group.dart';
 import 'component_widget.dart';

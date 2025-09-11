@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../controller/layout_model_controller.dart';
+import '../layout_model/controller/layout_model_controller.dart';
 
 class LayoutModelControllerProvider extends InheritedWidget {
   final LayoutModelController controller;

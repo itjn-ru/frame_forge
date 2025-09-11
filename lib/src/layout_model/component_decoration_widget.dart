@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'canvas/layout_model_provider.dart';
+import '../canvas/layout_model_provider.dart';
 import 'component.dart';
 import 'controller/layout_model_controller.dart';
 import 'custom_border_radius.dart';
@@ -41,7 +41,6 @@ class ComponentDecorationWidget extends StatelessWidget {
         color: style['backgroundColor'],
         borderRadius: border,
       ),
-      alignment: style['alignment'] ?? Alignment.bottomRight,
       padding: EdgeInsets.fromLTRB(
         padding[0] * scaleFactor,
         padding[1] * scaleFactor,

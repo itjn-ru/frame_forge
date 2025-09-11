@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../flutter_context_menu/core/models/context_menu.dart';
-import '../../flutter_context_menu/core/models/context_menu_entry.dart';
-import '../../flutter_context_menu/core/utils/helpers.dart';
+import '../flutter_context_menu/core/models/context_menu.dart';
+import '../flutter_context_menu/core/models/context_menu_entry.dart';
+import '../flutter_context_menu/core/utils/helpers.dart';
 
 bool isContextMenuVisible = false;
 

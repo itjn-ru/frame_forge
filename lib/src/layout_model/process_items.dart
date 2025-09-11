@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../../frame_forge.dart';
-import 'canvas/context_menu.dart';
+import '../canvas/context_menu.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that displays process items in a hierarchical tree view

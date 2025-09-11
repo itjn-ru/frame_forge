@@ -1,4 +1,4 @@
-import 'canvas/layout_model_provider.dart';
+import '../canvas/layout_model_provider.dart';
 import 'style_element.dart';
 import 'package:flutter/material.dart';
 import 'component_widget.dart';

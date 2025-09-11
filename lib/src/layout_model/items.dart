@@ -1,6 +1,6 @@
-import 'canvas/context_menu.dart';
+import '../canvas/context_menu.dart';
 import 'package:flutter/material.dart';
-import 'canvas/layout_model_provider.dart';
+import '../canvas/layout_model_provider.dart';
 import 'controller/layout_model_controller.dart';
 import 'item.dart';
 import 'page.dart';
