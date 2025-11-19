@@ -1,26 +1,28 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
 import '../ui_kit/ui_kit.dart';
-import 'custom_margin.dart';
 import 'controller/events.dart';
 import 'controller/layout_model_controller.dart';
 import 'custom_border_radius.dart';
+import 'custom_margin.dart';
 import 'property.dart';
 import 'property_alignment_widget.dart';
+import 'property_bool_widget.dart';
 import 'property_border_radius_widget.dart';
+import 'property_border_style_widget.dart';
 import 'property_color_widget.dart';
 import 'property_font_weight_widget.dart';
 import 'property_image_widget.dart';
 import 'property_margin_widget.dart';
 import 'property_offset_widget.dart';
+import 'property_padding_widget.dart';
 import 'property_size_widget.dart';
 import 'property_style_widget.dart';
 import 'property_uuid_widget.dart';
-import 'package:uuid/uuid.dart';
-import 'property_padding_widget.dart';
 import 'style.dart';
-import 'property_border_style_widget.dart';
 
 /// Base class for property widgets - kept for backward compatibility
 class PropertyWidget extends StatelessWidget {
@@ -63,6 +65,8 @@ class PropertyWidget extends StatelessWidget {
         return PropertyUuidWidget(controller, propertyKey) as PropertyWidget;
       case const (Uint8List):
         return PropertyImageWidget(controller, propertyKey) as PropertyWidget;
+      case const (bool):
+        return PropertyBoolWidget(controller, propertyKey);
       default:
         return PropertyWidget(controller, propertyKey);
     }

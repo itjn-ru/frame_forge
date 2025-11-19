@@ -2,36 +2,36 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-
-import 'constants.dart';
-import 'custom_border_radius.dart';
-import 'custom_margin.dart';
-import 'form_expandble_list.dart';
-import 'item.dart';
-import 'process_group.dart';
-import 'property.dart';
-import 'screen_size_enum.dart';
-import 'style.dart';
 import 'package:flutter/widgets.dart';
+
 import 'component_group.dart';
 import 'component_table.dart';
 import 'component_text.dart';
+import 'constants.dart';
+import 'custom_border_radius.dart';
+import 'custom_margin.dart';
 import 'form_checkbox.dart';
+import 'form_expandble_list.dart';
+import 'form_hidden_field.dart';
 import 'form_image.dart';
+import 'form_radio.dart';
 import 'form_slider_button.dart';
+import 'form_text_field.dart';
+import 'item.dart';
 import 'page.dart';
 import 'process_element.dart';
+import 'process_group.dart';
+import 'property.dart';
+import 'screen_size_enum.dart';
 import 'source_variable.dart';
+import 'style.dart';
 import 'style_element.dart';
-import 'form_hidden_field.dart';
-import 'form_radio.dart';
-import 'form_text_field.dart';
 
 mixin FromMapToMap {
   Map propertiesToMap(Item item) {
-    final map = {};
+    final Map<dynamic, dynamic> map = <dynamic, dynamic>{};
 
-    item.properties.forEach((key, property) {
+    item.properties.forEach((String key, Property property) {
       try {
         map[key] = switch (property.type) {
           const (String) => property.value,
@@ -41,25 +41,28 @@ mixin FromMapToMap {
           const (ScreenSizeEnum) => property.value.index,
           const (Uint8List) => base64.encode(property.value),
           const (CustomBorderStyle) => property.value.toMap(),
-          const (Offset) => {
+          const (Offset) => <String, String>{
               'left': property.value.dx.toString(),
               'top': property.value.dy.toString(),
             },
-          const (Size) => {
+          const (Size) => <String, String>{
               'width': property.value.width.toString(),
               'height': property.value.height.toString(),
             },
           const (Color) => property.value.value.toRadixString(16).toUpperCase(),
-          const (Style) => {
+          const (Style) => <String, String>{
               'id': property.value.id.toString(),
               'name': property.value.name.toString(),
             },
           const (FontWeight) => property.value.value.toString(),
-          const (TextStyle) => {
+          const (TextStyle) => <String, dynamic>{
               'fontSize': property.value.fontSize,
               'fontWeight': property.value.fontWeight.value,
             },
-          const (Alignment) => {'x': property.value.x, 'y': property.value.y},
+          const (Alignment) => <String, dynamic>{
+              'x': property.value.x,
+              'y': property.value.y
+            },
           _ => property.value.toString(),
         };
       } catch (e) {
@@ -71,7 +74,7 @@ mixin FromMapToMap {
   }
 
   List<Map<String, dynamic>> itemsToMap(Item item) {
-    final List<Map<String, dynamic>> list = [];
+    final List<Map<String, dynamic>> list = <Map<String, dynamic>>[];
 
     for (item in item.items) {
       list.add(<String, dynamic>{
@@ -89,6 +92,7 @@ mixin FromMapToMap {
       return MapEntry(
           key,
           switch (key) {
+            'required' => Property('обязательное', value == 'true', type: bool),
             'margin' => Property(
                 'Margin',
                 value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
@@ -189,7 +193,7 @@ mixin FromMapToMap {
                 type: double,
               ),
             'fontWeight' => Property(
-                "Font Weight",
+                'Font Weight',
                 FontWeight.values[((int.tryParse(value) ?? 400) ~/ 100) - 1],
                 type: FontWeight,
               ),
@@ -285,14 +289,15 @@ mixin FromMapToMap {
   }
 
   List<Item> itemsFromMap(Item parent, List<Map<String, dynamic>> list) {
-    final List<Item> items = [];
+    final List<Item> items = <Item>[];
 
     for (final Map<String, dynamic> element in list) {
       Item item = switchItem(element, parent);
 
-      final Map<String, Property> itemProperties = propertiesFromMap(element['properties']);
+      final Map<String, Property> itemProperties =
+          propertiesFromMap(element['properties']);
 
-      item.properties.forEach((key, value) {
+      item.properties.forEach((String key, Property value) {
         if (itemProperties.containsKey(key)) {
           if (key == 'fontSize') {
             item.properties[key]!.value =
@@ -351,7 +356,7 @@ mixin FromMapToMap {
         return FormRadio('');
       case 'image':
         return FormImage('');
-      case "sliderButton":
+      case 'sliderButton':
         return FormSliderButton('');
       case 'checkbox':
         return FormCheckbox('');
