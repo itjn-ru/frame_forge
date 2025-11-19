@@ -1,6 +1,6 @@
 name: frame_forge
 description: "A visual editor (Figma-like) for creating and rendering interfaces based on XML. Designed for BDUI (Backend-Driven UI) applications where the UI is generated from server data."
-version: 1.1.1
+version: 1.1.2
 repository: https://github.com/itjn-ru/frame_forge
 
 environment:
@@ -18,7 +18,7 @@ dependencies:
   vector_math: ^2.1.4
   xml: ^6.5.0
   web: ^1.0.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -29,7 +29,7 @@ platforms:
   android:
   ios:
   linux:
-  macos:  
+  macos:
   web:
   windows:
 

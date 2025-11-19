@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.1.2] - 2025-11-19
+
+### Added
+
+- `PropertyBoolWidget` — a new property editor widget for boolean attributes.
+- `isRequired` (boolean) property for `FormTextField` to mark fields as required.
+- `textFunction` property in `ComponentText` for generating text via a user-defined function.
+- `inputId` property in `ComponentText` to link a text component to an input field.
+- `source` property and unified property keys (`text`, `source`, `alignment`).
+- `alignment` property added to `FormTextField` (text alignment).
+
+### Changed
+
+- Interface property keys and labels migrated to English (`lang change to en`).
+- Updated example `example/web/index.html` (metadata/structure updates).
+
+### Removed
+
+- `lib/src/layout_model/item_list_wrapper.dart` removed.
+- `lib/src/layout_model/mobile_download_service.dart` removed.
+
+### Refactor
+
+- Consolidated and standardized text and form component properties (consistent keys and naming).
+
 ## [1.1.1] - 2025-09-11
 
 - Fixed text alignment in components
@@ -14,13 +39,14 @@
 - add controller for resize and move
 - add show the selected item on top
 - add service-oriented architecture with dependency injection
-- implement global keyboard handler with international layout support  
+- implement global keyboard handler with international layout support
 - add undo/redo system
 - add comprehensive interface abstractions
 - update documentation with detailed features
 - fix Russian keyboard layout compatibility (Ctrl+Z -> Ctrl+Я)
 
 ## [1.0.2] - 2025-09-08
+
 - fix switch between ComponentPage
 - fix textAlignt in ComponentText
 - add to Style "BorderSide" (LTRB)
@@ -31,24 +57,28 @@
 - enhanced API documentation coverage with comprehensive dartdoc comments
 - canvas rendering optimization
 - add to controller: move/moveById/resize/resizeById methods and sealed ChangeItem with ChangeEvent, MoveEvent, ResizeEvent, AttributeChangeEvent. Move business logic out of UI.
-- refactor new event type of properties, add reusable textfield like size, offset, padding, marging, border, borderRadius and InputTextPropertyWidget 
+- refactor new event type of properties, add reusable textfield like size, offset, padding, marging, border, borderRadius and InputTextPropertyWidget
 - add compatibility for border radius values from older versions
 - improved public API documentation for better pub.dev compliance
 - added detailed class descriptions and parameter documentation
 
 ### Technical
+
 - Code formatting improvements across all files
 
 ## [1.0.1] - 2025-09-05
+
 - Multi-language documentation (English and Russian)
 - MIT license
 
 ### Changed
+
 - Migrated from deprecated `dart:html` to modern `package:web` for web compatibility
 - Improved static analysis compliance
 - Enhanced cross-platform file operations with conditional imports
 
 ### Technical
+
 - Universal file picker service with platform-specific implementations:
   - Web: HTML5 File API with modern web standards
   - Mobile/Desktop: file_picker package for native functionality
@@ -57,6 +87,7 @@
 - Comprehensive static analysis fixes
 
 ### Repository
+
 - Migrated from `layout_editor` to dedicated `frame_forge` repository
 - Updated package configuration and dependencies
 - Added proper pub.dev compliance
@@ -76,6 +107,7 @@
 ## [0.0.1] - Initial Development
 
 ### Added
+
 - Initial development version
 - Basic project structure
 - Core components foundation
