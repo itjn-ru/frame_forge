@@ -16,6 +16,7 @@ import 'property_border_style_widget.dart';
 import 'property_color_widget.dart';
 import 'property_font_weight_widget.dart';
 import 'property_image_widget.dart';
+import 'property_list_color_widget.dart';
 import 'property_list_widget.dart';
 import 'property_margin_widget.dart';
 import 'property_offset_widget.dart';
@@ -54,6 +55,8 @@ class PropertyWidget extends StatelessWidget {
         return PropertySizeWidget(controller, propertyKey) as PropertyWidget;
       case const (Color):
         return PropertyColorWidget(controller, propertyKey) as PropertyWidget;
+      case const (List<Color>):
+        return PropertyListColorWidget(controller, propertyKey);
       case const (Alignment):
         return PropertyAlignmentWidget(controller, propertyKey)
             as PropertyWidget;

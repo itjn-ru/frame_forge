@@ -7,10 +7,10 @@ class FormSliderButton extends LayoutComponent {
   FormSliderButton(String name) : super('sliderButton', name) {
     properties['text'] = Property('text', '');
     properties['source'] = Property('source', '');
-    properties['activeColor'] = Property(
-      'activeColor',
-      const Color(0xFF6200EE),
-      type: Color,
+    properties['activeColors'] = Property(
+      'activeColors',
+      <Color>[const Color(0xFF6200EE)],
+      type: List<Color>,
     );
     properties['inactiveColor'] = Property(
       'inactiveColor',

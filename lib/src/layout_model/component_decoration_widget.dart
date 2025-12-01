@@ -37,10 +37,16 @@ class ComponentDecorationWidget extends StatelessWidget {
         : borderRadiusValue.borderRadius(scaleFactor);
     final List<dynamic> padding = style['padding'] ?? <dynamic>[0, 0, 0, 0];
     final List<dynamic> margin = style['margin'] ?? <dynamic>[0, 0, 0, 0];
+    // Ensure backgroundColor is a Color (defensive against legacy/int values)
+    final dynamic bgRaw = style['backgroundColor'];
+    final Color bgColor = bgRaw is Color
+        ? bgRaw
+        : (bgRaw is int ? Color(bgRaw) : Colors.transparent);
+
     return Container(
       decoration: BoxDecoration(
         border: _buildBorder(style),
-        color: style['backgroundColor'],
+        color: bgColor,
         borderRadius: border,
       ),
       padding: EdgeInsets.fromLTRB(

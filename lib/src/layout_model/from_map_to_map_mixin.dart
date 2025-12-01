@@ -36,6 +36,10 @@ mixin FromMapToMap {
       try {
         map[key] = switch (property.type) {
           const (List<String>) => (property.value as List<String>).join(','),
+          const (List<Color>) => (property.value as List)
+              .whereType<Color>()
+              .map((Color e) => (e).value.toRadixString(16).toUpperCase())
+              .join(','),
           const (String) => property.value,
           const (CustomMargin) => property.value.join(','),
           const (List<int>) => property.value.join(','),
@@ -94,6 +98,22 @@ mixin FromMapToMap {
       return MapEntry(
           key,
           switch (key) {
+            'hintText' => Property(
+                'HintText',
+                _normalizeToStringList(
+                    value.split(',').map((e) => e.toString()).toList()),
+                type: List<String>,
+              ),
+            'initialValue' => Property(
+                'Initial Value',
+                int.tryParse(value.toString()) ?? 0,
+                type: int,
+              ),
+            'activeColors' => Property(
+                'Active Colors',
+                _normalizeToColorList(value),
+                type: List<Color>,
+              ),
             'inputId' => Property(
                 'inputId',
                 _normalizeToStringList(
@@ -423,4 +443,42 @@ List<String> _normalizeToStringList(dynamic value) {
     return result;
   }
   return <String>[];
+}
+
+List<Color> _normalizeToColorList(dynamic value) {
+  if (value == null) return <Color>[];
+  if (value is List<Color>) return List<Color>.from(value);
+  if (value is List) {
+    final List<Color> out = <Color>[];
+    for (final dynamic v in value) {
+      if (v is Color) {
+        out.add(v);
+      } else if (v is int) {
+        out.add(Color(v));
+      } else if (v is String) {
+        String s = v.trim();
+        if (s.isEmpty) continue;
+        if (s.startsWith('#')) s = s.substring(1);
+        if (s.startsWith('0x')) s = s.substring(2);
+        if (s.length == 6) s = 'FF$s';
+        final int? val = int.tryParse(s, radix: 16);
+        if (val != null) out.add(Color(val));
+      }
+    }
+    return out;
+  }
+  if (value is String) {
+    final List<Color> out = <Color>[];
+    for (String s in value.split(',')) {
+      s = s.trim();
+      if (s.isEmpty) continue;
+      if (s.startsWith('#')) s = s.substring(1);
+      if (s.startsWith('0x')) s = s.substring(2);
+      if (s.length == 6) s = 'FF$s';
+      final int? val = int.tryParse(s, radix: 16);
+      if (val != null) out.add(Color(val));
+    }
+    return out;
+  }
+  return <Color>[];
 }
