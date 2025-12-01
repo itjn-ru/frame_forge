@@ -1,11 +1,12 @@
 import 'dart:math';
 
-import 'component.dart';
-import 'style_element.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'component.dart';
 import 'component_widget.dart';
+import 'style_element.dart';
 
 class FormTextFieldWidget extends ComponentWidget {
   const FormTextFieldWidget({required super.component, super.key});
@@ -36,7 +37,7 @@ class _TextFieldPropertieState extends State<TextFieldPropertie> {
   late final bool isTime;
   TimeOfDay selectedTime24Hour = TimeOfDay.now();
   late final bool isDate;
-  List<String> parts = [];
+  List<String> parts = <String>[];
 
   @override
   void initState() {
@@ -58,9 +59,9 @@ class _TextFieldPropertieState extends State<TextFieldPropertie> {
     return SizedBox(
       height: widget.component['size']?.height + 5,
       child: Stack(
-        children: [
+        children: <Widget>[
           Row(
-            children: [
+            children: <Widget>[
               if (widget.component['text'] != '')
                 SizedBox(
                   width: 40,
@@ -151,7 +152,7 @@ class _DropDownWidgetState extends State<DropDownWidget> {
   @override
   void initState() {
     menuItems = widget.component['caption'].split(',');
-    menuItems.map((e) => e.trim());
+    menuItems.map((String e) => e.trim());
     selectedItem = menuItems.first;
     super.initState();
   }
@@ -159,9 +160,9 @@ class _DropDownWidgetState extends State<DropDownWidget> {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: selectedItem,
+      initialValue: selectedItem,
       //width: constraints.maxWidth,
-      onChanged: (value) {
+      onChanged: (String? value) {
         setState(() {
           selectedItem = value!;
         });
@@ -213,9 +214,9 @@ class _CounterWidgetState extends State<CounterWidget> {
     //     style['fontSize'].toDouble();
     final double fontSizeButton =
         Theme.of(context).textTheme.titleMedium?.fontSize ??
-        style['fontSize'].toDouble();
+            style['fontSize'].toDouble();
     return SizedBox(
-      height: widget.component["size"].height ?? 30,
+      height: widget.component['size'].height ?? 30,
       child: Container(
         padding: EdgeInsets.zero,
         decoration: BoxDecoration(
@@ -224,14 +225,14 @@ class _CounterWidgetState extends State<CounterWidget> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+          children: <Widget>[
             _createIncrementDicrementButton(
               Icons.remove,
               () => readOnly ? null : _decrementCounter(),
               fontSizeButton,
             ),
             SizedBox(
-              width: widget.component["size"].height,
+              width: widget.component['size'].height,
               child: Center(
                 child: Text(
                   '$selectedQuantitie',
@@ -261,8 +262,8 @@ class _CounterWidgetState extends State<CounterWidget> {
     return RawMaterialButton(
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       constraints: BoxConstraints(
-        minWidth: widget.component["size"].height,
-        minHeight: widget.component["size"].height,
+        minWidth: widget.component['size'].height,
+        minHeight: widget.component['size'].height,
       ),
       onPressed: onPressed,
       focusElevation: 0,

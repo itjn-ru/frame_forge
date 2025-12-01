@@ -23,18 +23,20 @@ class ComponentDecorationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final LayoutModelController controller =
+        LayoutModelControllerProvider.of(context);
     final LayoutModel layoutModel = controller.layoutModel;
     final StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
-        StyleElement("style");
-    final  CustomBorderRadius borderRadiusValue = style.properties['borderRadius']?.value;
+            StyleElement('style');
+    final CustomBorderRadius borderRadiusValue =
+        style.properties['borderRadius']?.value;
 
     final BorderRadius? border = (borderRadiusValue is Type)
         ? null
         : borderRadiusValue.borderRadius(scaleFactor);
-    final List<dynamic> padding = style['padding'] ?? [0, 0, 0, 0];
-    final List<dynamic> margin = style['margin'] ?? [0, 0, 0, 0];
+    final List<dynamic> padding = style['padding'] ?? <dynamic>[0, 0, 0, 0];
+    final List<dynamic> margin = style['margin'] ?? <dynamic>[0, 0, 0, 0];
     return Container(
       decoration: BoxDecoration(
         border: _buildBorder(style),

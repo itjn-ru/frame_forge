@@ -27,7 +27,8 @@ class PropertyBorderRadiusWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final Property? property =
+        controller.getCurrentItem()?.properties[propertyKey]!;
     final CustomBorderRadiusEnum selected = CustomBorderRadiusEnum.fromModel(
       property?.value,
     );
@@ -54,9 +55,9 @@ class PropertyBorderRadiusWidget extends PropertyWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Row(
-          children: [
+          children: <Widget>[
             const Text('Радиус: '),
             Expanded(
               child: NumericPropertyTextField(
@@ -75,12 +76,13 @@ class PropertyBorderRadiusWidget extends PropertyWidget {
           isExpanded: true,
           items: CustomBorderRadiusEnum.values
               .map<DropdownMenuItem<CustomBorderRadiusEnum>>(
-                (e) => DropdownMenuItem(value: e, child: Text(e.title)),
+                (CustomBorderRadiusEnum e) =>
+                    DropdownMenuItem(value: e, child: Text(e.title)),
               )
               .toList(),
-          onChanged: (value) {
+          onChanged: (CustomBorderRadiusEnum? value) {
             if (value != null) {
-              final radius = currentRadius;
+              final double radius = currentRadius;
               switch (value) {
                 case CustomBorderRadiusEnum.none:
                   property?.value = const BorderRadiusNone();

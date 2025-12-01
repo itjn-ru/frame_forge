@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
 import 'property.dart';
@@ -21,14 +22,13 @@ class PropertyMarginWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller
-        .getItemById(controller.selectedId)
-        ?.properties[propertyKey];
+    final Property? property =
+        controller.getItemById(controller.selectedId)?.properties[propertyKey];
     final List<int> values = List<int>.from(
       (property?.value is List)
           ? (property!.value as List<dynamic>)
-                .map((dynamic e) => int.tryParse(e.toString()) ?? 0)
-                .toList()
+              .map((dynamic e) => int.tryParse(e.toString()) ?? 0)
+              .toList()
           : const <int>[0, 0, 0, 0],
     );
 
@@ -42,7 +42,7 @@ class PropertyMarginWidget extends PropertyWidget {
       children: <Widget>[
         Row(
           children: <Widget>[
-            const Text("Margin left: "),
+            const Text('Margin left: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[0].toString(),
@@ -54,7 +54,7 @@ class PropertyMarginWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Margin right: "),
+            const Text('Margin right: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[2].toString(),
@@ -70,7 +70,7 @@ class PropertyMarginWidget extends PropertyWidget {
         const SizedBox(height: 8),
         Row(
           children: <Widget>[
-            const Text("Margin top: "),
+            const Text('Margin top: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[1].toString(),
@@ -82,7 +82,7 @@ class PropertyMarginWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Margin bottom: "),
+            const Text('Margin bottom: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[3].toString(),

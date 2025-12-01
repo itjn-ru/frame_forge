@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frame_forge/src/layout_model/component_decoration_widget.dart';
+
 import '../canvas/layout_model_provider.dart';
 import 'component_widget.dart';
 import 'controller/layout_model_controller.dart';
@@ -18,12 +19,13 @@ class ComponentTextWidget extends ComponentWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-    String text = component["text"];
-    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    String text = component['text'];
+    final LayoutModelController controller =
+        LayoutModelControllerProvider.of(context);
     final LayoutModel layoutModel = controller.layoutModel;
     StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
-        StyleElement("style");
+            StyleElement('style');
     final Alignment alignment = component['alignment'];
 
     // Transform Alignment to TextAlign
@@ -35,6 +37,7 @@ class ComponentTextWidget extends ComponentWidget {
       }
       return TextAlign.left; // default
     }
+
     final TextStyle textStyle = TextStyle(
       color: style['color'],
       fontSize: style['fontSize'] * scaleFactor,
@@ -60,5 +63,3 @@ class ComponentTextWidget extends ComponentWidget {
     );
   }
 }
-
-            

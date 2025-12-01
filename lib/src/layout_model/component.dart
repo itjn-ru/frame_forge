@@ -20,12 +20,12 @@ class LayoutComponent extends LayoutComponentAndSource {
   /// - size: 360x30 pixels
   /// - style: basic style
   LayoutComponent(super.type, super.name) {
-    properties["position"] = Property(
-      "position",
+    properties['position'] = Property(
+      'position',
       const Offset(0, 0),
       type: Offset,
     );
-    properties["size"] = Property("size", const Size(360, 30), type: Size);
-    properties["style"] = Property("style", Style.basic, type: Style);
+    properties['size'] = Property('size', const Size(360, 30), type: Size);
+    properties['style'] = Property('style', Style.basic, type: Style);
   }
 }

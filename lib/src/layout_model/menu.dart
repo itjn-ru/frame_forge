@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'component.dart';
 import 'component_and_source.dart';
 import 'component_group.dart';
+import 'component_group_menu.dart';
+import 'component_page_menu.dart';
+import 'component_root_menu.dart';
+import 'component_table.dart';
 import 'component_table_menu.dart';
 import 'component_text.dart';
+import 'component_text_menu.dart';
 import 'controller/events.dart';
 import 'controller/layout_model_controller.dart';
 import 'form_checkbox.dart';
@@ -13,9 +19,14 @@ import 'form_expandble_list.dart';
 import 'form_expandble_list_menu.dart';
 import 'form_hidden_field.dart';
 import 'form_hidden_field_menu.dart';
+import 'form_image.dart';
 import 'form_image_menu.dart';
+import 'form_radio.dart';
+import 'form_radio_menu.dart';
 import 'form_slider_button.dart';
 import 'form_slider_button_menu.dart';
+import 'form_text_field.dart';
+import 'form_text_field_menu.dart';
 import 'item.dart';
 import 'page.dart';
 import 'process.dart';
@@ -25,25 +36,15 @@ import 'process_group.dart';
 import 'process_group_menu.dart';
 import 'process_item_menu.dart';
 import 'process_page_menu.dart';
-import 'style.dart';
-import 'style_element.dart';
-import 'style_element_menu.dart';
-import 'style_page_menu.dart';
 import 'root.dart';
 import 'source.dart';
 import 'source_page_menu.dart';
 import 'source_variable.dart';
 import 'source_variable_menu.dart';
-import 'component_group_menu.dart';
-import 'component_page_menu.dart';
-import 'component_root_menu.dart';
-import 'component_table.dart';
-import 'component_text_menu.dart';
-import 'form_image.dart';
-import 'form_radio.dart';
-import 'form_radio_menu.dart';
-import 'form_text_field.dart';
-import 'form_text_field_menu.dart';
+import 'style.dart';
+import 'style_element.dart';
+import 'style_element_menu.dart';
+import 'style_page_menu.dart';
 
 /// Context menu provider for layout components and data sources.
 ///
@@ -133,7 +134,8 @@ class ComponentAndSourceMenu {
           );
       }
     } else {
-      final LayoutComponentAndSource? component = controller.layoutModel.getComponentByItem(target);
+      final LayoutComponentAndSource? component =
+          controller.layoutModel.getComponentByItem(target);
 
       if (component == null) {
         return ComponentAndSourceMenu(controller, target, onChanged: onChanged);
@@ -155,8 +157,8 @@ class ComponentAndSourceMenu {
   List<ContextMenuEntry> getContextMenu(
     Function(LayoutModelEvent event)? onChanged,
   ) {
-    return [
-      const MenuHeader(text: "Editing"),
+    return <ContextMenuEntry>[
+      const MenuHeader(text: 'Editing'),
       MenuItem(
         label: 'Copy',
         icon: Icons.copy,
@@ -184,7 +186,7 @@ class ComponentAndSourceMenu {
         icon: Icons.delete,
         onSelected: () {
           // Use undoable delete instead of direct model manipulation
-          final itemToDelete = controller.getItemById(target.id);
+          final Item? itemToDelete = controller.getItemById(target.id);
           if (itemToDelete != null) {
             controller.select(target.id);
             controller.deleteSelected();

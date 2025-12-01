@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 
+import 'component_and_source.dart';
 import 'component_group.dart';
 import 'component_table.dart';
 import 'constants.dart';
@@ -11,7 +12,6 @@ import 'root.dart';
 import 'screen_size_enum.dart';
 import 'style.dart';
 import 'style_element.dart';
-import 'component_and_source.dart';
 
 /// Core model for managing dynamic UI layouts.
 ///
@@ -96,7 +96,8 @@ class LayoutModel with FromMapToMap {
 
     final StylePage stylePage = root.items.whereType<StylePage>().first;
 
-    final Iterable<StyleElement> list = stylePage.items.whereType<StyleElement>();
+    final Iterable<StyleElement> list =
+        stylePage.items.whereType<StyleElement>();
 
     for (final StyleElement style in list) {
       styleList.add(Style(style['id'], style['name']));
@@ -112,16 +113,21 @@ class LayoutModel with FromMapToMap {
   StyleElement? getStyleElementById(String id) {
     final StylePage stylePage = root.items.whereType<StylePage>().first;
 
-    final Iterable<StyleElement> list = stylePage.items.whereType<StyleElement>();
+    final Iterable<StyleElement> list =
+        stylePage.items.whereType<StyleElement>();
 
-    return list.where((StyleElement element) => element['id'] == id).firstOrNull;
+    return list
+        .where((StyleElement element) => element['id'] == id)
+        .firstOrNull;
   }
 
   /// Maps items to their containing pages
-  final Map<Item, ComponentAndSourcePage> _itemsOnPage = <Item, ComponentAndSourcePage>{};
+  final Map<Item, ComponentAndSourcePage> _itemsOnPage =
+      <Item, ComponentAndSourcePage>{};
 
   /// Maps items to their layout components
-  final Map<Item, LayoutComponentAndSource> _itemsOnComponent = <Item, LayoutComponentAndSource>{};
+  final Map<Item, LayoutComponentAndSource> _itemsOnComponent =
+      <Item, LayoutComponentAndSource>{};
 
   /// Maps page types to their current items
   final Map<Type, Item> curItemOnPage = <Type, Item>{};
@@ -209,8 +215,38 @@ class LayoutModel with FromMapToMap {
 
     usedIds.clear();
 
+    // load properties map
+    final Map<String, Property> loadedProperties =
+        propertiesFromMap(map['properties']);
+
+    // Ensure ID uniqueness for loaded properties
+    ensureUniqueIds(loadedProperties);
+
+    // Merge loaded properties with constructor defaults:
+    // Keep constructor properties when a property is absent in the loaded map.
+    final Map<String, Property> mergedRootProperties =
+        Map<String, Property>.from(root.properties);
+
+    loadedProperties.forEach((String key, Property loadedProperty) {
+      if (mergedRootProperties.containsKey(key)) {
+        if (key == 'fontSize') {
+          mergedRootProperties[key]!.value =
+              double.tryParse(loadedProperty.value) ?? '11';
+        } else if (mergedRootProperties[key]?.type == loadedProperty.type) {
+          loadedProperty.title = mergedRootProperties[key]!.title;
+          mergedRootProperties[key] = loadedProperty;
+        } else {
+          // Type mismatch or missing type, override with loaded value
+          mergedRootProperties[key] = loadedProperty;
+        }
+      } else {
+        // new property present in data, add it
+        mergedRootProperties[key] = loadedProperty;
+      }
+    });
+
     root
-      ..properties = propertiesFromMap(map['properties'])
+      ..properties = mergedRootProperties
       ..items = _itemsFromMap(root, map['items']);
     curItemOnPage[ComponentPage] = root;
 
@@ -220,38 +256,38 @@ class LayoutModel with FromMapToMap {
     curPage = root.items.whereType<ComponentPage>().first;
 
     if (root.items.whereType<SourcePage>().isEmpty) {
-      final sourcePage = SourcePage('страница данных');
+      final SourcePage sourcePage = SourcePage('страница данных');
       root.items.add(sourcePage);
       curItemOnPage[SourcePage] = sourcePage;
     } else {
-      final sourcePage = root.items.whereType<SourcePage>().first;
+      final SourcePage sourcePage = root.items.whereType<SourcePage>().first;
       curItemOnPage[SourcePage] = sourcePage;
     }
 
     if (root.items.whereType<StylePage>().isEmpty) {
-      final stylePage = StylePage('страница стилей');
+      final StylePage stylePage = StylePage('страница стилей');
       root.items.add(stylePage);
       curItemOnPage[StylePage] = stylePage;
     } else {
-      final stylePage = root.items.whereType<StylePage>().first;
+      final StylePage stylePage = root.items.whereType<StylePage>().first;
       curItemOnPage[StylePage] = stylePage;
     }
 
     if (root.items.whereType<ProcessPage>().isEmpty) {
-      final processPage = ProcessPage('процессы');
+      final ProcessPage processPage = ProcessPage('процессы');
       root.items.add(processPage);
       curItemOnPage[ProcessPage] = processPage;
     } else {
-      final processPage = root.items.whereType<ProcessPage>().first;
+      final ProcessPage processPage = root.items.whereType<ProcessPage>().first;
       curItemOnPage[ProcessPage] = processPage;
     }
 
     //добавляем basic style, если отсутствует в файле
-    final stylePage = root.items.whereType<StylePage>().first;
+    final StylePage stylePage = root.items.whereType<StylePage>().first;
 
     if (stylePage.items
         .whereType<StyleElement>()
-        .where((element) => element['id'] == UuidNil)
+        .where((StyleElement element) => element['id'] == UuidNil)
         .isEmpty) {
       final StyleElement basicElement = StyleElement('basic style');
       basicElement.properties['id'] = Property(
@@ -265,15 +301,15 @@ class LayoutModel with FromMapToMap {
   }
 
   /// Мапа для складирования properties для проверки на уникальность
-  final Set<String> usedIds = {};
+  final Set<String> usedIds = <String>{};
 
   // Функция для проверки и замены id
   void ensureUniqueIds(Map<String, dynamic> properties) {
-    properties.forEach((key, value) {
+    properties.forEach((String key, value) {
       if (key == 'id' && value is Property && value.value is String) {
         String id = value.value;
         if (usedIds.contains(id)) {
-          final newId = const Uuid().v4();
+          final String newId = const Uuid().v4();
           value.value = newId;
           usedIds.add(newId);
         } else {
@@ -284,17 +320,18 @@ class LayoutModel with FromMapToMap {
   }
 
   List<Item> _itemsFromMap(Item parent, List list) {
-    final List<Item> items = [];
+    final List<Item> items = <Item>[];
 
     for (final element in list) {
       Item item = switchItem(element, parent);
 
-      final itemProperties = propertiesFromMap(element['properties']);
+      final Map<String, Property> itemProperties =
+          propertiesFromMap(element['properties']);
 
       /// Проверка на уникальность id
       ensureUniqueIds(itemProperties);
 
-      item.properties.forEach((key, value) {
+      item.properties.forEach((String key, Property value) {
         if (itemProperties.containsKey(key)) {
           if (key == 'fontSize') {
             item.properties[key]!.value =
@@ -312,14 +349,14 @@ class LayoutModel with FromMapToMap {
       if (item is LayoutComponentAndSource) {
         //curComponent = item;
         if (item is! ComponentGroup) {
-          for (final curItem in item.items) {
+          for (final Item curItem in item.items) {
             _setComponentForItem(item, curItem);
           }
         }
       }
 
       if (item is ComponentAndSourcePage) {
-        for (final curItem in item.items) {
+        for (final Item curItem in item.items) {
           _setPageForItem(item, curItem);
         }
       }
@@ -331,9 +368,9 @@ class LayoutModel with FromMapToMap {
   }
 
   Map toMap() {
-    final Map map = {};
+    final Map map = <dynamic, dynamic>{};
 
-    map['layout'] = {
+    map['layout'] = <String, Object>{
       'properties': propertiesToMap(root),
       'items': itemsToMap(root),
     };
@@ -343,14 +380,14 @@ class LayoutModel with FromMapToMap {
   /// Direct item addition for undo operations
   /// Bypasses complex logic and directly inserts item at specified index
   void addItemDirect(Item parent, Item item, {int? index}) {
-    final actualIndex = index ?? parent.items.length;
+    final int actualIndex = index ?? parent.items.length;
     parent.items.insert(actualIndex, item);
-    
+
     // Restore page/component mappings
-    final page = getPageByItem(parent);
+    final ComponentAndSourcePage page = getPageByItem(parent);
     _setPageForItem(page, item);
-    
-    final component = getComponentByItem(parent);
+
+    final LayoutComponentAndSource? component = getComponentByItem(parent);
     if (component != null) {
       _setComponentForItem(component, item);
     }
@@ -358,8 +395,8 @@ class LayoutModel with FromMapToMap {
 
   void addItem(Item parent, Item item, {int? index}) {
     if (item is ComponentPage) {
-      var indexLastPage = root.items.lastIndexWhere(
-        (element) => element.runtimeType == ComponentPage,
+      int indexLastPage = root.items.lastIndexWhere(
+        (Item element) => element.runtimeType == ComponentPage,
       );
       root.items.insert(index ?? ++indexLastPage, item);
     } else if (item is LayoutComponentAndSource) {
@@ -369,12 +406,12 @@ class LayoutModel with FromMapToMap {
 
       //curComponent = item is ComponentGroup ? null : item;
 
-      final page = getPageByItem(parent);
+      final ComponentAndSourcePage page = getPageByItem(parent);
 
       _setPageForItem(page, item);
 
       if (item is! ComponentGroup) {
-        for (final subItem in item.items) {
+        for (final Item subItem in item.items) {
           _setComponentForItem(item, subItem);
         }
       }
@@ -388,56 +425,59 @@ class LayoutModel with FromMapToMap {
           .lastIndexWhere((element) => element.runtimeType == item.runtimeType);
       _curItem.items.insert(++indexLastItem, item);*/
 
-      final component = getComponentByItem(parent);
+      final LayoutComponentAndSource? component = getComponentByItem(parent);
 
       if (component == null) {
         return;
       }
 
-      var indexLastItem = parent.items.lastIndexWhere(
-        (element) => element.runtimeType == item.runtimeType,
+      int indexLastItem = parent.items.lastIndexWhere(
+        (Item element) => element.runtimeType == item.runtimeType,
       );
       parent.items.insert(index ?? ++indexLastItem, item);
 
       switch (item.runtimeType) {
         case const (ComponentTableColumn):
           component.items
-              .where((element) => element.runtimeType == ComponentTableRowGroup)
-              .forEach((rowGroup) {
-                for (final row in rowGroup.items) {
-                  final cell = ComponentTableCell('ячейка');
-                  row.items.add(cell);
+              .where((Item element) =>
+                  element.runtimeType == ComponentTableRowGroup)
+              .forEach((Item rowGroup) {
+            for (final Item row in rowGroup.items) {
+              final ComponentTableCell cell = ComponentTableCell('ячейка');
+              row.items.add(cell);
 
-                  //_setComponentForItem(component, cell);
-                }
-              });
+              //_setComponentForItem(component, cell);
+            }
+          });
 
         case const (ComponentTableRowGroup):
-          final row = ComponentTableRow('строка');
+          final ComponentTableRow row = ComponentTableRow('строка');
           item.items.add(row);
           //_setComponentForItem(component, row);
 
           component.items
-              .where((element) => element.runtimeType == ComponentTableColumn)
-              .forEach((rowGroup) {
-                final cell = ComponentTableCell('ячейка');
+              .where(
+                  (Item element) => element.runtimeType == ComponentTableColumn)
+              .forEach((Item rowGroup) {
+            final ComponentTableCell cell = ComponentTableCell('ячейка');
 
-                row.items.add(cell);
-              });
+            row.items.add(cell);
+          });
         case const (ComponentTableRow):
           component.items
-              .where((element) => element.runtimeType == ComponentTableColumn)
-              .forEach((rowGroup) {
-                final cell = ComponentTableCell('ячейка');
+              .where(
+                  (Item element) => element.runtimeType == ComponentTableColumn)
+              .forEach((Item rowGroup) {
+            final ComponentTableCell cell = ComponentTableCell('ячейка');
 
-                item.items.add(cell);
-              });
+            item.items.add(cell);
+          });
 
         default:
       }
 
       _setComponentForItem(component, item);
-      final page = getPageByItem(parent);
+      final ComponentAndSourcePage page = getPageByItem(parent);
       _setPageForItem(page, item);
     }
   }
@@ -446,15 +486,15 @@ class LayoutModel with FromMapToMap {
     deleteItem(curItem);
   }
 
-  Item? findParentById(Item _root, String targetId) {
-    for (final child in _root.items) {
+  Item? findParentById(Item root, String targetId) {
+    for (final Item child in root.items) {
       final bool hasTargetId = child.properties['id']?.value == targetId;
 
       if (hasTargetId) {
-        return _root; 
+        return root;
       }
 
-      final found = findParentById(child, targetId);
+      final Item? found = findParentById(child, targetId);
       if (found != null) {
         return found;
       }
@@ -463,7 +503,7 @@ class LayoutModel with FromMapToMap {
   }
 
   void deleteItem(Item item) {
-    final parent = findParentById(root, item.id);
+    final Item? parent = findParentById(root, item.id);
     if (parent != null) {
       parent.items.remove(item);
       return;
@@ -473,7 +513,7 @@ class LayoutModel with FromMapToMap {
   _setPageForItem(ComponentAndSourcePage page, Item item) {
     _itemsOnPage[item] = page;
 
-    for (final subItem in item.items) {
+    for (final Item subItem in item.items) {
       _setPageForItem(page, subItem);
     }
   }
@@ -485,7 +525,7 @@ class LayoutModel with FromMapToMap {
     //_itemsOnComponent[_curComponent!] = _curComponent!;
     _itemsOnComponent[item] = component;
 
-    for (final curItem in item.items) {
+    for (final Item curItem in item.items) {
       _setComponentForItem(component, curItem);
     }
   }
@@ -493,17 +533,17 @@ class LayoutModel with FromMapToMap {
   Item? addItemToParent(Item parent, Item item, Item pasteItem) {
     if (parent.items.isEmpty) return null;
     if (parent.items.contains(item)) {
-      final index = parent.items.indexOf(item);
+      final int index = parent.items.indexOf(item);
       addItem(parent, pasteItem, index: index);
       return parent;
     }
-    for (var element in parent.items) {
+    for (Item element in parent.items) {
       if (element.items.contains(item)) {
-        final index = element.items.indexOf(item);
+        final int index = element.items.indexOf(item);
         addItem(element, pasteItem, index: index);
         return element;
       } else {
-        var newParent = addItemToParent(element, item, pasteItem);
+        Item? newParent = addItemToParent(element, item, pasteItem);
         if (newParent != null) return newParent;
       }
     }

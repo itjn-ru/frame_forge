@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.3] - 2025-11-21
+
+### Added
+
+- `isRequired` (boolean) property for `FormTextField` to mark fields as required.
+- `function` and `inputId` properties in `Root` for handle template data via a user-defined function.
+
+### Changed
+
+- `inputId` property now supports multiple IDs (`List<String>`) with graceful backward compatibility for legacy single `String` values.
+
+### Fixed
+
+- Normalized dynamic list values in `PropertyListWidget` to avoid type cast errors when legacy data provides a single `String` or nested list structure.
+- Fixed `fromMap` deserialization to preserve constructor default properties (`textFunction`, `link`, `inputId`) when loading legacy data without these fields. Properties from constructors now merge with loaded data instead of being discarded.
+
 ## [1.1.2] - 2025-11-19
 
 ### Added

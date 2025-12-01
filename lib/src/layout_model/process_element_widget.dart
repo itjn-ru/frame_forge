@@ -7,7 +7,7 @@ class ProcessElementWidget extends ProcessWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-    final String cellText = process["name"] ?? "";
+    final String cellText = process['name'] ?? '';
 
     return Text(cellText);
   }

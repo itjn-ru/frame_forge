@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'controller/events.dart';
 import 'menu.dart';
@@ -12,12 +13,12 @@ class StylePageMenu extends ComponentAndSourceMenu {
     void Function(LayoutModelEvent event)? onChanged,
   ) {
     return <ContextMenuEntry>[
-      const MenuHeader(text: "Editing"),
+      const MenuHeader(text: 'Editing'),
       MenuItem(
         label: 'Add style',
         icon: Icons.add,
         onSelected: () {
-          final StyleElement item = StyleElement("style");
+          final StyleElement item = StyleElement('style');
           controller.layoutModel.addItem(target, item);
           onChanged!(AddItemEvent(id: item.id));
         },

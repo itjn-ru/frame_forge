@@ -22,6 +22,7 @@ import 'page.dart';
 import 'process_element.dart';
 import 'process_group.dart';
 import 'property.dart';
+import 'root.dart';
 import 'screen_size_enum.dart';
 import 'source_variable.dart';
 import 'style.dart';
@@ -34,6 +35,7 @@ mixin FromMapToMap {
     item.properties.forEach((String key, Property property) {
       try {
         map[key] = switch (property.type) {
+          const (List<String>) => (property.value as List<String>).join(','),
           const (String) => property.value,
           const (CustomMargin) => property.value.join(','),
           const (List<int>) => property.value.join(','),
@@ -92,6 +94,22 @@ mixin FromMapToMap {
       return MapEntry(
           key,
           switch (key) {
+            'inputId' => Property(
+                'inputId',
+                _normalizeToStringList(
+                    value.split(',').map((e) => e.toString()).toList()),
+                type: List<String>,
+              ),
+            'textFunction' => Property(
+                'generateTextFunction',
+                value ?? '',
+                type: String,
+              ),
+            'link' => Property(
+                'link',
+                value ?? '',
+                type: String,
+              ),
             'required' => Property('обязательное', value == 'true', type: bool),
             'margin' => Property(
                 'Margin',
@@ -297,19 +315,30 @@ mixin FromMapToMap {
       final Map<String, Property> itemProperties =
           propertiesFromMap(element['properties']);
 
-      item.properties.forEach((String key, Property value) {
-        if (itemProperties.containsKey(key)) {
+      // Merge loaded properties with constructor defaults
+      // Constructor properties are preserved if not present in loaded map
+      final Map<String, Property> mergedProperties = 
+          Map<String, Property>.from(item.properties);
+      
+      itemProperties.forEach((String key, Property loadedProperty) {
+        if (mergedProperties.containsKey(key)) {
           if (key == 'fontSize') {
-            item.properties[key]!.value =
-                double.tryParse(itemProperties[key]?.value) ?? '11';
+            mergedProperties[key]!.value =
+                double.tryParse(loadedProperty.value) ?? '11';
+          } else if (mergedProperties[key]?.type == loadedProperty.type) {
+            loadedProperty.title = mergedProperties[key]!.title;
+            mergedProperties[key] = loadedProperty;
+          } else {
+            // Type mismatch or missing type - use loaded value
+            mergedProperties[key] = loadedProperty;
           }
-          if (item.properties[key]?.type == itemProperties[key]?.type) {
-            itemProperties[key]!.title = item.properties[key]!.title;
-            item.properties[key] = itemProperties[key]!;
-          }
+        } else {
+          // New property from loaded data not in constructor
+          mergedProperties[key] = loadedProperty;
         }
       });
-
+      
+      item.properties = mergedProperties;
       item.items = itemsFromMap(item, element['items']);
 
       items.add(item);
@@ -320,6 +349,8 @@ mixin FromMapToMap {
 
   Item switchItem(Map<String, dynamic> element, Item parent) {
     switch (element['type']) {
+      case 'root':
+        return Root('');
       case 'componentPage':
         return ComponentPage('');
       case 'sourcePage':
@@ -373,4 +404,23 @@ mixin FromMapToMap {
     }
     return Item('item', 'item');
   }
+}
+List<String> _normalizeToStringList(dynamic value) {
+  if (value == null) return <String>[];
+  if (value is String) return <String>[value];
+  if (value is List<String>) return List<String>.from(value);
+  if (value is List) {
+    final List<String> result = <String>[];
+    for (final dynamic e in value) {
+      if (e is String) {
+        result.add(e);
+      } else if (e is List) {
+        for (final dynamic inner in e) {
+          if (inner is String) result.add(inner);
+        }
+      }
+    }
+    return result;
+  }
+  return <String>[];
 }

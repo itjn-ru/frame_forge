@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'component.dart';
 
 class HiddenFieldFile extends StatelessWidget {
@@ -13,14 +14,14 @@ class HiddenFieldFile extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
-      children: [
+      children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(left: 8),
           child: SizedBox(
             height: 30,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: <Widget>[
                 IconButton(
                   padding: EdgeInsets.zero,
                   iconSize: 26,

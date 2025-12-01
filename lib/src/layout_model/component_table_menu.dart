@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'component.dart';
+import 'component_table.dart';
 import 'controller/events.dart';
 import 'item.dart';
 import 'menu.dart';
-import 'component_table.dart';
 
 class ComponentTableMenu extends ComponentAndSourceMenu {
   ComponentTableMenu(super.controller, super.target, {super.onChanged});
@@ -15,16 +16,17 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
   ) {
     if (target is LayoutComponent) {
       return <ContextMenuEntry>[
-        const MenuHeader(text: "Editing"),
+        const MenuHeader(text: 'Editing'),
         MenuItem.submenu(
           label: 'Add',
           icon: Icons.add,
-          items: [
+          items: <ContextMenuEntry>[
             MenuItem(
               label: 'Column',
               icon: Icons.view_column_outlined,
               onSelected: () {
-                final ComponentTableColumn item = ComponentTableColumn('column');
+                final ComponentTableColumn item =
+                    ComponentTableColumn('column');
                 controller.layoutModel.addItem(target, item);
                 onChanged!(AddItemEvent(id: item.id));
               },
@@ -33,7 +35,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               label: 'Row Group',
               icon: Icons.table_rows,
               onSelected: () {
-                final ComponentTableRowGroup item = ComponentTableRowGroup('row group');
+                final ComponentTableRowGroup item =
+                    ComponentTableRowGroup('row group');
                 controller.layoutModel.addItem(target, item);
                 onChanged!(AddItemEvent(id: item.id));
               },
@@ -75,12 +78,11 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
       switch (target.runtimeType) {
         case const (ComponentTableColumn):
           return <ContextMenuEntry>[
-            const MenuHeader(text: "Editing"),
+            const MenuHeader(text: 'Editing'),
             MenuItem(
               label: 'Delete column',
               icon: Icons.delete,
-              onSelected:
-                  controller.layoutModel
+              onSelected: controller.layoutModel
                           .getComponentByItem(target)!
                           .items
                           .whereType<ComponentTableColumn>()
@@ -94,8 +96,8 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
             ),
           ];
         case const (ComponentTableRowGroup):
-          return [
-            const MenuHeader(text: "Editing"),
+          return <ContextMenuEntry>[
+            const MenuHeader(text: 'Editing'),
             MenuItem(
               label: 'Add Row',
               icon: Icons.add,
@@ -109,8 +111,7 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
             MenuItem(
               label: 'Delete group of rows',
               icon: Icons.delete,
-              onSelected:
-                  controller.layoutModel
+              onSelected: controller.layoutModel
                       .getComponentByItem(target)!
                       .items
                       .whereType<ComponentTableRowGroup>()
@@ -130,26 +131,26 @@ class ComponentTableMenu extends ComponentAndSourceMenu {
               .items
               .whereType<ComponentTableRowGroup>()
               .forEach((ComponentTableRowGroup rowGroup) {
-                if (rowGroup.items.where((Item row) => row == target).isNotEmpty) {
-                  foundGroup = rowGroup;
-                }
-              });
+            if (rowGroup.items.where((Item row) => row == target).isNotEmpty) {
+              foundGroup = rowGroup;
+            }
+          });
 
           if (foundGroup == null) {
             return <ContextMenuEntry>[];
           }
           return <ContextMenuEntry>[
-            const MenuHeader(text: "Editing"),
+            const MenuHeader(text: 'Editing'),
             MenuItem(
               label: 'Delete row',
               icon: Icons.delete,
               onSelected:
                   foundGroup!.items.whereType<ComponentTableRow>().length > 1
-                  ? () {
-                      controller.layoutModel.deleteItem(target);
-                      onChanged!(RemoveItemEvent(id: target.id));
-                    }
-                  : null,
+                      ? () {
+                          controller.layoutModel.deleteItem(target);
+                          onChanged!(RemoveItemEvent(id: target.id));
+                        }
+                      : null,
             ),
           ];
       }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../canvas/layout_model_provider.dart';
 import '../canvas/resizable_draggable_widget.dart';
 import 'component.dart';
@@ -43,7 +44,8 @@ class GroupCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final LayoutModelController controller =
+        LayoutModelControllerProvider.of(context);
 
     return ValueListenableBuilder<Set<String?>>(
       valueListenable: controller.changedItems,
@@ -60,11 +62,11 @@ class GroupCanvas extends StatelessWidget {
                   return ResizableDraggableWidget(
                     key: ValueKey<String>(item.id),
                     position: Offset(
-                      item["position"]?.dx * scale ?? 0,
-                      item["position"]?.dy * scale ?? 0,
+                      item['position']?.dx * scale ?? 0,
+                      item['position']?.dy * scale ?? 0,
                     ),
-                    initWidth: item["size"]?.width * scale,
-                    initHeight: item["size"]?.height * scale ?? 50,
+                    initWidth: item['size']?.width * scale,
+                    initHeight: item['size']?.height * scale ?? 50,
                     canvasWidth: component['size'].width * scale,
                     canvasHeight: component['size'].height * scale,
                     bgColor: const Color(0x33FFFFFF),
@@ -79,7 +81,7 @@ class GroupCanvas extends StatelessWidget {
           );
         }
         return Stack(
-          children: [
+          children: <Widget>[
             ...list,
             // ...templateWidgets,
           ],
@@ -101,7 +103,8 @@ class _ItemUpdateScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final LayoutModelController controller =
+        LayoutModelControllerProvider.of(context);
     final bool shouldUpdate = updatedItemIds.contains(itemId);
     // Mark as handled after repaint
     if (shouldUpdate) {

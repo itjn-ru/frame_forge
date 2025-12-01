@@ -1,7 +1,151 @@
-include: package:flutter_lints/flutter.yaml
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+#
+# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
+# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
+# invoked from the command line by running `flutter analyze`.
 
+# The following line activates a set of recommended lints for Flutter apps,
+# packages, and plugins designed to encourage good coding practices.
+include: package:flutter_lints/flutter.yaml
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  plugins:
+    - dart_code_metrics
 linter:
   rules:
     - always_specify_types
     - avoid_print
-    
+    - prefer_single_quotes
+    - prefer_mixin
+    - sized_box_for_whitespace
+    - sized_box_shrink_expand
+    - use_colored_box
+    - use_decorated_box
+    - use_super_parameters
+    - package_names
+    - sort_pub_dependencies
+    - avoid_unnecessary_containers
+
+dart_code_metrics:
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 5
+    source-lines-of-code: 30
+  metrics-exclude:
+    - test/**
+  anti-patterns:
+    - long-method:
+        max-length: 30
+        severity: style
+    - long-parameter-list: ignore
+  rules:
+    - member-ordering-extended:
+        order:
+          - public-static-fields
+          - private-static-fields
+          - public-static-methods
+          - private-static-methods
+
+          - public-const-fields
+          - private-const-fields
+          - public-final-fields
+          - public-final-late-fields
+          - public-late-fields
+          - public-fields
+          - protected-final-fields
+          - protected-final-late-fields
+          - protected-late-fields
+          - protected-fields
+          - private-final-fields
+          - private-final-late-fields
+          - private-late-fields
+          - private-fields
+
+          - constructors
+          - named-constructors
+          - factory-constructors
+
+          - public-getters
+          - public-setters
+          - private-getters
+          - private-setters
+
+          - overriden-methods
+
+          - init-state-method
+          - did-change-dependencies-method
+          - did-update-widget-method
+          - build-method
+          - dispose-method
+
+          - public-methods
+          - protected-methods
+          - private-methods
+
+    - prefer-trailing-comma:
+        severity: style
+    - avoid-collection-methods-with-unrelated-types
+    - avoid-duplicate-exports
+    - avoid-dynamic
+    - avoid-global-state
+    - avoid-missing-enum-constant-in-map
+    - avoid-nested-conditional-expressions
+    - avoid-non-null-assertion:
+        exclude:
+          - "**/components/**"
+    - avoid-throw-in-catch-block
+    - avoid-unnecessary-type-assertions
+    - avoid-unnecessary-type-casts
+    - avoid-unrelated-type-assertions
+    - avoid-unused-parameters
+    - binary-expression-operand-order
+    - double-literal-format
+    - no-boolean-literal-compare
+    - no-empty-block
+    - no-equal-then-else
+    - no-object-declaration
+    - prefer-commenting-analyzer-ignores
+    - prefer-correct-identifier-length:
+        min-length: 3
+        max-length: 40
+    - prefer-correct-type-name:
+        min-length: 3
+        max-length: 40
+    - prefer-enums-by-name
+    - prefer-first
+    - prefer-last
+    - prefer-immediate-return
+    - prefer-match-file-name
+    - prefer-conditional-expressions
+    - prefer-trailing-comma
+    - always-remove-listener
+    - avoid-border-all
+    - avoid-returning-widgets
+    - avoid-shrink-wrap-in-lists
+    - avoid-unnecessary-setstate
+    - avoid-use-expanded-as-spacer
+    - avoid-wrapping-in-padding
+    - prefer-const-border-radius
+    - prefer-correct-edge-insets-constructor
+    - prefer-extracting-callbacks:
+        allowed-line-count: 20
+        ignored-named-arguments:
+          - List.generate
+          - generate
+          - generator
+    - prefer-single-widget-per-file:
+        ignore-private-widgets: true
+    - no-magic-number: ignore # TODO: enable later, when all sizes will be variables
+    - prefer-moving-to-variable: ignore
+      # TODO: enable when magic number is resolved - allowed-duplicated-chains: 3
+    ## использовать в случае если необходимо подсветить общую переиспользуемую функциональность
+    - ban-name: ignore
+    ## можно настроить форматирование комментов
+    - format-comment: ignore
+    - newline-before-return: ignore
+    - avoid-ignoring-return-values: ignore
+    - no-equal-arguments: ignore

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
 import 'property.dart';
@@ -21,14 +22,13 @@ class PropertyPaddingWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller
-        .getItemById(controller.selectedId)
-        ?.properties[propertyKey];
+    final Property? property =
+        controller.getItemById(controller.selectedId)?.properties[propertyKey];
     final List<int> values = List<int>.from(
       (property?.value is List)
           ? (property!.value as List<dynamic>)
-                .map((dynamic e) => int.tryParse(e.toString()) ?? 0)
-                .toList()
+              .map((dynamic e) => int.tryParse(e.toString()) ?? 0)
+              .toList()
           : const <int>[0, 0, 0, 0],
     );
 
@@ -39,14 +39,14 @@ class PropertyPaddingWidget extends PropertyWidget {
     }
 
     return Column(
-      children: [
+      children: <Widget>[
         Row(
-          children: [
-            const Text("Left Padding: "),
+          children: <Widget>[
+            const Text('Left Padding: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[0].toString(),
-                onChanged: (v) => updateIndex(0, v),
+                onChanged: (String v) => updateIndex(0, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,
@@ -54,11 +54,11 @@ class PropertyPaddingWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Right Padding: "),
+            const Text('Right Padding: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[2].toString(),
-                onChanged: (v) => updateIndex(2, v),
+                onChanged: (String v) => updateIndex(2, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,
@@ -69,12 +69,12 @@ class PropertyPaddingWidget extends PropertyWidget {
         ),
         const SizedBox(height: 8),
         Row(
-          children: [
-            const Text("Top Padding: "),
+          children: <Widget>[
+            const Text('Top Padding: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[1].toString(),
-                onChanged: (v) => updateIndex(1, v),
+                onChanged: (String v) => updateIndex(1, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,
@@ -82,11 +82,11 @@ class PropertyPaddingWidget extends PropertyWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text("Bottom Padding: "),
+            const Text('Bottom Padding: '),
             Expanded(
               child: NumericPropertyTextField(
                 defaultValue: values[3].toString(),
-                onChanged: (v) => updateIndex(3, v),
+                onChanged: (String v) => updateIndex(3, v),
                 onSubmitted: _emitChange,
                 onTapOutside: _emitChange,
                 onTabPressed: _emitChange,

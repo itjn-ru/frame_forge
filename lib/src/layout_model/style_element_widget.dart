@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+
 import 'style_widget.dart';
 
 class StyleElementWidget extends StyleWidget {
@@ -6,14 +7,14 @@ class StyleElementWidget extends StyleWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-    final String cellText = style["name"] ?? "";
+    final String cellText = style['name'] ?? '';
 
-    return  Text(
-        cellText,
-        style: TextStyle(
-          fontSize: style["fontSize"],
-          fontWeight: style["fontWeight"],
-        ),
+    return Text(
+      cellText,
+      style: TextStyle(
+        fontSize: style['fontSize'],
+        fontWeight: style['fontWeight'],
+      ),
     );
 
     /*var columns = source.items.whereType<SourceTableColumn>();

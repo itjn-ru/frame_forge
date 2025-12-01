@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/src/gestures/events.dart';
+import 'package:frame_forge/src/flutter_context_menu/core/models/context_menu_entry.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../frame_forge.dart';
 import '../canvas/context_menu.dart';
-import 'package:flutter/material.dart';
 
 /// A widget that displays process items in a hierarchical tree view
 ///
@@ -47,7 +49,7 @@ class ProcessItemsState extends State<ProcessItems>
   Widget _buildItem(Item item, String? processType, double width) {
     Widget child;
     if (item.items.isNotEmpty) {
-      final List<Widget> children = [];
+      final List<Widget> children = <Widget>[];
 
       final List<Item> items = item.items;
 
@@ -78,9 +80,8 @@ class ProcessItemsState extends State<ProcessItems>
           ),
           Flex(
             mainAxisSize: MainAxisSize.min,
-            direction: processType != 'parallelly'
-                ? Axis.vertical
-                : Axis.horizontal,
+            direction:
+                processType != 'parallelly' ? Axis.vertical : Axis.horizontal,
             children: children,
           ),
         ],
@@ -133,7 +134,7 @@ class _ItemWrapperState extends State<ItemWrapper> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: ( event) {
+      onEnter: (PointerEnterEvent event) {
         setState(() {
           position = event.position;
         });
@@ -149,13 +150,13 @@ class _ItemWrapperState extends State<ItemWrapper> {
           );
         },
         onSecondaryTap: () {
-          final menu = ComponentAndSourceMenu.create(
+          final ComponentAndSourceMenu menu = ComponentAndSourceMenu.create(
             widget.controller,
             widget.item,
           );
 
-          final menuItems = menu.getContextMenu(
-            (event) => widget.controller.eventBus.emit(event),
+          final List<ContextMenuEntry> menuItems = menu.getContextMenu(
+            (LayoutModelEvent event) => widget.controller.eventBus.emit(event),
           );
           createAndShowContextMenu(
             context,
@@ -170,7 +171,7 @@ class _ItemWrapperState extends State<ItemWrapper> {
             SelectionEvent(id: const Uuid().v4(), itemId: widget.item.id),
           );
         },
-        child: Container(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             border: Border.all(

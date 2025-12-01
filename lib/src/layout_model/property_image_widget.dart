@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+
+import 'controller/layout_model_controller.dart';
 import 'property.dart';
 import 'property_widget.dart';
-import 'controller/layout_model_controller.dart';
 
 class PropertyImageWidget extends PropertyWidget {
   const PropertyImageWidget(super.controller, super.propertyKey, {super.key});

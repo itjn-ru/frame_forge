@@ -22,9 +22,8 @@ class PropertyOffsetWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller
-        .getItemById(controller.selectedId)
-        ?.properties[propertyKey];
+    final Property? property =
+        controller.getItemById(controller.selectedId)?.properties[propertyKey];
     final Offset offset = property?.value ?? Offset.zero;
 
     void updateDx(String value) {
@@ -36,8 +35,8 @@ class PropertyOffsetWidget extends PropertyWidget {
     }
 
     return DualPropertyTextField(
-      firstLabel: "Left",
-      secondLabel: "Top",
+      firstLabel: 'Left',
+      secondLabel: 'Top',
       firstValue: offset.dx.toString(),
       secondValue: offset.dy.toString(),
       onFirstChanged: updateDx,

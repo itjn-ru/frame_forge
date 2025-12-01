@@ -15,13 +15,13 @@ class ComponentText extends LayoutComponent {
     );
     properties['textFunction'] = Property(
       'generateTextFunction',
-      null,
+      '',
       type: String,
     );
     properties['inputId'] = Property(
       'inputId',
-      null,
-      type: String,
+      <String>[],
+      type: List<String>,
     );
   }
 }

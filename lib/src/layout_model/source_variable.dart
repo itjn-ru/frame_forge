@@ -11,6 +11,6 @@ class SourceVariable extends LayoutSource {
   ///
   /// [name] The name/identifier for this variable
   SourceVariable(String name) : super('variable', name) {
-    properties["type"] = Property("type", '');
+    properties['type'] = Property('type', '');
   }
 }

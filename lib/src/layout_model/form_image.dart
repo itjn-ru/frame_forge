@@ -4,10 +4,10 @@ import 'component.dart';
 import 'property.dart';
 
 class FormImage extends LayoutComponent {
-  FormImage(name) : super("image", name) {
-    properties["Uint8List"] = Property(
-      "imageData",
-      Uint8List.fromList([0]),
+  FormImage(name) : super('image', name) {
+    properties['Uint8List'] = Property(
+      'imageData',
+      Uint8List.fromList(<int>[0]),
       type: Uint8List,
     );
   }

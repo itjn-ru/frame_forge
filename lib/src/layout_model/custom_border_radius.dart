@@ -53,11 +53,20 @@ sealed class CustomBorderRadius {
       case BorderRadiusNone():
         return <String, dynamic>{'type': 'BorderRadiusNone'};
       case BorderRadiusAll():
-        return <String, dynamic>{'type': 'BorderRadiusAll', 'radius': obj.toJson()};
+        return <String, dynamic>{
+          'type': 'BorderRadiusAll',
+          'radius': obj.toJson()
+        };
       case BorderRadiusTop():
-        return <String, dynamic>{'type': 'BorderRadiusTop', 'radius': jsonEncode(obj.toJson())};
+        return <String, dynamic>{
+          'type': 'BorderRadiusTop',
+          'radius': jsonEncode(obj.toJson())
+        };
       case BorderRadiusBottom():
-        return <String, dynamic>{'type': 'BorderRadiusBottom', 'radius': obj.toJson()};
+        return <String, dynamic>{
+          'type': 'BorderRadiusBottom',
+          'radius': obj.toJson()
+        };
     }
   }
 }
@@ -100,9 +109,9 @@ class BorderRadiusTop extends CustomBorderRadius {
 
   @override
   BorderRadius borderRadius(double scale) => BorderRadius.only(
-    topLeft: Radius.circular(radius / scale),
-    topRight: Radius.circular(radius / scale),
-  );
+        topLeft: Radius.circular(radius / scale),
+        topRight: Radius.circular(radius / scale),
+      );
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{'radius': radius, 'type': 'BorderRadiusTop'};
@@ -119,9 +128,9 @@ class BorderRadiusBottom extends CustomBorderRadius {
 
   @override
   BorderRadius borderRadius(double scale) => BorderRadius.only(
-    bottomLeft: Radius.circular(radius / scale),
-    bottomRight: Radius.circular(radius / scale),
-  );
+        bottomLeft: Radius.circular(radius / scale),
+        bottomRight: Radius.circular(radius / scale),
+      );
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{'radius': radius, 'type': 'BorderRadiusBottom'};

@@ -1,6 +1,7 @@
-import '../color_picker/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
+import '../color_picker/color_picker.dart';
 import 'controller/events.dart';
 import 'property.dart';
 import 'property_widget.dart';
@@ -10,7 +11,8 @@ class PropertyColorWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final Property? property =
+        controller.getCurrentItem()?.properties[propertyKey]!;
     return Row(
       children: <Widget>[
         ElevatedButton(
@@ -49,7 +51,7 @@ class PropertyColorWidget extends PropertyWidget {
               },
             );
           },
-          child: const Text("Color Picker"),
+          child: const Text('Color Picker'),
         ),
       ],
     );

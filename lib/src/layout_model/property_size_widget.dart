@@ -21,9 +21,8 @@ class PropertySizeWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller
-        .getItemById(controller.selectedId)
-        ?.properties[propertyKey];
+    final Property? property =
+        controller.getItemById(controller.selectedId)?.properties[propertyKey];
     final Size size = property?.value ?? Size.zero;
 
     void updateWidth(String value) {
@@ -35,8 +34,8 @@ class PropertySizeWidget extends PropertyWidget {
     }
 
     return DualPropertyTextField(
-      firstLabel: "Width",
-      secondLabel: "Height",
+      firstLabel: 'Width',
+      secondLabel: 'Height',
       firstValue: size.width.toString(),
       secondValue: size.height.toString(),
       onFirstChanged: updateWidth,

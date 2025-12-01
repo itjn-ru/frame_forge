@@ -7,12 +7,12 @@ enum ScreenSizeEnum {
   /// Mobile screen configuration (360x720)
   ///
   /// Optimized for mobile devices with portrait orientation.
-  mobile(width: 360, height: 720, title: 'mobile', value: true),
+  mobile(width: 360, height: 720, title: 'мобильный', value: true),
 
   /// Desktop screen configuration (720x720)
   ///
   /// Optimized for desktop displays with square aspect ratio.
-  desktop(width: 720, height: 720, title: 'desktop', value: false);
+  desktop(width: 720, height: 720, title: 'десктоп', value: false);
 
   /// The width of this screen size in logical pixels
   final double width;

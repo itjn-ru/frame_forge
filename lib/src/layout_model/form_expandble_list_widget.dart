@@ -1,11 +1,11 @@
-import 'package:frame_forge/src/expandble_widget/expandble_style.dart';
 import 'package:flutter/material.dart';
+import 'package:frame_forge/src/expandble_widget/expandble_style.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../canvas/layout_model_provider.dart';
 import '../expandble_widget/expandble_widget_content.dart';
 import '../expandble_widget/expandble_widget_controller.dart';
-import '../canvas/layout_model_provider.dart';
 import 'component.dart';
 import 'component_group.dart';
 import 'component_widget.dart';
@@ -47,12 +47,13 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
 
   final NumberFormat numberFormat = NumberFormat(',##0.00', 'ru_RU');
 
-  late final LayoutModelController modelController = LayoutModelControllerProvider.of(context);
+  late final LayoutModelController modelController =
+      LayoutModelControllerProvider.of(context);
   late final LayoutModel layoutModel = modelController.layoutModel;
   late StyleElement style =
       layoutModel.getStyleElementById(widget.component['style'].id) ??
-      StyleElement("style");
-  late final  border = style['borderRadius'];
+          StyleElement('style');
+  late final border = style['borderRadius'];
   late final List<Widget> items = List<Widget>.generate(
     widget.component.items.length - 1,
     (int index) => SizedBox(
@@ -62,10 +63,11 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
       ),
     ),
   );
-  late final ComponentGroup header = widget.component.items.whereType<ComponentGroup>().first;
+  late final ComponentGroup header =
+      widget.component.items.whereType<ComponentGroup>().first;
   late final StyleElement headerStyle =
       layoutModel.getStyleElementById(header['style'].id) ??
-      StyleElement("style");
+          StyleElement('style');
   late final TextStyle textStyle = TextStyle(
     color: style['color'],
     fontSize: style['fontSize'],
@@ -81,7 +83,7 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
     }
     super.initState();
 
-    controller.stateChanges.listen((value) {
+    controller.stateChanges.listen((bool value) {
       if (expandedHeight != null && value && size.height != expandedHeight) {
         widget.component.properties['expandble']?.value = value;
         widget.component.properties['expandedSize']?.value = size;
@@ -103,7 +105,7 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
         );
       }
     });
-    controller.heightChanges.listen((height) {
+    controller.heightChanges.listen((double? height) {
       if (height != null && height != expandedHeight) {
         setState(() => expandedHeight = height);
       }
@@ -119,7 +121,7 @@ class _ExpandbleComponentState extends State<ExpandbleComponent> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         ExpandableWidget(
           style: ExpandableStyle(
             marginTop: style['margin'][1],

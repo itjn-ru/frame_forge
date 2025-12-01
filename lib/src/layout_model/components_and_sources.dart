@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:frame_forge/src/canvas/screensize_provider.dart';
 
 import '../../frame_forge.dart';
 import '../canvas/layout_model_provider.dart';
 import '../canvas/main_canvas.dart';
-import 'package:flutter/material.dart';
 import 'style_widget.dart';
 
 class ComponentsAndSources extends StatelessWidget {

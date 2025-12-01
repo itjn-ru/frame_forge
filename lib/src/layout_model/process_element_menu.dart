@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../frame_forge.dart';
 import '../flutter_context_menu/components/menu_divider.dart';
 import '../flutter_context_menu/components/menu_header.dart';
@@ -12,8 +13,8 @@ class ProcessElementMenu extends ComponentAndSourceMenu {
   List<ContextMenuEntry> getContextMenu(
     void Function(LayoutModelEvent event)? onChanged,
   ) {
-    return [
-      const MenuHeader(text: "Editing"),
+    return <ContextMenuEntry>[
+      const MenuHeader(text: 'Editing'),
       MenuItem(
         label: 'Copy',
         icon: Icons.delete,

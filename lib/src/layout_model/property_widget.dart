@@ -16,6 +16,7 @@ import 'property_border_style_widget.dart';
 import 'property_color_widget.dart';
 import 'property_font_weight_widget.dart';
 import 'property_image_widget.dart';
+import 'property_list_widget.dart';
 import 'property_margin_widget.dart';
 import 'property_offset_widget.dart';
 import 'property_padding_widget.dart';
@@ -67,6 +68,8 @@ class PropertyWidget extends StatelessWidget {
         return PropertyImageWidget(controller, propertyKey) as PropertyWidget;
       case const (bool):
         return PropertyBoolWidget(controller, propertyKey);
+      case const (List<String>):
+        return PropertyListWidget(controller, propertyKey);
       default:
         return PropertyWidget(controller, propertyKey);
     }

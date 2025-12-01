@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../canvas/layout_model_provider.dart';
 import 'component_widget.dart';
 import 'controller/layout_model_controller.dart';
@@ -10,16 +11,17 @@ class FormCheckboxWidget extends ComponentWidget {
 
   @override
   Widget buildWidget(BuildContext context) {
-    final LayoutModelController controller = LayoutModelControllerProvider.of(context);
+    final LayoutModelController controller =
+        LayoutModelControllerProvider.of(context);
     final LayoutModel layoutModel = controller.layoutModel;
     StyleElement style =
         layoutModel.getStyleElementById(component['style'].id) ??
-        StyleElement("style");
+            StyleElement('style');
     final double fontSize = style['fontSize'];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        if (component.properties["text"]?.value != null)
+      children: <Widget>[
+        if (component.properties['text']?.value != null)
           Expanded(
             child: Text(
               '${component.properties["text"]?.value}: ',

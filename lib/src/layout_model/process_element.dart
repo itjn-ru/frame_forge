@@ -1,15 +1,14 @@
 import 'process.dart';
-import 'process_status_id_enum.dart';
 import 'property.dart';
 
 class ProcessElement extends LayoutProcess {
-  ProcessElement(String name) : super("processElement", name) {
+  ProcessElement(String name) : super('processElement', name) {
     properties['statusId'] = Property(
-      "Status Id",
-      ProcessStatusIdEnum.created.value,
+      'Status Id',
+      'created',
       type: String,
     );
-    properties['title'] = Property("title", '', type: String);
-    properties['creatorTitle'] = Property("Creator Title", '', type: String);
+    properties['title'] = Property('title', '', type: String);
+    properties['creatorTitle'] = Property('Creator Title', '', type: String);
   }
 }

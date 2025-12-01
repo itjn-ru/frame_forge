@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'property.dart';
-import 'root.dart';
-import 'style.dart';
+import 'package:xml/src/xml/utils/node_list.dart';
 import 'package:xml/xml.dart';
 
 import 'item.dart';
+import 'property.dart';
+import 'root.dart';
+import 'style.dart';
 
 /// Saves a layout model map to XML format
 ///
@@ -16,10 +17,10 @@ import 'item.dart';
 /// Returns a formatted XML string representation of the layout model.
 String saveMap(Map root) {
   final XmlBuilder builder = XmlBuilder();
-  builder.processing("xml", "version=\"1.0\" encoding=\"UTF-8\"");
+  builder.processing('xml', 'version="1.0" encoding="UTF-8"');
 
   builder.element(
-    "layout",
+    'layout',
     nest: () {
       _saveMapProperties(builder, root['properties']);
       _saveMapItems(builder, root['items']);
@@ -36,7 +37,7 @@ String saveMap(Map root) {
 /// [properties] The properties map to serialize
 _saveMapProperties(XmlBuilder builder, Map properties) {
   builder.element(
-    "properties",
+    'properties',
     nest: () {
       properties.forEach((key, property) {
         builder.element(
@@ -63,7 +64,7 @@ _saveMapProperties(XmlBuilder builder, Map properties) {
 /// [items] The items list to serialize
 _saveMapItems(XmlBuilder builder, List items) {
   builder.element(
-    "items",
+    'items',
     nest: () {
       for (final element in items) {
         builder.element(
@@ -90,9 +91,9 @@ Map<String, dynamic> readMap(String layout) {
   final XmlDocument xml = XmlDocument.parse(layout);
   final XmlElement xmlRoot = xml.rootElement;
 
-  final Map<String, dynamic> root = {};
-  root['properties'] = _readMapProperties(xmlRoot.getElement("properties"));
-  root['items'] = _readMapItems(xmlRoot.getElement("items"));
+  final Map<String, dynamic> root = <String, dynamic>{};
+  root['properties'] = _readMapProperties(xmlRoot.getElement('properties'));
+  root['items'] = _readMapItems(xmlRoot.getElement('items'));
 
   return root;
 }
@@ -103,7 +104,7 @@ Map<String, dynamic> readMap(String layout) {
 ///
 /// Returns a map of property names to their values.
 Map<String, dynamic> _readMapProperties(XmlElement? xmlProperties) {
-  final Map<String, dynamic> properties = {};
+  final Map<String, dynamic> properties = <String, dynamic>{};
 
   if (xmlProperties == null) {
     return properties;
@@ -129,7 +130,7 @@ Map<String, dynamic> _readMapProperties(XmlElement? xmlProperties) {
 
     properties[propertyKey] = propertyValue.runtimeType == String
         ? propertyValue.toString().replaceAll('&#x20;', ' ')
-        : propertyValue ?? "";
+        : propertyValue ?? '';
 
     /*if (xmlProperty.childElements.isEmpty) {
       json[propertyKey] =
@@ -149,7 +150,7 @@ Map<String, dynamic> _readMapProperties(XmlElement? xmlProperties) {
 }
 
 List<Map<String, dynamic>> _readMapItems(XmlElement? xmlItems) {
-  final List<Map<String, dynamic>> items = [];
+  final List<Map<String, dynamic>> items = <Map<String, dynamic>>[];
 
   if (xmlItems == null) {
     return items;
@@ -162,8 +163,8 @@ List<Map<String, dynamic>> _readMapItems(XmlElement? xmlItems) {
   for (final XmlElement xmlItem in xmlItems.childElements) {
     final Map<String, dynamic> item = <String, dynamic>{
       'type': xmlItem.localName,
-      'properties': _readMapProperties(xmlItem.getElement("properties")),
-      'items': _readMapItems(xmlItem.getElement("items")),
+      'properties': _readMapProperties(xmlItem.getElement('properties')),
+      'items': _readMapItems(xmlItem.getElement('items')),
     };
     items.add(item);
   }
@@ -173,10 +174,10 @@ List<Map<String, dynamic>> _readMapItems(XmlElement? xmlItems) {
 
 String save(Root root) {
   final XmlBuilder builder = XmlBuilder();
-  builder.processing("xml", "version=\"1.0\" encoding=\"UTF-8\"");
+  builder.processing('xml', 'version="1.0" encoding="UTF-8"');
 
   builder.element(
-    "layout",
+    'layout',
     nest: () {
       _saveProperties(builder, root.properties);
       _saveItems(builder, root.items);
@@ -190,7 +191,7 @@ String save(Root root) {
 
 _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
   builder.element(
-    "properties",
+    'properties',
     nest: () {
       properties.forEach((String key, Property property) {
         builder.element(
@@ -198,12 +199,12 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
           nest: () {
             switch (property.type) {
               case const (Offset):
-                builder.attribute("left", (property.value as Offset).dx);
-                builder.attribute("top", (property.value as Offset).dy);
+                builder.attribute('left', (property.value as Offset).dx);
+                builder.attribute('top', (property.value as Offset).dy);
                 break;
               case const (Size):
-                builder.attribute("width", (property.value as Size).width);
-                builder.attribute("height", (property.value as Size).height);
+                builder.attribute('width', (property.value as Size).width);
+                builder.attribute('height', (property.value as Size).height);
                 break;
               case const (Color):
                 builder.text(
@@ -211,15 +212,15 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
                 );
                 break;
               case const (TextStyle):
-                builder.attribute("fontSize", property.value.fontSize);
+                builder.attribute('fontSize', property.value.fontSize);
                 break;
               case const (CustomBorderStyle):
-                builder.attribute("borderWidth", property.value.width);
+                builder.attribute('borderWidth', property.value.width);
                 builder.attribute(
-                  "borderColor",
+                  'borderColor',
                   property.value.color.value.toRadixString(16).toUpperCase(),
                 );
-                builder.attribute("borderSide", property.value.side);
+                builder.attribute('borderSide', property.value.side);
                 break;
               //case XFile:
               //  builder.cdata(base64Encode(property.value));
@@ -235,7 +236,7 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
 
 _saveItems(XmlBuilder builder, List<Item> items) {
   builder.element(
-    "items",
+    'items',
     nest: () {
       for (final Item element in items) {
         builder.element(
@@ -254,12 +255,13 @@ Root read(String layout) {
   final XmlDocument xml = XmlDocument.parse(layout);
   final XmlElement xmlRoot = xml.rootElement;
 
-  final Map<String, Property> properties = _readProperties(xmlRoot.getElement("properties"));
+  final Map<String, Property> properties =
+      _readProperties(xmlRoot.getElement('properties'));
 
-  final Root root = Root(properties["name"]);
+  final Root root = Root(properties['name']);
   root.properties = properties;
 
-  root.items = _readItems(xmlRoot.getElement("items"));
+  root.items = _readItems(xmlRoot.getElement('items'));
 
   /*
 
@@ -306,7 +308,7 @@ Root read(String layout) {
 }
 
 Map<String, Property> _readProperties(XmlElement? xmlProperties) {
-  final Map<String, Property> properties = {};
+  final Map<String, Property> properties = <String, Property>{};
 
   if (xmlProperties == null) {
     return properties;
@@ -317,116 +319,120 @@ Map<String, Property> _readProperties(XmlElement? xmlProperties) {
   }
 
   for (final XmlElement xmlProperty in xmlProperties.childElements) {
-    final xmlValue = xmlProperty.children;
-    final propertyKey = xmlProperty.localName;
+    final XmlNodeList<XmlNode> xmlValue = xmlProperty.children;
+    final String propertyKey = xmlProperty.localName;
     dynamic propertyValue;
 
     switch (propertyKey) {
-      case "topBorder":
+      case 'topBorder':
         propertyValue = CustomBorderStyle(
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "width")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'width')
                     .single
                     .value,
               ) ??
               0.0,
           Colors.black,
           xmlProperty.attributes
-                  .where((attribute) => attribute.name.local == "side")
-                  .single
-                  .value
-              as CustomBorderSide,
+              .where((XmlAttribute attribute) => attribute.name.local == 'side')
+              .single
+              .value as CustomBorderSide,
         );
         break;
-      case "leftBorder":
+      case 'leftBorder':
         propertyValue = CustomBorderStyle(
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "width")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'width')
                     .single
                     .value,
               ) ??
               0.0,
           Colors.black,
           xmlProperty.attributes
-                  .where((attribute) => attribute.name.local == "side")
-                  .single
-                  .value
-              as CustomBorderSide,
+              .where((XmlAttribute attribute) => attribute.name.local == 'side')
+              .single
+              .value as CustomBorderSide,
         );
         break;
-      case "rightBorder":
+      case 'rightBorder':
         propertyValue = CustomBorderStyle(
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "width")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'width')
                     .single
                     .value,
               ) ??
               0.0,
           Colors.black,
           xmlProperty.attributes
-                  .where((attribute) => attribute.name.local == "side")
-                  .single
-                  .value
-              as CustomBorderSide,
+              .where((XmlAttribute attribute) => attribute.name.local == 'side')
+              .single
+              .value as CustomBorderSide,
         );
         break;
-      case "bottomBorder":
+      case 'bottomBorder':
         propertyValue = CustomBorderStyle(
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "width")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'width')
                     .single
                     .value,
               ) ??
               0.0,
           Colors.black,
           xmlProperty.attributes
-                  .where((attribute) => attribute.name.local == "side")
-                  .single
-                  .value
-              as CustomBorderSide,
+              .where((XmlAttribute attribute) => attribute.name.local == 'side')
+              .single
+              .value as CustomBorderSide,
         );
         break;
-      case "position":
+      case 'position':
         propertyValue = Offset(
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "left")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'left')
                     .single
                     .value,
               ) ??
               0.0,
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "top")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'top')
                     .single
                     .value,
               ) ??
               0.0,
         );
         break;
-      case "size":
+      case 'size':
         propertyValue = Size(
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "width")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'width')
                     .single
                     .value,
               ) ??
               0.0,
           double.tryParse(
                 xmlProperty.attributes
-                    .where((attribute) => attribute.name.local == "height")
+                    .where((XmlAttribute attribute) =>
+                        attribute.name.local == 'height')
                     .single
                     .value,
               ) ??
               0.0,
         );
         break;
-      case "color":
+      case 'color':
         break;
       default:
         if (xmlValue.isNotEmpty) {
@@ -471,10 +477,11 @@ List<Item> _readItems(XmlElement? xmlItems) {
   }
 
   for (final XmlElement xmlItem in xmlItems.childElements) {
-    final properties = _readProperties(xmlItem.getElement("properties"));
-    final Item item = Item("item", properties["name"]);
+    final Map<String, Property> properties =
+        _readProperties(xmlItem.getElement('properties'));
+    final Item item = Item('item', properties['name']);
     item.properties = properties;
-    item.items = _readItems(xmlItem.getElement("items"));
+    item.items = _readItems(xmlItem.getElement('items'));
     items.add(item);
   }
 

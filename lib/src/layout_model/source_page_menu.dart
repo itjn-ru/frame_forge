@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../flutter_context_menu/flutter_context_menu.dart';
 import 'controller/events.dart';
 import 'menu.dart';
@@ -11,12 +12,12 @@ class SourcePageMenu extends ComponentAndSourceMenu {
   List<ContextMenuEntry> getContextMenu(
     void Function(LayoutModelEvent event)? onChanged,
   ) {
-    return [
-      const MenuHeader(text: "Editing"),
+    return <ContextMenuEntry>[
+      const MenuHeader(text: 'Editing'),
       MenuItem.submenu(
         label: 'Add',
         icon: Icons.add,
-        items: [
+        items: <ContextMenuEntry>[
           MenuItem(
             label: 'Variable',
             icon: Icons.add,

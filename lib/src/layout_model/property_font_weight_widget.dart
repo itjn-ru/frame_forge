@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
 import 'controller/events.dart';
 import 'property.dart';
 import 'property_widget.dart';
@@ -13,9 +14,10 @@ class PropertyFontWeightWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final Property? property =
+        controller.getCurrentItem()?.properties[propertyKey]!;
     return Row(
-      children: [
+      children: <Widget>[
         Expanded(
           child: DropdownButton<FontWeight>(
             onTap: () => controller.eventBus.emit(
@@ -31,16 +33,16 @@ class PropertyFontWeightWidget extends PropertyWidget {
                   (FontWeight fontWeight) => DropdownMenuItem<FontWeight>(
                     value: fontWeight,
                     child: Text(switch (fontWeight) {
-                      FontWeight.w100 => "100",
-                      FontWeight.w200 => "200",
-                      FontWeight.w300 => "300",
-                      FontWeight.w400 => "normal",
-                      FontWeight.w500 => "500",
-                      FontWeight.w600 => "600",
-                      FontWeight.w700 => "bold",
-                      FontWeight.w800 => "800",
-                      FontWeight.w900 => "900",
-                      _ => "",
+                      FontWeight.w100 => '100',
+                      FontWeight.w200 => '200',
+                      FontWeight.w300 => '300',
+                      FontWeight.w400 => 'normal',
+                      FontWeight.w500 => '500',
+                      FontWeight.w600 => '600',
+                      FontWeight.w700 => 'bold',
+                      FontWeight.w800 => '800',
+                      FontWeight.w900 => '900',
+                      _ => '',
                     }),
                   ),
                 )

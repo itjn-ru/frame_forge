@@ -1,12 +1,15 @@
-import '../canvas/context_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/gestures/events.dart';
+import 'package:frame_forge/src/flutter_context_menu/core/models/context_menu_entry.dart';
+import 'package:frame_forge/src/layout_model/controller/events.dart';
+
+import '../canvas/context_menu.dart';
 import '../canvas/layout_model_provider.dart';
 import 'controller/layout_model_controller.dart';
 import 'item.dart';
+import 'menu.dart';
 import 'page.dart';
 import 'root.dart';
-
-import 'menu.dart';
 
 /// A widget that displays a hierarchical tree of layout items
 ///
@@ -41,7 +44,7 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
       controller: widget.controller,
       child: ValueListenableBuilder<String?>(
         valueListenable: widget.controller.selectedIdNotifier,
-        builder: (context, selectedId, _) {
+        builder: (BuildContext context, String? selectedId, _) {
           return _buildItem(widget._item, selectedId);
         },
       ),
@@ -52,7 +55,7 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
     Widget child;
 
     if (item.items.isNotEmpty) {
-      final children = <Widget>[];
+      final List<Widget> children = <Widget>[];
       children.add(ItemWidget(item));
       late final List<Item> items;
       if (item is Root) {
@@ -65,7 +68,7 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
         ..addAll(
           List.generate(
             items.length,
-            (index) => Padding(
+            (int index) => Padding(
               padding: index == items.length - 1
                   ? const EdgeInsets.only(left: 5, right: 5)
                   : const EdgeInsets.only(left: 5, right: 5, bottom: 5),
@@ -77,7 +80,9 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
           Padding(
             padding: const EdgeInsets.all(5),
             child: Row(
-              children: [Expanded(child: Text(item['name'], softWrap: true))],
+              children: <Widget>[
+                Expanded(child: Text(item['name'], softWrap: true))
+              ],
             ),
           ),
         );
@@ -87,7 +92,7 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
       child = ItemWidget(item);
     }
 
-    final curPageType = switch (widget._item.runtimeType) {
+    final Type curPageType = switch (widget._item.runtimeType) {
       const (SourcePage) => SourcePage,
       const (StylePage) => StylePage,
       const (ProcessPage) => ProcessPage,
@@ -97,15 +102,15 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
     // final curItem = widget.controller.layoutModel.curItemOnPage[curPageType];
 
     return InkWell(
-      child: Container(
+      child: DecoratedBox(
         //padding: const EdgeInsets.only(left: 5,  right: 5),
         /*const EdgeInsets.all(5),*/
         decoration: BoxDecoration(
           color: item.id == selectedId
               ? Colors.amber
               : item is ComponentAndSourcePage
-              ? Colors.grey
-              : Colors.white,
+                  ? Colors.grey
+                  : Colors.white,
           border: Border.all(),
         ),
         child: child,
@@ -143,12 +148,13 @@ class ItemWidgetState extends State<ItemWidget> {
   bool dragging = false;
   Offset? position;
 
-  late final controller = LayoutModelControllerProvider.of(context);
+  late final LayoutModelController controller =
+      LayoutModelControllerProvider.of(context);
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (event) {
+      onEnter: (PointerEnterEvent event) {
         setState(() {
           position = event.position;
         });
@@ -164,10 +170,11 @@ class ItemWidgetState extends State<ItemWidget> {
           setState(() {});
         },
         onSecondaryTap: () {
-          final menu = ComponentAndSourceMenu.create(controller, widget.item);
+          final ComponentAndSourceMenu menu =
+              ComponentAndSourceMenu.create(controller, widget.item);
 
-          final menuItems = menu.getContextMenu(
-            (event) => controller.eventBus.emit(event),
+          final List<ContextMenuEntry> menuItems = menu.getContextMenu(
+            (LayoutModelEvent event) => controller.eventBus.emit(event),
           );
           createAndShowContextMenu(
             context,
@@ -188,7 +195,7 @@ class ItemWidgetState extends State<ItemWidget> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            children: <Widget>[
               Text(
                 widget.item['name'],
                 overflow: TextOverflow.clip,

@@ -1,6 +1,7 @@
-import 'package:frame_forge/src/color_picker/color_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:frame_forge/src/color_picker/color_picker.dart';
 import 'package:uuid/uuid.dart';
+
 import '../ui_kit/ui_kit.dart';
 import 'controller/events.dart';
 import 'property.dart';
@@ -27,7 +28,8 @@ class PropertyBorderStyleWidget extends PropertyWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Property? property = controller.getCurrentItem()?.properties[propertyKey]!;
+    final Property? property =
+        controller.getCurrentItem()?.properties[propertyKey]!;
     final String widthValue = property?.value?.width.toString() ?? '';
 
     const List<CustomBorderSide> sides = CustomBorderSide.values;
@@ -90,7 +92,8 @@ class PropertyBorderStyleWidget extends PropertyWidget {
           isExpanded: true,
           items: sides
               .map<DropdownMenuItem<CustomBorderSide>>(
-                (CustomBorderSide e) => DropdownMenuItem<CustomBorderSide>(value: e, child: Text(e.title)),
+                (CustomBorderSide e) => DropdownMenuItem<CustomBorderSide>(
+                    value: e, child: Text(e.title)),
               )
               .toList(),
           onChanged: (CustomBorderSide? value) {

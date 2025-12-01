@@ -12,21 +12,20 @@ class SourceVariableMenu extends ComponentAndSourceMenu {
   List<ContextMenuEntry> getContextMenu(
     void Function(LayoutModelEvent event)? onChanged,
   ) {
-    return [
+    return <ContextMenuEntry>[
       MenuItem.submenu(
         label: 'Add',
         icon: Icons.add,
-        items: [
+        items: <ContextMenuEntry>[
           MenuItem(
             label: 'Variable',
             icon: Icons.add,
             onSelected: () {
-              final item = SourceVariable('variable');
+              final SourceVariable item = SourceVariable('variable');
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
-          
         ],
       ),
       const MenuDivider(),

@@ -23,7 +23,7 @@ class Item with FromMapToMap {
   List<Item> items = <Item>[];
 
   /// Properties defining the item's configuration and appearance.
-  Map<String, Property> properties = {};
+  Map<String, Property> properties = <String, Property>{};
 
   /// Creates a new item with the specified [type] and [name].
   ///
@@ -45,9 +45,9 @@ class Item with FromMapToMap {
   String get id => properties['id']?.value ?? '';
 
   Map<String, dynamic> toMap() {
-    final Map<String, dynamic> map = {};
+    final Map<String, dynamic> map = <String, dynamic>{};
 
-    map['layout'] = {
+    map['layout'] = <String, Object>{
       'properties': propertiesToMap(this),
       'items': itemsToMap(this),
       'type': type,
@@ -58,7 +58,7 @@ class Item with FromMapToMap {
   }
 
   Item fromMap(Map map) {
-    final item = Item(
+    final Item item = Item(
       map['type'],
       map['properties']['name'],
       mayBeParent: map['mayBeParent'] as bool,
@@ -77,7 +77,7 @@ class Item with FromMapToMap {
     List<Item>? items,
     Map<String, Property>? properties,
   }) {
-    final item = Item(
+    final Item item = Item(
       type ?? this.type,
       (properties ?? this.properties)['name'],
       mayBeParent: mayBeParent ?? this.mayBeParent,

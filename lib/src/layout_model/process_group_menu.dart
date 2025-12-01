@@ -1,5 +1,6 @@
-import 'package:frame_forge/src/layout_model/process_element.dart';
 import 'package:flutter/material.dart';
+import 'package:frame_forge/src/layout_model/process_element.dart';
+
 import '../../frame_forge.dart';
 import '../flutter_context_menu/components/menu_divider.dart';
 import '../flutter_context_menu/components/menu_header.dart';
@@ -14,8 +15,8 @@ class ProcessGroupMenu extends ComponentAndSourceMenu {
   List<ContextMenuEntry> getContextMenu(
     void Function(LayoutModelEvent event)? onChanged,
   ) {
-    return [
-      const MenuHeader(text: "Editing"),
+    return <ContextMenuEntry>[
+      const MenuHeader(text: 'Editing'),
       MenuItem.submenu(
         label: 'Add Group of processes',
         icon: Icons.add,
@@ -24,7 +25,7 @@ class ProcessGroupMenu extends ComponentAndSourceMenu {
             label: 'Parallelly',
             icon: Icons.widgets,
             onSelected: () {
-              final ProcessGroup item = ProcessGroup("Parallel Process");
+              final ProcessGroup item = ProcessGroup('Parallel Process');
               item.properties['processType']?.value = 'parallelly';
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
@@ -34,7 +35,7 @@ class ProcessGroupMenu extends ComponentAndSourceMenu {
             label: 'Sequentially',
             icon: Icons.widgets,
             onSelected: () {
-              final ProcessGroup item = ProcessGroup("Sequential Process");
+              final ProcessGroup item = ProcessGroup('Sequential Process');
               item.properties['processType']?.value = 'sequentially';
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
@@ -46,7 +47,7 @@ class ProcessGroupMenu extends ComponentAndSourceMenu {
         label: 'Add Process',
         icon: Icons.add,
         onSelected: () {
-          final ProcessElement item = ProcessElement("Process");
+          final ProcessElement item = ProcessElement('Process');
           controller.layoutModel.addItem(target, item);
           onChanged!(AddItemEvent(id: item.id));
         },
@@ -77,7 +78,7 @@ class ProcessGroupMenu extends ComponentAndSourceMenu {
         label: 'Delete',
         icon: Icons.delete,
         onSelected: () {
-          final ProcessElement item = ProcessElement("Process");
+          final ProcessElement item = ProcessElement('Process');
           controller.layoutModel.deleteItem(controller.layoutModel.curItem);
           onChanged!(RemoveItemEvent(id: item.id));
         },
