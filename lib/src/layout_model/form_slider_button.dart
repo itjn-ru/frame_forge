@@ -22,5 +22,15 @@ class FormSliderButton extends LayoutComponent {
       const Color(0xFF6200EE),
       type: Color,
     );
+    properties['hintText'] = Property(
+      'hintText',
+      <String>[],
+      type: List<String>,
+    );
+    properties['initialValue'] = Property(
+      'initialValue',
+      0,
+      type: int,
+    );
   }
 }

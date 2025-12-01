@@ -317,9 +317,9 @@ mixin FromMapToMap {
 
       // Merge loaded properties with constructor defaults
       // Constructor properties are preserved if not present in loaded map
-      final Map<String, Property> mergedProperties = 
+      final Map<String, Property> mergedProperties =
           Map<String, Property>.from(item.properties);
-      
+
       itemProperties.forEach((String key, Property loadedProperty) {
         if (mergedProperties.containsKey(key)) {
           if (key == 'fontSize') {
@@ -337,7 +337,7 @@ mixin FromMapToMap {
           mergedProperties[key] = loadedProperty;
         }
       });
-      
+
       item.properties = mergedProperties;
       item.items = itemsFromMap(item, element['items']);
 
