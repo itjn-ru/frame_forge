@@ -1,6 +1,12 @@
 # Changelog
 
-## [1.1.3] - 2025-11-21
+## [1.1.3] - 2025-12-01
+
+### Added
+
+- active colors for thumb for slider button
+
+## [1.1.3] - 2025-12-01
 
 ### Added
 
