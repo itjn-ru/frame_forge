@@ -175,7 +175,8 @@ class _CustomSliderState extends State<CustomSlider> {
     final Color inactiveColor =
         _parseColor(widget.component['inactiveColor']) ??
             Theme.of(context).disabledColor;
-
+    final Color thumbColor =
+        _parseColor(widget.component['thumbColor']) ?? Colors.white;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
@@ -204,7 +205,7 @@ class _CustomSliderState extends State<CustomSlider> {
             tickMarkShape: const SliderTickMarkCircle(),
             trackShape: const LineSliderTrackShape(),
             trackHeight: 1,
-            thumbShape: const SliderThumbShape(),
+            thumbShape: SliderThumbShape(thumbColor: thumbColor),
             // Only thumb uses selectedColor; track & ticks use inactiveColor
             activeTrackColor: inactiveColor,
             disabledActiveTrackColor: inactiveColor,
@@ -236,11 +237,13 @@ class _CustomSliderState extends State<CustomSlider> {
 }
 
 class SliderThumbShape extends SliderComponentShape {
+  final Color thumbColor;
   const SliderThumbShape({
-    this.enabledThumbRadius = 12.0,
-    this.disabledThumbRadius = 12,
+    this.enabledThumbRadius = 8.0,
+    this.disabledThumbRadius = 8,
     this.elevation = 1.0,
     this.pressedElevation = 6.0,
+    required this.thumbColor,
   });
 
   final double enabledThumbRadius;
@@ -284,11 +287,17 @@ class SliderThumbShape extends SliderComponentShape {
 
     final double radius = radiusTween.evaluate(enableAnimation);
 
-    // Draw a solid thumb using the active (thumb) color
-    final Paint fill = Paint()
-      ..color = sliderTheme.thumbColor!
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, radius, fill);
+    {
+      Paint paint = Paint()..color = sliderTheme.thumbColor!;
+      paint.strokeWidth = 7;
+      paint.style = PaintingStyle.stroke;
+      canvas.drawCircle(center, radius, paint);
+      {
+        Paint paint = Paint()..color = thumbColor;
+        paint.style = PaintingStyle.fill;
+        canvas.drawCircle(center, radius, paint);
+      }
+    }
   }
 }
 
@@ -337,7 +346,7 @@ class SliderTickMarkCircle extends SliderTickMarkShape {
     paint.style = PaintingStyle.stroke;
     canvas.drawCircle(center, radius, paint);
     {
-      Paint paint = Paint()..color = sliderTheme.inactiveTrackColor!;
+      Paint paint = Paint()..color = sliderTheme.disabledActiveTickMarkColor!;
       paint.style = PaintingStyle.fill;
       canvas.drawCircle(center, radius, paint);
     }
