@@ -4,6 +4,7 @@
 
 ### Added
 
+- `hintText` and `initialValue` for FormSliderButton
 - `isRequired` (boolean) property for `FormTextField` to mark fields as required.
 - `function` and `inputId` properties in `Root` for handle template data via a user-defined function.
 
