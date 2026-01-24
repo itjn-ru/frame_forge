@@ -6,6 +6,10 @@
 
 - image widget with property: fitbox and data as Uint8List
 
+### Changed
+
+- Improved label rendering in FormSliderButtonWidget: the selected label now appears above others, with full width and animation, while other labels dynamically calculate their width and do not overlap. UX is improved for both long and short label lists.
+
 ## [1.1.4] - 2025-12-01
 
 ### Added

@@ -167,6 +167,11 @@ class _CustomSliderState extends State<CustomSlider> {
     final double maxValue = steps > 1 ? (steps - 1).toDouble() : 0.0;
     final double clampedValue = _currentSliderValue.clamp(0.0, maxValue);
     final int idx = clampedValue.round();
+    final TextStyle textStyle = TextStyle(
+      color: style['color'],
+      fontSize: style['fontSize'] * widget.scale,
+      fontWeight: style['fontWeight'],
+    );
 
     // Use provided color for the selected index or fallback to theme primary
     final Color selectedColor = (idx >= 0 && idx < activeColors.length)
@@ -180,25 +185,118 @@ class _CustomSliderState extends State<CustomSlider> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List<Widget>.generate(steps, (int i) {
-            final bool isSelected = clampedValue.round() == i;
-            return Expanded(
-              child: Text(
-                hintText[i],
-                textAlign: i == 0
-                    ? TextAlign.left
-                    : (i == steps - 1 ? TextAlign.right : TextAlign.center),
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: fontSize,
-                  color: isSelected ? selectedColor : inactiveColor,
-                ),
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double w = constraints.maxWidth;
+            final double trackUsable =
+                w; // full width (adjust if padding needed)
+            final int count = steps;
+            if (count == 0) {
+              return const SizedBox.shrink();
+            }
+            final double spacing =
+                count > 1 ? trackUsable / (count - 1) : trackUsable;
+            const double edgeFactor =
+                0.55; // portion of spacing allowed for edge labels
+            const double innerFactor =
+                0.8; // portion of spacing allowed for inner labels
+            const double minWidth =
+                28; // ensure some minimal tap/visibility area
+            const double horizontalPad = 4;
+
+            List<_LabelMetrics> metrics = <_LabelMetrics>[];
+            for (int i = 0; i < count; i++) {
+              final TextPainter tp = TextPainter(
+                text: TextSpan(text: hintText[i], style: textStyle),
+                textDirection: TextDirection.ltr,
+                maxLines: 1,
+                ellipsis: '…',
+              )..layout(maxWidth: trackUsable);
+              double desired = tp.size.width + horizontalPad * 2;
+              final double maxAllowed = (i == 0 || i == count - 1)
+                  ? spacing * edgeFactor
+                  : spacing * innerFactor;
+              final double finalWidth = desired.clamp(minWidth, maxAllowed);
+              metrics.add(_LabelMetrics(width: finalWidth, painter: tp));
+            }
+// Selected label full width (unclamped) for better UX visibility
+            final int selectedIndex = idx.clamp(0, count - 1);
+            final TextPainter selectedPainter = TextPainter(
+              text: TextSpan(
+                text: hintText[selectedIndex],
+                style: textStyle.copyWith(
+                    fontWeight: FontWeight.bold, color: selectedColor),
               ),
+              textDirection: TextDirection.ltr,
+              maxLines: 2, // allow wrap if needed
+              ellipsis: '…',
+            )..layout(maxWidth: trackUsable * 0.85); // keep some side margin
+            final double selectedFraction =
+                count <= 1 ? 0 : selectedIndex / (count - 1);
+            final double selectedCenterX = selectedFraction * trackUsable;
+            final double selectedWidth =
+                selectedPainter.size.width + horizontalPad * 2;
+            double selectedLeft = selectedCenterX - selectedWidth / 2;
+            if (selectedLeft < 0) selectedLeft = 0;
+            if (selectedLeft + selectedWidth > trackUsable) {
+              selectedLeft = trackUsable - selectedWidth;
+            }
+            return SizedBox(
+              height: (fontSize * 2.6).clamp(32, 72),
+              child: Stack(children: <Widget>[
+                // Truncated baseline labels (non-selected)
+                for (int i = 0; i < count; i++)
+                  if (i != selectedIndex)
+                    (() {
+                      final double fraction = count <= 1 ? 0 : i / (count - 1);
+                      final double centerX = fraction * trackUsable;
+                      final double width = metrics[i].width;
+                      double left = centerX - width / 2;
+                      if (left < 0) left = 0;
+                      if (left + width > trackUsable)
+                        left = trackUsable - width;
+                      return Positioned(
+                        left: left,
+                        top: 0,
+                        width: width,
+                        child: Center(
+                          child: Text(
+                            hintText[i],
+                            style: textStyle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    })(),
+                // Selected label overlay (full, bold, highlighted)
+                Positioned(
+                  left: selectedLeft,
+                  top: 0, // slight downward to separate layers
+                  width: selectedWidth,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPad,
+                      vertical: fontSize * 0.1,
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        hintText[selectedIndex],
+                        style: textStyle.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: selectedColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
             );
-          }),
+          },
         ),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
@@ -220,7 +318,7 @@ class _CustomSliderState extends State<CustomSlider> {
             value: clampedValue,
             max: maxValue,
             divisions: divisions > 0 ? divisions : null,
-            label: (steps > 0 && idx >= 0 && idx < steps) ? hintText[idx] : '',
+            // label: (steps > 0 && idx >= 0 && idx < steps) ? hintText[idx] : '',
             activeColor: inactiveColor,
             inactiveColor: inactiveColor,
             thumbColor: selectedColor,
@@ -234,6 +332,47 @@ class _CustomSliderState extends State<CustomSlider> {
       ],
     );
   }
+}
+
+double _segmentWidth(int steps, double totalWidth) {
+  if (steps <= 1) return totalWidth;
+  return totalWidth / (steps);
+}
+
+double _labelX(int index, int steps, double trackUsable, double fullWidth) {
+  if (steps <= 1) return 0;
+  final double fraction = index / (steps - 1); // 0..1
+  final double centerX = fraction * trackUsable;
+  final double segWidth = _segmentWidth(steps, trackUsable);
+  double left = centerX - segWidth / 2;
+  // Clamp within bounds
+  if (left < 0) left = 0;
+  if (left + segWidth > fullWidth) left = fullWidth - segWidth;
+  return left;
+}
+
+List<double> _measureLabelWidths(
+  List<String> labels,
+  TextStyle style,
+  double maxWidth,
+) {
+  final List<double> out = <double>[];
+  for (final String text in labels) {
+    final TextPainter tp = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+      ellipsis: '…',
+    )..layout(maxWidth: maxWidth);
+    out.add(tp.size.width + 4); // small padding
+  }
+  return out;
+}
+
+class _LabelMetrics {
+  final double width;
+  final TextPainter painter;
+  _LabelMetrics({required this.width, required this.painter});
 }
 
 class SliderThumbShape extends SliderComponentShape {
