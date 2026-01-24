@@ -13,6 +13,7 @@ import 'property_alignment_widget.dart';
 import 'property_bool_widget.dart';
 import 'property_border_radius_widget.dart';
 import 'property_border_style_widget.dart';
+import 'property_box_fit_widget.dart';
 import 'property_color_widget.dart';
 import 'property_font_weight_widget.dart';
 import 'property_image_widget.dart';
@@ -49,6 +50,8 @@ class PropertyWidget extends StatelessWidget {
         return PropertyOffsetWidget(controller, propertyKey) as PropertyWidget;
       case const (CustomMargin):
         return PropertyMarginWidget(controller, propertyKey) as PropertyWidget;
+      case const (BoxFit):
+        return PropertyBoxFitWidget(controller, propertyKey) as PropertyWidget;
       case const (List<int>):
         return PropertyPaddingWidget(controller, propertyKey) as PropertyWidget;
       case const (Size):
@@ -56,7 +59,8 @@ class PropertyWidget extends StatelessWidget {
       case const (Color):
         return PropertyColorWidget(controller, propertyKey) as PropertyWidget;
       case const (List<Color>):
-        return PropertyListColorWidget(controller, propertyKey);
+        return PropertyListColorWidget(controller, propertyKey)
+            as PropertyWidget;
       case const (Alignment):
         return PropertyAlignmentWidget(controller, propertyKey)
             as PropertyWidget;
@@ -70,7 +74,7 @@ class PropertyWidget extends StatelessWidget {
       case const (Uint8List):
         return PropertyImageWidget(controller, propertyKey) as PropertyWidget;
       case const (bool):
-        return PropertyBoolWidget(controller, propertyKey);
+        return PropertyBoolWidget(controller, propertyKey) as PropertyWidget;
       case const (List<String>):
         return PropertyListWidget(controller, propertyKey);
       default:

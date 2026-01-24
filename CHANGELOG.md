@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.5] - 2026-01-25
+
+### Added
+
+- image widget with property: fitbox and data as Uint8List
+
 ## [1.1.4] - 2025-12-01
 
 ### Added

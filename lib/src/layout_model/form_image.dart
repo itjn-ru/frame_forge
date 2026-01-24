@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:flutter/widgets.dart';
+
 import 'component.dart';
 import 'property.dart';
 
@@ -9,6 +11,11 @@ class FormImage extends LayoutComponent {
       'imageData',
       Uint8List.fromList(<int>[0]),
       type: Uint8List,
+    );
+    properties['BoxFit'] = Property(
+      'fit',
+      BoxFit.contain,
+      type: BoxFit,
     );
   }
 }

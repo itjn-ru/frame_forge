@@ -67,7 +67,7 @@ class ComponentWidget extends StatelessWidget {
       case const (FormTextField):
         return FormTextFieldWidget(component: component);
       case const (FormImage):
-        return FormImageWidget(component: component);
+        return FormImageWidget(component: component, scaleFactor: scaleFactor);
       case const (FormCheckbox):
         return FormCheckboxWidget(component: component);
       case const (FormExpandbleList):

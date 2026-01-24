@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
+import 'component_decoration_widget.dart';
 import 'component_widget.dart';
 
 class FormImageWidget extends ComponentWidget {
-  const FormImageWidget({required super.component, super.key});
+  final double scaleFactor;
+  const FormImageWidget(
+      {required super.component, super.key, required this.scaleFactor});
 
   @override
   Widget buildWidget(BuildContext context) {
-    return SizedBox(
-      width: 300,
-      height: 300,
-      child: Image.memory(component.properties['Uint8List']?.value),
+    return ComponentDecorationWidget(
+      component: component,
+      scaleFactor: scaleFactor,
+      child: Image.memory(component.properties['Uint8List']?.value,
+          fit: component.properties['BoxFit']?.value ?? BoxFit.none),
     );
   }
 }

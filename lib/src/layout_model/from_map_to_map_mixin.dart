@@ -46,6 +46,7 @@ mixin FromMapToMap {
           const (CustomBorderRadius) => property.value.toJson(),
           const (ScreenSizeEnum) => property.value.index,
           const (Uint8List) => base64.encode(property.value),
+          const (BoxFit) => property.value.toString().split('.').last,
           const (CustomBorderStyle) => property.value.toMap(),
           const (Offset) => <String, String>{
               'left': property.value.dx.toString(),
@@ -157,6 +158,20 @@ mixin FromMapToMap {
             'Uint8List' =>
               // Property('картинка', Uint8List.fromList(value.codeUnits), type: Uint8List ),
               Property('Image', base64.decode(value), type: Uint8List),
+            'BoxFit' => Property(
+                'Box Fit',
+                switch (value) {
+                  'fill' => BoxFit.fill,
+                  'contain' => BoxFit.contain,
+                  'cover' => BoxFit.cover,
+                  'fitWidth' => BoxFit.fitWidth,
+                  'fitHeight' => BoxFit.fitHeight,
+                  'none' => BoxFit.none,
+                  'scaleDown' => BoxFit.scaleDown,
+                  _ => BoxFit.contain,
+                },
+                type: BoxFit,
+              ),
             'horizontalAlignment' => Property(
                 'Horizontal Alignment',
                 double.tryParse(value.toString()),

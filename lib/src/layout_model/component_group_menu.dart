@@ -6,6 +6,7 @@ import 'component_text.dart';
 import 'controller/events.dart';
 import 'form_checkbox.dart';
 import 'form_hidden_field.dart';
+import 'form_image.dart';
 import 'form_radio.dart';
 import 'form_slider_button.dart';
 import 'form_text_field.dart';
@@ -83,6 +84,15 @@ class ComponentGroupMenu extends ComponentAndSourceMenu {
             icon: Icons.text_fields,
             onSelected: () {
               final FormHiddenField item = FormHiddenField('hidden field');
+              controller.layoutModel.addItem(target, item);
+              onChanged!(AddItemEvent(id: item.id));
+            },
+          ),
+          MenuItem(
+            label: 'Image',
+            icon: Icons.picture_in_picture,
+            onSelected: () {
+              final FormImage item = FormImage('image');
               controller.layoutModel.addItem(target, item);
               onChanged!(AddItemEvent(id: item.id));
             },
