@@ -1,26 +1,26 @@
-import 'package:frame_forge/src/layout_model/property.dart';
-import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:frame_forge/src/layout_model/property.dart';
+import 'package:uuid/uuid.dart';
 
 import '../item.dart';
 import '../layout_model.dart';
 import '../page.dart';
-import 'file_picker/file_picker_service.dart';
-import 'file_picker/file_picker_factory.dart';
 import 'clipboard.dart';
 import 'event_bus.dart';
 import 'events.dart';
-import 'project.dart';
-import 'undo.dart';
-import 'keyboard_handler.dart';
-import 'interfaces/undo_redo_service.dart';
+import 'file_picker/file_picker_factory.dart';
+import 'file_picker/file_picker_service.dart';
 import 'interfaces/canvas_view_service.dart';
 import 'interfaces/transformation_service.dart';
-import 'services/undo_redo_service_impl.dart';
+import 'interfaces/undo_redo_service.dart';
+import 'keyboard_handler.dart';
+import 'project.dart';
 import 'services/canvas_view_service_impl.dart';
 import 'services/transformation_service_impl.dart';
-
+import 'services/undo_redo_service_impl.dart';
+import 'undo.dart';
 
 /// Controller for managing layout model operations and state.
 ///
@@ -43,15 +43,15 @@ class LayoutModelController {
   /// Event bus for handling layout model events.
   final LayoutModelEventBus eventBus;
 
-  final ValueNotifier<Set<String?>> changedItems = ValueNotifier({});
+  final ValueNotifier<Set<String?>> changedItems = ValueNotifier(<String?>{});
   final ValueNotifier<Map<String, Property>> propertiesNotifier = ValueNotifier(
-    {},
+    <String, Property>{},
   );
 
   late final LayoutModelClipboard clipboard;
   late final LayoutModelEditorProject project;
   late final GlobalKeyboardHandler keyboardHandler;
-  
+
   /// Services for di
   late final UndoRedoService undoRedoService;
   late final CanvasViewService canvasViewService;
@@ -86,7 +86,7 @@ class LayoutModelController {
       projectCreator: projectCreator,
     );
     keyboardHandler = GlobalKeyboardHandler(this);
-    
+
     // Initialize services
     canvasViewService = CanvasViewServiceImpl(this.eventBus);
     undoRedoService = UndoRedoServiceImpl(this.eventBus);
@@ -101,7 +101,8 @@ class LayoutModelController {
     selectedIdNotifier.value = itemId;
 
     /// Update all [Property] in the notifier
-    propertiesNotifier.value = getItemById(itemId)?.properties ?? {};
+    propertiesNotifier.value =
+        getItemById(itemId)?.properties ?? <String, Property>{};
 
     eventBus.emit(SelectionEvent(id: const Uuid().v4(), itemId: itemId));
   }
@@ -119,7 +120,10 @@ class LayoutModelController {
 
   void updateProperty(String key, Property value) {
     // Update notifier for UI widgets
-    propertiesNotifier.value = <String, Property>{...propertiesNotifier.value, key: value};
+    propertiesNotifier.value = <String, Property>{
+      ...propertiesNotifier.value,
+      key: value
+    };
   }
 
   void markItemAsHandled(String itemId) {
@@ -138,7 +142,7 @@ class LayoutModelController {
       return null;
     }
 
-    return searchInItems([layoutModel.root]);
+    return searchInItems(<Item>[layoutModel.root]);
   }
 
   Item? getCurrentItem() => getItemById(selectedId);
@@ -184,7 +188,7 @@ class LayoutModelController {
       return null;
     }
 
-    return searchInItems([layoutModel.root], item);
+    return searchInItems(<Item>[layoutModel.root], item);
   }
 
   /// This method is used to dispose of the node editor controller and all of its resources, subsystems and members.
@@ -260,11 +264,13 @@ class LayoutModelController {
   bool get canRedo => undoRedoService.canRedo;
 
   void undo() {
-    (undoRedoService as UndoRedoServiceImpl).executeUndo((UndoableAction action) => action.revert(this));
+    (undoRedoService as UndoRedoServiceImpl)
+        .executeUndo((UndoableAction action) => action.revert(this));
   }
 
   void redo() {
-    (undoRedoService as UndoRedoServiceImpl).executeRedo((UndoableAction action) => action.apply(this));
+    (undoRedoService as UndoRedoServiceImpl)
+        .executeRedo((UndoableAction action) => action.apply(this));
   }
 
   void _pushAction(UndoableAction action) {
@@ -272,7 +278,8 @@ class LayoutModelController {
   }
 
   // --- Public methods for creating undo actions (used by ResizableDraggableController) ---
-  void pushMoveAction(String itemId, {required Offset from, required Offset to}) {
+  void pushMoveAction(String itemId,
+      {required Offset from, required Offset to}) {
     _pushAction(MoveAction(itemId: itemId, from: from, to: to));
   }
 
@@ -295,16 +302,19 @@ class LayoutModelController {
       toPos: toPos,
     ));
   }
-  
+
   /// Simple move by ID for keyboard handler (arrows)
-  void moveItemById(String? itemId, Offset delta, {bool snap = false, double step = 5.0}) {
+  void moveItemById(String? itemId, Offset delta,
+      {bool snap = false, double step = 5.0}) {
     final Item? item = getItemById(itemId);
     if (item == null) return;
 
-    final Offset current = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
+    final Offset current =
+        (item.properties['position']?.value as Offset?) ?? Offset.zero;
     Offset next = current + delta;
     if (snap) {
-      double snapToGrid(double value, {double step = 5.0}) => (value / step).round() * step;
+      double snapToGrid(double value, {double step = 5.0}) =>
+          (value / step).round() * step;
       next = Offset(
         snapToGrid(next.dx, step: step),
         snapToGrid(next.dy, step: step),
@@ -316,14 +326,14 @@ class LayoutModelController {
     applyPosition(item.id, next, emitDelta: delta);
   }
 
-  
   // --- Internal direct apply helpers used by undo/redo and actions ---
   void applyPosition(String itemId, Offset next, {Offset? emitDelta}) {
     final Item? item = getItemById(itemId);
     if (item == null) return;
-    final Offset prev = (item.properties["position"]?.value as Offset?) ?? Offset.zero;
-    item.properties["position"]?.value = next;
-    updateProperty("position", Property("position", next, type: Offset));
+    final Offset prev =
+        (item.properties['position']?.value as Offset?) ?? Offset.zero;
+    item.properties['position']?.value = next;
+    updateProperty('position', Property('position', next, type: Offset));
     final String id = const Uuid().v4();
     eventBus.emit(ChangeItem(id: id, itemId: itemId));
     eventBus.emit(
@@ -339,8 +349,8 @@ class LayoutModelController {
   void applySize(String itemId, Size size) {
     final Item? item = getItemById(itemId);
     if (item == null) return;
-    item.properties["size"]?.value = size;
-    updateProperty("size", Property("размер", size, type: Size));
+    item.properties['size']?.value = size;
+    updateProperty('size', Property('размер', size, type: Size));
     final String id = const Uuid().v4();
     eventBus.emit(ChangeItem(id: id, itemId: itemId));
     eventBus.emit(ResizeEvent(id: id, itemId: itemId, newSize: size));
@@ -352,10 +362,10 @@ class LayoutModelController {
     if (id == null) return;
     final Item? item = getItemById(id);
     if (item == null) return;
-  // Find immediate parent and index for undo
-  final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
-  if (parent == null) return;
-  final int index = parent.items.indexOf(item);
+    // Find immediate parent and index for undo
+    final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
+    if (parent == null) return;
+    final int index = parent.items.indexOf(item);
     // Push undo and apply delete
     _pushAction(DeleteAction(
       itemId: id,
@@ -369,11 +379,11 @@ class LayoutModelController {
   void applyDelete(String itemId) {
     final Item? item = getItemById(itemId);
     if (item == null) return;
-  final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
-  if (parent == null) return;
-  parent.items.remove(item);
-  select(parent.id);
-  eventBus.emit(RemoveItemEvent(id: itemId));
+    final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
+    if (parent == null) return;
+    parent.items.remove(item);
+    select(parent.id);
+    eventBus.emit(RemoveItemEvent(id: itemId));
   }
 
   void applyInsert(Item parent, Item item, {int? index}) {
@@ -383,7 +393,8 @@ class LayoutModelController {
       layoutModel.addItemDirect(parent, item, index: index);
     } else {
       // Find the real parent and insert after the selected item
-      final Item? realParent = layoutModel.findParentById(layoutModel.root, parent.id);
+      final Item? realParent =
+          layoutModel.findParentById(layoutModel.root, parent.id);
       if (realParent != null) {
         final int selectedIndex = realParent.items.indexOf(parent);
         final int insertIndex = selectedIndex + 1;
@@ -404,13 +415,14 @@ class LayoutModelController {
     // Determine the actual parent and index for insertion
     Item actualParent;
     int? actualIndex;
-    
+
     if (parent.mayBeParent) {
       actualParent = parent;
       actualIndex = index;
     } else {
       // Find the real parent and calculate insertion index
-      final Item? realParent = layoutModel.findParentById(layoutModel.root, parent.id);
+      final Item? realParent =
+          layoutModel.findParentById(layoutModel.root, parent.id);
       if (realParent != null) {
         actualParent = realParent;
         final int selectedIndex = realParent.items.indexOf(parent);
@@ -420,8 +432,9 @@ class LayoutModelController {
         actualIndex = index;
       }
     }
-    
-    _pushAction(InsertAction(parent: actualParent, snapshot: item, index: actualIndex));
+
+    _pushAction(
+        InsertAction(parent: actualParent, snapshot: item, index: actualIndex));
     applyInsert(parent, item, index: index);
   }
 

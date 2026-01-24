@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'property_text_field.dart';
 
 /// Specialized TextField for numeric values with Tab handling
@@ -19,7 +20,7 @@ class NumericPropertyTextField extends PropertyTextField {
   }) : super(keyboardType: TextInputType.number);
 }
 
-/// Виджет для ввода пары значений (например, координат, размеров)
+/// Widget for editing two numeric properties side by side
 class DualPropertyTextField extends StatelessWidget {
   final String firstLabel;
   final String secondLabel;
@@ -53,8 +54,8 @@ class DualPropertyTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        Text("$firstLabel: "),
+      children: <Widget>[
+        Text('$firstLabel: '),
         Expanded(
           child: NumericPropertyTextField(
             defaultValue: firstValue,
@@ -68,7 +69,7 @@ class DualPropertyTextField extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text("$secondLabel: "),
+        Text('$secondLabel: '),
         Expanded(
           child: NumericPropertyTextField(
             defaultValue: secondValue,
