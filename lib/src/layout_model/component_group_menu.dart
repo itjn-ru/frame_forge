@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../flutter_context_menu/flutter_context_menu.dart';
+import 'component_group.dart';
 import 'component_table.dart';
 import 'component_text.dart';
 import 'controller/events.dart';
@@ -25,6 +26,15 @@ class ComponentGroupMenu extends ComponentAndSourceMenu {
         label: 'Add',
         icon: Icons.add,
         items: <ContextMenuEntry>[
+          MenuItem(
+            label: 'Group',
+            icon: Icons.widgets,
+            onSelected: () {
+              final ComponentGroup item = ComponentGroup('group');
+              controller.layoutModel.addItem(target, item);
+              onChanged!(AddItemEvent(id: item.id));
+            },
+          ),
           MenuItem(
             label: 'Slider',
             icon: Icons.smart_button,
