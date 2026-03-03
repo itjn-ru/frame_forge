@@ -8,5 +8,6 @@ class FormHiddenField extends LayoutComponent {
     properties['caption'] = Property('caption', '');
     properties['id'] = Property('id', const Uuid().v4, type: String);
     properties['source'] = Property('source', '');
+    properties['required'] = Property('isRequired', false, type: bool);
   }
 }
