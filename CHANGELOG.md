@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.1.6] - 2026-03-16
+
+### Added
+
+- `SourceReference` class — typed reference to source variables, replacing plain string `source` properties on components. Supports `variableName`, `mapKey`, and `nullable` fields.
+- `SourceVariableGroup` — a container for organizing source variables into logical groups within a `SourcePage`. Groups can be nested.
+- `SourceVariableType` marker class with a predefined list of supported types (`String`, `int`, `double`, `bool`, `List`, `Map`).
+- `nullable` and `possibleValues` properties on `SourceVariable`.
+- `PropertySourceWidget` — hierarchical navigator for selecting source variables, with breadcrumb navigation, group drill-down, Map key selection, and nullable toggle.
+- `PropertySourceVariableTypeWidget` — dropdown widget for selecting `SourceVariable` type.
+- `SourceVariableGroupMenu` — context menu for adding variables and sub-groups inside a group.
+- Auto-sync: `LayoutModel` now automatically creates missing `SourceVariable` entries from component source references and removes root-level duplicates that exist inside groups.
+- Example JSON button (`TemplateAppbarExampleJsonButton`) — generates and displays a sample JSON based on the current source variable definitions.
+
+### Changed
+
+- All component `source` properties (`ComponentGroup`, `ComponentTable`, `ComponentText`, `FormCheckbox`, `FormExpandbleList`, `FormHiddenField`, `FormRadio`, `FormSliderButton`, `FormTextField`) now use `SourceReference` instead of plain `String`.
+- `Item.operator[]` returns `SourceReference.toString()` for source properties to maintain backward compatibility.
+- Library exports sorted alphabetically; added exports for `SourceReference`, `SourceVariableGroup`, and `SourceVariableType`.
+- `library frame_forge;` changed to `library;` (unnamed library).
+- Serialization (`FromMapToMap`) updated to handle `SourceReference` and `SourceVariableType` round-trip.
+
 ## [1.1.5] - 2026-01-25
 
 ### Added
