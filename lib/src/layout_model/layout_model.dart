@@ -10,6 +10,9 @@ import 'page.dart';
 import 'property.dart';
 import 'root.dart';
 import 'screen_size_enum.dart';
+import 'source_reference.dart';
+import 'source_variable.dart';
+import 'source_variable_group.dart';
 import 'style.dart';
 import 'style_element.dart';
 
@@ -297,6 +300,86 @@ class LayoutModel with FromMapToMap {
       );
       stylePage.items.insert(0, basicElement);
       _setPageForItem(stylePage, basicElement);
+    }
+
+    // Auto-sync: add missing source variables from component pages
+    _syncSourceVariables();
+  }
+
+  /// Scans all component pages for source references and creates
+  /// missing SourceVariable entries in the SourcePage.
+  /// Also removes root-level duplicate variables that already exist in groups.
+  void _syncSourceVariables() {
+    final SourcePage sourcePage = root.items.whereType<SourcePage>().first;
+
+    // First, remove root-level duplicates: if a variable with the same name
+    // already exists inside a group, remove the root-level copy.
+    final Set<String> namesInGroups = <String>{};
+    for (final Item item in sourcePage.items) {
+      if (item is SourceVariableGroup) {
+        _collectExistingVariableNames(item.items, namesInGroups);
+      }
+    }
+    if (namesInGroups.isNotEmpty) {
+      sourcePage.items.removeWhere(
+        (Item item) =>
+            item is SourceVariable &&
+            namesInGroups.contains(
+              item.properties['name']?.value?.toString() ?? '',
+            ),
+      );
+    }
+
+    // Collect existing variable names (including those inside groups)
+    final Set<String> existingNames = <String>{};
+    _collectExistingVariableNames(sourcePage.items, existingNames);
+
+    // Collect all referenced source variable names from components
+    final Set<String> referencedNames = <String>{};
+    for (final Item page in root.items.whereType<ComponentPage>()) {
+      _collectSourceReferences(page, referencedNames);
+    }
+
+    // Create missing variables with default type String
+    for (final String name in referencedNames) {
+      if (name.isNotEmpty && !existingNames.contains(name)) {
+        final SourceVariable newVar = SourceVariable(name);
+        newVar.properties['name'] = Property('Name', name);
+        sourcePage.items.add(newVar);
+        _setPageForItem(sourcePage, newVar);
+      }
+    }
+  }
+
+  /// Recursively collects source variable names from items.
+  void _collectSourceReferences(Item item, Set<String> names) {
+    final Property? sourceProp = item.properties['source'];
+    if (sourceProp != null) {
+      if (sourceProp.value is SourceReference) {
+        final String varName =
+            (sourceProp.value as SourceReference).variableName;
+        if (varName.isNotEmpty) names.add(varName);
+      } else if (sourceProp.value is String &&
+          (sourceProp.value as String).isNotEmpty) {
+        names.add(sourceProp.value as String);
+      }
+    }
+
+    for (final Item child in item.items) {
+      _collectSourceReferences(child, names);
+    }
+  }
+
+  /// Recursively collects existing variable names, including inside groups.
+  void _collectExistingVariableNames(List<Item> items, Set<String> names) {
+    for (final Item item in items) {
+      if (item is SourceVariable) {
+        final String name =
+            item.properties['name']?.value?.toString() ?? '';
+        if (name.isNotEmpty) names.add(name);
+      } else if (item is SourceVariableGroup) {
+        _collectExistingVariableNames(item.items, names);
+      }
     }
   }
 

@@ -40,6 +40,8 @@ import 'root.dart';
 import 'source.dart';
 import 'source_page_menu.dart';
 import 'source_variable.dart';
+import 'source_variable_group.dart';
+import 'source_variable_group_menu.dart';
 import 'source_variable_menu.dart';
 import 'style.dart';
 import 'style_element.dart';
@@ -87,6 +89,8 @@ class ComponentAndSourceMenu {
       return ProcessGroupMenu(controller, target, onChanged: onChanged);
     } else if (target is SourcePage) {
       return SourcePageMenu(controller, target, onChanged: onChanged);
+    } else if (target is SourceVariableGroup) {
+      return SourceVariableGroupMenu(controller, target, onChanged: onChanged);
     } else if (target is StylePage) {
       return StylePageMenu(controller, target, onChanged: onChanged);
     } else if (target is ProcessPage) {

@@ -6,8 +6,8 @@ import 'menu.dart';
 import 'source_variable.dart';
 import 'source_variable_group.dart';
 
-class SourcePageMenu extends ComponentAndSourceMenu {
-  SourcePageMenu(super.controller, super.target, {super.onChanged});
+class SourceVariableGroupMenu extends ComponentAndSourceMenu {
+  SourceVariableGroupMenu(super.controller, super.target, {super.onChanged});
 
   @override
   List<ContextMenuEntry> getContextMenu(
@@ -38,15 +38,6 @@ class SourcePageMenu extends ComponentAndSourceMenu {
               onChanged!(AddItemEvent(id: item.id));
             },
           ),
-          // MenuItem(
-          //   label: 'Таблицу',
-          //   icon: Icons.add,
-          //   onSelected: () {
-          //     final item = SourceTable('таблица');
-          //     controller.layoutModel.addItem(target, item);
-          //     onChanged!(AddItemEvent(id: item.id));
-          //   },
-          // ),
         ],
       ),
       const MenuDivider(),
@@ -73,7 +64,7 @@ class SourcePageMenu extends ComponentAndSourceMenu {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Delete',
+        label: 'Delete Group',
         icon: Icons.delete,
         onSelected: () {
           controller.layoutModel.deleteItem(target);
