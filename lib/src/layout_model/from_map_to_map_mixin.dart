@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'component_group.dart';
 import 'component_table.dart';
@@ -24,7 +23,9 @@ import 'process_group.dart';
 import 'property.dart';
 import 'root.dart';
 import 'screen_size_enum.dart';
+import 'source_reference.dart';
 import 'source_variable.dart';
+import 'source_variable_group.dart';
 import 'style.dart';
 import 'style_element.dart';
 
@@ -70,6 +71,15 @@ mixin FromMapToMap {
               'x': property.value.x,
               'y': property.value.y
             },
+          const (SourceReference) => <String, String>{
+              'variableName':
+                  (property.value as SourceReference).variableName,
+              'mapKey': (property.value as SourceReference).mapKey,
+              'nullable':
+                  (property.value as SourceReference).nullable.toString(),
+            },
+          const (SourceVariableType) =>
+              (property.value as SourceVariableType).value,
           _ => property.value.toString(),
         };
       } catch (e) {
@@ -99,6 +109,19 @@ mixin FromMapToMap {
       return MapEntry(
           key,
           switch (key) {
+            'source' => Property(
+                'source',
+                value is Map
+                    ? SourceReference(
+                        variableName:
+                            value['variableName']?.toString() ?? '',
+                        mapKey: value['mapKey']?.toString() ?? '',
+                        nullable: value['nullable']?.toString() != 'false',
+                      )
+                    : SourceReference.fromString(
+                        value?.toString() ?? ''),
+                type: SourceReference,
+              ),
             'hintText' => Property(
                 'HintText',
                 _normalizeToStringList(
@@ -121,6 +144,7 @@ mixin FromMapToMap {
                     value.split(',').map((e) => e.toString()).toList()),
                 type: List<String>,
               ),
+
             'textFunction' => Property(
                 'generateTextFunction',
                 value ?? '',
@@ -130,6 +154,15 @@ mixin FromMapToMap {
                 'link',
                 value ?? '',
                 type: String,
+              ),
+            'type' => Property(
+                'type',
+                sourceVariableTypes.contains(value?.toString())
+                    ? SourceVariableType(value.toString())
+                    : value ?? '',
+                type: sourceVariableTypes.contains(value?.toString())
+                    ? SourceVariableType
+                    : String,
               ),
             'required' => Property('обязательное', value == 'true', type: bool),
             'margin' => Property(
@@ -416,6 +449,8 @@ mixin FromMapToMap {
         return ComponentText('');
       case 'variable':
         return SourceVariable('');
+      case 'variableGroup':
+        return SourceVariableGroup('');
       case 'textField':
         return FormTextField('');
       case 'radio':

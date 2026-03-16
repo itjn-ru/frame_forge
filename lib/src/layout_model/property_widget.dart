@@ -23,8 +23,12 @@ import 'property_margin_widget.dart';
 import 'property_offset_widget.dart';
 import 'property_padding_widget.dart';
 import 'property_size_widget.dart';
+import 'property_source_variable_type_widget.dart';
+import 'property_source_widget.dart';
 import 'property_style_widget.dart';
 import 'property_uuid_widget.dart';
+import 'source_reference.dart';
+import 'source_variable.dart';
 import 'style.dart';
 
 /// Base class for property widgets - kept for backward compatibility
@@ -77,6 +81,11 @@ class PropertyWidget extends StatelessWidget {
         return PropertyBoolWidget(controller, propertyKey) as PropertyWidget;
       case const (List<String>):
         return PropertyListWidget(controller, propertyKey);
+      case const (SourceReference):
+        return PropertySourceWidget(controller, propertyKey) as PropertyWidget;
+      case const (SourceVariableType):
+        return PropertySourceVariableTypeWidget(controller, propertyKey)
+            as PropertyWidget;
       default:
         return PropertyWidget(controller, propertyKey);
     }
