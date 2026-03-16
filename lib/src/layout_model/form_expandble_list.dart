@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'component.dart';
 import 'component_group.dart';
 import 'property.dart';
+import 'source_reference.dart';
 
 class FormExpandbleList extends LayoutComponent {
   FormExpandbleList(String name) : super('expandblelist', name) {
@@ -12,7 +13,8 @@ class FormExpandbleList extends LayoutComponent {
       const Size(360, 30),
       type: Size,
     );
-    properties['source'] = Property('source', '');
+    properties['source'] =
+        Property('source', SourceReference(), type: SourceReference);
     items.add(ComponentGroup('header'));
   }
 }

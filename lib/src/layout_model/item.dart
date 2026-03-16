@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 
 import 'from_map_to_map_mixin.dart';
 import 'property.dart';
+import 'source_reference.dart';
 import 'style.dart';
 
 /// Base class for all layout elements in Frame Forge.
@@ -37,8 +38,12 @@ class Item with FromMapToMap {
   /// Accesses a property value by [name].
   ///
   /// Returns the value of the property with the given name, or null if not found.
+  /// For [SourceReference] values, returns the string representation
+  /// so that widget code can use it as a String without changes.
   dynamic operator [](String name) {
-    return properties[name]?.value;
+    final dynamic value = properties[name]?.value;
+    if (value is SourceReference) return value.toString();
+    return value;
   }
 
   /// Gets the unique identifier for this item.

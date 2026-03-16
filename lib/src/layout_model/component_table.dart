@@ -1,11 +1,13 @@
 import 'component.dart';
 import 'item.dart';
 import 'property.dart';
+import 'source_reference.dart';
 import 'style.dart';
 
 class ComponentTable extends LayoutComponent {
   ComponentTable(String name) : super('table', name) {
-    properties['source'] = Property('source', '');
+    properties['source'] =
+        Property('source', SourceReference(), type: SourceReference);
     items.add(ComponentTableColumn('column'));
 
     final ComponentTableRow row = ComponentTableRow('row');
@@ -45,7 +47,8 @@ class ComponentTableRow extends Item {
 class ComponentTableCell extends Item {
   ComponentTableCell(String name) : super('cell', name) {
     properties['text'] = Property('text', '');
-    properties['source'] = Property('source', '');
+    properties['source'] =
+        Property('source', SourceReference(), type: SourceReference);
     properties['style'] = Property('style', Style.basic, type: Style);
   }
 }
