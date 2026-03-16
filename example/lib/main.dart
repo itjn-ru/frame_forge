@@ -4,6 +4,7 @@ import 'package:example/local/web_download_service.dart';
 import 'package:example/maket_page_components_column.dart';
 import 'package:example/maket_page_example_view.dart';
 import 'package:example/maket_page_properties_column.dart';
+import 'package:example/template_appbar_example_json_button.dart';
 import 'package:example/template_appbar_export_button.dart';
 import 'package:example/template_appbar_import_button.dart';
 import 'package:file_picker/file_picker.dart';
@@ -103,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
           TemplateAppbarImportButtonExample(_layoutModelController),
           TemplateAppbarImportButton(_layoutModelController),
           TemplateAppbarExportButton(_layoutModelController),
+          TemplateAppbarExampleJsonButton(_layoutModelController),
         ],
       ),
       body: Row(
