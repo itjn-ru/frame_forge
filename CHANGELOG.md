@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.6] - 2026-03-19
+
+### Changed
+
+- Split `source` property into plain string `source` and `sourceV2` (SourceReference) across all components
+- Added SourceReference XML serialization/deserialization in file.dart
+- Updated `FromMapToMap` mixin to handle both `source` and `sourceV2` keys
+
 ## [1.1.5] - 2026-01-25
 
 ### Added
