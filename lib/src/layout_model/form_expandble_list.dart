@@ -13,7 +13,8 @@ class FormExpandbleList extends LayoutComponent {
       const Size(360, 30),
       type: Size,
     );
-    properties['source'] =
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] =
         Property('source', SourceReference(), type: SourceReference);
     items.add(ComponentGroup('header'));
   }

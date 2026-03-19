@@ -6,6 +6,7 @@ import 'style.dart';
 class ComponentGroup extends LayoutComponent {
   ComponentGroup(String name) : super('group', name) {
     properties['style'] = Property('style', Style.basic, type: Style);
-    properties['source'] = Property('источник', SourceReference(), type: SourceReference);
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] = Property('source', SourceReference(), type: SourceReference);
   }
 }

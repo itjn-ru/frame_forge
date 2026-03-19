@@ -5,6 +5,7 @@ import 'package:xml/xml.dart';
 import 'item.dart';
 import 'property.dart';
 import 'root.dart';
+import 'source_reference.dart';
 import 'style.dart';
 
 /// Saves a layout model map to XML format
@@ -222,6 +223,13 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
                 );
                 builder.attribute('borderSide', property.value.side);
                 break;
+              case const (SourceReference):
+                final SourceReference ref =
+                    property.value as SourceReference;
+                builder.attribute('variableName', ref.variableName);
+                builder.attribute('mapKey', ref.mapKey);
+                builder.attribute('nullable', ref.nullable.toString());
+                break;
               //case XFile:
               //  builder.cdata(base64Encode(property.value));
               default:
@@ -433,6 +441,15 @@ Map<String, Property> _readProperties(XmlElement? xmlProperties) {
         );
         break;
       case 'color':
+        break;
+      case 'sourceV2':
+        propertyValue = SourceReference(
+          variableName:
+              xmlProperty.getAttribute('variableName') ?? '',
+          mapKey: xmlProperty.getAttribute('mapKey') ?? '',
+          nullable:
+              xmlProperty.getAttribute('nullable') == 'true',
+        );
         break;
       default:
         if (xmlValue.isNotEmpty) {

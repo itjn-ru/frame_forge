@@ -111,6 +111,10 @@ mixin FromMapToMap {
           switch (key) {
             'source' => Property(
                 'source',
+                value?.toString() ?? '',
+              ),
+            'sourceV2' => Property(
+                'source',
                 value is Map
                     ? SourceReference(
                         variableName:

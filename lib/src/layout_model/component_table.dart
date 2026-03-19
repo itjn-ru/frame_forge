@@ -6,7 +6,8 @@ import 'style.dart';
 
 class ComponentTable extends LayoutComponent {
   ComponentTable(String name) : super('table', name) {
-    properties['source'] =
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] =
         Property('source', SourceReference(), type: SourceReference);
     items.add(ComponentTableColumn('column'));
 
@@ -47,7 +48,8 @@ class ComponentTableRow extends Item {
 class ComponentTableCell extends Item {
   ComponentTableCell(String name) : super('cell', name) {
     properties['text'] = Property('text', '');
-    properties['source'] =
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] =
         Property('source', SourceReference(), type: SourceReference);
     properties['style'] = Property('style', Style.basic, type: Style);
   }
