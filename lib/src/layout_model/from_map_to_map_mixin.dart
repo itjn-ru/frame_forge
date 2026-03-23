@@ -72,14 +72,13 @@ mixin FromMapToMap {
               'y': property.value.y
             },
           const (SourceReference) => <String, String>{
-              'variableName':
-                  (property.value as SourceReference).variableName,
+              'variableName': (property.value as SourceReference).variableName,
               'mapKey': (property.value as SourceReference).mapKey,
               'nullable':
                   (property.value as SourceReference).nullable.toString(),
             },
           const (SourceVariableType) =>
-              (property.value as SourceVariableType).value,
+            (property.value as SourceVariableType).value,
           _ => property.value.toString(),
         };
       } catch (e) {
@@ -111,15 +110,17 @@ mixin FromMapToMap {
           switch (key) {
             'source' => Property(
                 'source',
+                value?.toString() ?? '',
+              ),
+            'sourceV2' => Property(
+                'source',
                 value is Map
                     ? SourceReference(
-                        variableName:
-                            value['variableName']?.toString() ?? '',
+                        variableName: value['variableName']?.toString() ?? '',
                         mapKey: value['mapKey']?.toString() ?? '',
                         nullable: value['nullable']?.toString() != 'false',
                       )
-                    : SourceReference.fromString(
-                        value?.toString() ?? ''),
+                    : SourceReference.fromString(value?.toString() ?? ''),
                 type: SourceReference,
               ),
             'hintText' => Property(
@@ -144,7 +145,6 @@ mixin FromMapToMap {
                     value.split(',').map((e) => e.toString()).toList()),
                 type: List<String>,
               ),
-
             'textFunction' => Property(
                 'generateTextFunction',
                 value ?? '',

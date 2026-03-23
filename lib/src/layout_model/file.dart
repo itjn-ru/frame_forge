@@ -5,6 +5,7 @@ import 'package:xml/xml.dart';
 import 'item.dart';
 import 'property.dart';
 import 'root.dart';
+import 'source_reference.dart';
 import 'style.dart';
 
 /// Saves a layout model map to XML format
@@ -35,7 +36,7 @@ String saveMap(Map root) {
 ///
 /// [builder] The XML builder to append properties to
 /// [properties] The properties map to serialize
-_saveMapProperties(XmlBuilder builder, Map properties) {
+void _saveMapProperties(XmlBuilder builder, Map properties) {
   builder.element(
     'properties',
     nest: () {
@@ -62,7 +63,7 @@ _saveMapProperties(XmlBuilder builder, Map properties) {
 ///
 /// [builder] The XML builder to append items to
 /// [items] The items list to serialize
-_saveMapItems(XmlBuilder builder, List items) {
+void _saveMapItems(XmlBuilder builder, List items) {
   builder.element(
     'items',
     nest: () {
@@ -189,7 +190,7 @@ String save(Root root) {
   return document.toXmlString(pretty: true);
 }
 
-_saveProperties(XmlBuilder builder, Map<String, Property> properties) {
+void _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
   builder.element(
     'properties',
     nest: () {
@@ -222,6 +223,12 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
                 );
                 builder.attribute('borderSide', property.value.side);
                 break;
+              case const (SourceReference):
+                final SourceReference ref = property.value as SourceReference;
+                builder.attribute('variableName', ref.variableName);
+                builder.attribute('mapKey', ref.mapKey);
+                builder.attribute('nullable', ref.nullable.toString());
+                break;
               //case XFile:
               //  builder.cdata(base64Encode(property.value));
               default:
@@ -234,7 +241,7 @@ _saveProperties(XmlBuilder builder, Map<String, Property> properties) {
   );
 }
 
-_saveItems(XmlBuilder builder, List<Item> items) {
+void _saveItems(XmlBuilder builder, List<Item> items) {
   builder.element(
     'items',
     nest: () {
@@ -433,6 +440,13 @@ Map<String, Property> _readProperties(XmlElement? xmlProperties) {
         );
         break;
       case 'color':
+        break;
+      case 'sourceV2':
+        propertyValue = SourceReference(
+          variableName: xmlProperty.getAttribute('variableName') ?? '',
+          mapKey: xmlProperty.getAttribute('mapKey') ?? '',
+          nullable: xmlProperty.getAttribute('nullable') == 'true',
+        );
         break;
       default:
         if (xmlValue.isNotEmpty) {

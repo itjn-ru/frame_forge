@@ -8,8 +8,9 @@ import 'source_reference.dart';
 class ComponentText extends LayoutComponent {
   ComponentText(String name) : super('text', name) {
     properties['text'] = Property('text', '');
-    properties['source'] =
-        Property('источник', SourceReference(), type: SourceReference);
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] =
+        Property('source', SourceReference(), type: SourceReference);
     properties['alignment'] = Property(
       'alignment',
       Alignment.centerLeft,

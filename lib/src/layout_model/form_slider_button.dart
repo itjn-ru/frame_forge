@@ -7,7 +7,8 @@ import 'source_reference.dart';
 class FormSliderButton extends LayoutComponent {
   FormSliderButton(String name) : super('sliderButton', name) {
     properties['text'] = Property('text', '');
-    properties['source'] =
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] =
         Property('source', SourceReference(), type: SourceReference);
     properties['activeColors'] = Property(
       'activeColors',

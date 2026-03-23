@@ -9,7 +9,8 @@ class FormTextField extends LayoutComponent {
     properties['text'] = Property('text', '');
     properties['caption'] = Property('caption', '');
     properties['text_button'] = Property('текст кнопки', '');
-    properties['source'] =
+    properties['source'] = Property('source', '');
+    properties['sourceV2'] =
         Property('source', SourceReference(), type: SourceReference);
     properties['alignment'] =
         Property('alignment', Alignment.centerLeft, type: Alignment);
