@@ -1,6 +1,5 @@
 # Changelog
 
-<<<<<<< HEAD
 ## [1.1.6] - 2026-03-16
 
 ### Added
@@ -22,15 +21,11 @@
 - Library exports sorted alphabetically; added exports for `SourceReference`, `SourceVariableGroup`, and `SourceVariableType`.
 - `library frame_forge;` changed to `library;` (unnamed library).
 - Serialization (`FromMapToMap`) updated to handle `SourceReference` and `SourceVariableType` round-trip.
-=======
-## [1.1.6] - 2026-03-19
 
-### Changed
+### Fixed
 
-- Split `source` property into plain string `source` and `sourceV2` (SourceReference) across all components
-- Added SourceReference XML serialization/deserialization in file.dart
-- Updated `FromMapToMap` mixin to handle both `source` and `sourceV2` keys
->>>>>>> f22e55325c607ee774123bb6cd99fc77aee7e95f
+- Fixed `source` import from XML: when `<source>` has attributes (`variableName`, `mapKey`, `nullable`), correctly extract variable name instead of dumping the raw map
+- Fallback: if `sourceV2` is absent, automatically create it from `source` (supports both plain string and Map with attributes)
 
 ## [1.1.5] - 2026-01-25
 

@@ -110,7 +110,13 @@ mixin FromMapToMap {
           switch (key) {
             'source' => Property(
                 'source',
-                value?.toString() ?? '',
+                value is Map
+                    ? SourceReference(
+                        variableName: value['variableName']?.toString() ?? '',
+                        mapKey: value['mapKey']?.toString() ?? '',
+                        nullable: value['nullable']?.toString() != 'false',
+                      ).toString()
+                    : value?.toString() ?? '',
               ),
             'sourceV2' => Property(
                 'source',
@@ -371,6 +377,26 @@ mixin FromMapToMap {
             _ => Property(key, value),
           });
     });
+
+    // If sourceV2 is missing, fall back to source
+    if (!properties.containsKey('sourceV2') && map.containsKey('source')) {
+      final dynamic sourceRaw = map['source'];
+      final SourceReference ref = sourceRaw is Map
+          ? SourceReference(
+              variableName: sourceRaw['variableName']?.toString() ?? '',
+              mapKey: sourceRaw['mapKey']?.toString() ?? '',
+              nullable: sourceRaw['nullable']?.toString() != 'false',
+            )
+          : SourceReference.fromString(sourceRaw?.toString() ?? '');
+      if (ref.isNotEmpty) {
+        properties['sourceV2'] = Property(
+          'source',
+          ref,
+          type: SourceReference,
+        );
+      }
+    }
+
     return properties;
   }
 
