@@ -15,5 +15,6 @@ class FormTextField extends LayoutComponent {
     properties['alignment'] =
         Property('alignment', Alignment.centerLeft, type: Alignment);
     properties['required'] = Property('isRequired', false, type: bool);
+    properties['multiline'] = Property('isMultiline', false, type: bool);
   }
 }

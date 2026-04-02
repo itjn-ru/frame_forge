@@ -171,6 +171,8 @@ mixin FromMapToMap {
                     : String,
               ),
             'required' => Property('обязательное', value == 'true', type: bool),
+            'multiline' =>
+              Property('многострочный', value == 'true', type: bool),
             'margin' => Property(
                 'Margin',
                 value.split(',').map((e) => int.tryParse(e) ?? 0).toList(),
