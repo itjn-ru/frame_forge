@@ -18,7 +18,9 @@ class ComponentRootMenu extends ComponentAndSourceMenu {
         label: 'Add Page',
         icon: Icons.add,
         onSelected: () {
-          final ComponentPage item = ComponentPage('page');
+          // Auto-generated unique name keeps pages distinguishable.
+          final ComponentPage item =
+              ComponentPage(controller.layoutModel.nextPageName());
           controller.layoutModel.addItem(target, item);
           onChanged!(AddItemEvent(id: item.id));
         },

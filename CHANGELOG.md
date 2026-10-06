@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.0] - 2026-03-17
+
+### Added
+
+- Master-detail page navigation for layouts with many component pages (50+):
+  - `PageList` widget — searchable, virtualized list of pages with the current page highlighted (theme-aware Material 3 colors), add-page toolbar button, double-tap rename and a context menu (rename / duplicate / delete).
+  - `PageQuickSwitcher` + `showPageQuickSwitcher()` — quick page switcher dialog (Ctrl+K) with keyboard navigation over `RawAutocomplete`.
+  - `GlobalKeyboardHandler` now opens the quick switcher on Ctrl+K (requires the editor Scaffold to keep `kNodeEditorWidgetKey`).
+  - `FrameForgeStrings` — centralized user-facing strings for the new widgets (first step towards full localization, see `doc/ux_audit.md`).
+- `LayoutModel.componentPages` — all component pages in order.
+- `LayoutModel.nextPageName()` — unique auto-generated page names (`page`, `page 2`, ...).
+- `LayoutModel.copyPage()` — deep copy of a page with fresh unique ids.
+- `LayoutModelController.switchPage()` — single entry point for switching the current page (updates `curPage`, `curPageType` and selection).
+- `LayoutModelController.currentComponentPage` — the component page currently open, with fallbacks when the selection lives outside component pages.
+- `LayoutModelController.addPage()` / `duplicatePage()` / `renamePage()` / `deletePage()` — undoable page operations (delete keeps at least one page and selects the neighbour).
+- Example app: the Pages tab is now master-detail (`PageList` + component tree of the current page only) instead of the full tree of all pages.
+- Tests for page management (`test/page_management_test.dart`).
+
+### Fixed
+
+- `items.dart`: tapping a page row in the tree now switches the editor to that page via `switchPage` (the previous `curPageType is ComponentPage` check was always false).
+- `items.dart` / `process_items.dart`: context menu no longer crashes with a null position when opened without a prior mouse hover (menu key / keyboard).
+
 ## [1.1.6] - 2026-03-16
 
 ### Added

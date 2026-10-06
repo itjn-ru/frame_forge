@@ -18,6 +18,7 @@ At its core, it uses XML to define the UI structure, making it ideal for applica
 - **Real-time Preview** - See changes instantly as you design
 - **Multi-screen Support** - Design for mobile, tablet, and desktop simultaneously
 - **Grid-based Layout** - Precise positioning with snap-to-grid functionality
+- **Page navigation (master-detail)** - Searchable page list for layouts with 50+ pages: `PageList`, quick switcher **Ctrl+K**, rename/duplicate/delete pages (all undoable)
 
 ### Architecture & Integration
 - **XML-based Structure** - Clean, readable markup defines UI components and properties
@@ -59,6 +60,28 @@ dependencies:
 ```
 
 ## Usage
+
+### Page navigation (layouts with many ComponentPages)
+
+For layouts with dozens of pages use master-detail: a page list on top
+(`PageList`: search, virtualization, context menu) and the component tree of the
+current page only below it.
+
+```dart
+Column(
+  children: [
+    Flexible(flex: 3, child: PageList(controller)),
+    Flexible(
+      flex: 4,
+      child: Items(controller.currentComponentPage, controller),
+    ),
+  ],
+)
+```
+
+Programmatic page management: `controller.switchPage(page)`, `addPage()`,
+`duplicatePage(page)`, `renamePage(page, name)`, `deletePage(page)` — all undoable.
+Quick switcher: **Ctrl+K** (the editor Scaffold must use `kNodeEditorWidgetKey`).
 
 ### Create DSL Model
 - Add required screen sizes for LayoutModel.

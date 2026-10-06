@@ -39,7 +39,10 @@ class _MaketPageComponentsColumnState extends State<MaketPageComponentsColumn>
             onTap: (value) {
               switch (value) {
                 case 0:
-                  widget.controller.layoutModel.curPageType = ComponentPage;
+                  // Return selection to the current component page so the
+                  // canvas shows components, not the previously open tab.
+                  widget.controller
+                      .switchPage(widget.controller.currentComponentPage);
                   break;
                 case 1:
                   widget.controller.layoutModel.curPageType = SourcePage;
@@ -61,12 +64,34 @@ class _MaketPageComponentsColumnState extends State<MaketPageComponentsColumn>
             child: TabBarView(
               controller: _tabController,
               children: [
-                ListView(
-                  shrinkWrap: true,
+                // Pages tab: master-detail. The master is a searchable,
+                // virtualized list of pages (PageList); the detail is the
+                // component tree of the currently open page only. This
+                // keeps the panel usable with dozens of pages.
+                Column(
                   children: [
-                    Items(
-                      widget.controller.layoutModel.root,
-                      widget.controller,
+                    Flexible(
+                      flex: 3,
+                      child: PageList(widget.controller,
+                          showSearchBar: true, showQuickSwitcher: false),
+                    ),
+                    const Divider(height: 1),
+                    Flexible(
+                      flex: 4,
+                      child: ValueListenableBuilder<String?>(
+                        valueListenable: widget.controller.selectedIdNotifier,
+                        builder: (BuildContext context, String? _, __) {
+                          return ListView(
+                            shrinkWrap: true,
+                            children: [
+                              Items(
+                                widget.controller.currentComponentPage,
+                                widget.controller,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
