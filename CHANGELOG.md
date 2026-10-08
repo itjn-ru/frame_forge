@@ -1,6 +1,14 @@
 # Changelog
 
-## [1.2.0] - 2026-03-17
+## [1.3.0] - 2026-10-08
+
+### Added
+
+- `FrameForgeStrings` fields are now mutable so a host app can localize the
+  built-in editor widgets (`PageList`, quick switcher, rename dialog) once
+  at startup — e.g. assigning Russian labels in an admin app.
+
+## [1.2.0] - 2026-10-08
 
 ### Added
 
