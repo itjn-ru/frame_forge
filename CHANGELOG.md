@@ -8,7 +8,7 @@
   - `PageList` widget — searchable, virtualized list of pages with the current page highlighted (theme-aware Material 3 colors), add-page toolbar button, double-tap rename and a context menu (rename / duplicate / delete).
   - `PageQuickSwitcher` + `showPageQuickSwitcher()` — quick page switcher dialog (Ctrl+K) with keyboard navigation over `RawAutocomplete`.
   - `GlobalKeyboardHandler` now opens the quick switcher on Ctrl+K (requires the editor Scaffold to keep `kNodeEditorWidgetKey`).
-  - `FrameForgeStrings` — centralized user-facing strings for the new widgets (first step towards full localization, see `doc/ux_audit.md`).
+  - `FrameForgeStrings` — centralized user-facing strings for the new widgets; fields are mutable so a host app can localize the built-in editor widgets once at startup, e.g. assigning Russian labels in the admin app (first step towards full localization, see `doc/ux_audit.md`).
 - `LayoutModel.componentPages` — all component pages in order.
 - `LayoutModel.nextPageName()` — unique auto-generated page names (`page`, `page 2`, ...).
 - `LayoutModel.copyPage()` — deep copy of a page with fresh unique ids.

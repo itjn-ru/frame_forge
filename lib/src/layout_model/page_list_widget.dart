@@ -205,11 +205,11 @@ class _PageListState extends State<PageList> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text(FrameForgeStrings.renameDialogTitle),
+          title: Text(FrameForgeStrings.renameDialogTitle),
           content: TextField(
             controller: nameController,
             autofocus: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: FrameForgeStrings.renameDialogLabel,
             ),
             onSubmitted: (String value) =>
@@ -218,12 +218,12 @@ class _PageListState extends State<PageList> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text(FrameForgeStrings.renameDialogCancel),
+              child: Text(FrameForgeStrings.renameDialogCancel),
             ),
             FilledButton(
               onPressed: () =>
                   Navigator.of(dialogContext).pop(nameController.text),
-              child: const Text(FrameForgeStrings.renameDialogSave),
+              child: Text(FrameForgeStrings.renameDialogSave),
             ),
           ],
         );

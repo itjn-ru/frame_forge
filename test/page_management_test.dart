@@ -11,7 +11,7 @@ void main() {
     );
     controller = LayoutModelController(
       layoutModel: layoutModel,
-      projectSaver: (Map map) async => true,
+      projectSaver: (Map<dynamic, dynamic> map) async => true,
       projectLoader: (bool isSaved) async => null,
     );
   });
