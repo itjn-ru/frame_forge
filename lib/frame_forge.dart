@@ -40,12 +40,15 @@ export 'src/layout_model/items.dart';
 export 'src/layout_model/layout_model.dart';
 export 'src/layout_model/menu.dart';
 export 'src/layout_model/page.dart';
+export 'src/layout_model/page_list_widget.dart';
+export 'src/layout_model/page_quick_switcher.dart';
 export 'src/layout_model/process_items.dart';
 export 'src/layout_model/properties.dart';
 export 'src/layout_model/screen_size_enum.dart';
 export 'src/layout_model/source_reference.dart';
 export 'src/layout_model/source_variable.dart';
 export 'src/layout_model/source_variable_group.dart';
+export 'src/layout_model/strings.dart';
 export 'src/layout_model/style.dart';
 // UI Kit components
 export 'src/ui_kit/ui_kit.dart';

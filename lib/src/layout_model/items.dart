@@ -92,15 +92,6 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
       child = ItemWidget(item);
     }
 
-    final Type curPageType = switch (widget._item.runtimeType) {
-      const (SourcePage) => SourcePage,
-      const (StylePage) => StylePage,
-      const (ProcessPage) => ProcessPage,
-      _ => ComponentPage,
-    };
-
-    // final curItem = widget.controller.layoutModel.curItemOnPage[curPageType];
-
     return InkWell(
       child: DecoratedBox(
         //padding: const EdgeInsets.only(left: 5,  right: 5),
@@ -119,14 +110,13 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
         if (item.id == selectedId) {
           return;
         }
-        if (curPageType is ComponentPage) {
-          widget.controller.layoutModel.curComponentItem = item;
+        // Tapping a page row switches the editor to that page,
+        // keeping curPage/selection in sync via the controller.
+        if (item is ComponentPage) {
+          widget.controller.switchPage(item);
+        } else {
+          widget.controller.select(item.id);
         }
-        // widget.controller.layoutModel.curItem = item;
-        // setState(() {
-        //   widget.controller.layoutModel.curItem = item;
-        // });
-        widget.controller.select(item.id);
       },
     );
   }
@@ -164,9 +154,12 @@ class ItemWidgetState extends State<ItemWidget> {
           if (widget.item == controller.layoutModel.curItem) {
             return;
           }
-          // controller.layoutModel.curItem = widget.item;
-          controller.select(widget.item.id);
-          // controller.eventBus.emit(SelectionEvent(id: const Uuid().v4(), itemId: widget.item.id));
+          // Page rows switch the whole editor to that page.
+          if (widget.item is ComponentPage) {
+            controller.switchPage(widget.item as ComponentPage);
+          } else {
+            controller.select(widget.item.id);
+          }
           setState(() {});
         },
         onSecondaryTap: () {
@@ -179,7 +172,7 @@ class ItemWidgetState extends State<ItemWidget> {
           createAndShowContextMenu(
             context,
             entries: menuItems,
-            position: position!,
+            position: position ?? Offset.zero,
           );
           if (widget.item == controller.layoutModel.curItem) {
             return;

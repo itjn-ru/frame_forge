@@ -191,6 +191,103 @@ class LayoutModelController {
     return searchInItems(<Item>[layoutModel.root], item);
   }
 
+  // --- Page navigation and management (master-detail pattern) ---
+
+  /// Switches the editor to the given component [page].
+  ///
+  /// Updates the model's current page, focuses selection on the page and
+  /// emits a [SelectionEvent] so the canvas and trees rebuild.
+  void switchPage(ComponentPage page) {
+    layoutModel.curPageType = ComponentPage;
+    layoutModel.curPage = page;
+    if (selectedId != page.id) {
+      select(page.id);
+    }
+  }
+
+  /// The component page that is currently open in the editor.
+  ///
+  /// Falls back to the model's current page when the selection lives
+  /// outside component pages (e.g. on data sources or styles).
+  ComponentPage get currentComponentPage {
+    final ComponentAndSourcePage page = getCurrentPage();
+    if (page is ComponentPage) return page;
+    if (layoutModel.curPage is ComponentPage) {
+      return layoutModel.curPage as ComponentPage;
+    }
+    return layoutModel.componentPages.first;
+  }
+
+  /// Creates a new component page with an auto-generated unique name
+  /// and switches to it (undoable).
+  void addPage({String? name}) {
+    final ComponentPage page =
+        ComponentPage(name ?? layoutModel.nextPageName());
+    final int indexLastPage = layoutModel.root.items.lastIndexWhere(
+        (Item element) => element.runtimeType == ComponentPage);
+    final int index = indexLastPage + 1;
+    _pushAction(InsertAction(
+        parent: layoutModel.root, snapshot: page, index: index));
+    applyInsertDirect(layoutModel.root, page, index: index);
+    switchPage(page);
+  }
+
+  /// Duplicates [page] with fresh identifiers and switches to the copy
+  /// (undoable).
+  void duplicatePage(ComponentPage page) {
+    final String baseName = (page['name'] ?? 'page').toString();
+    final ComponentPage copy =
+        layoutModel.copyPage(page, name: _uniqueCopyName(baseName));
+    final int index = layoutModel.root.items.indexOf(page) + 1;
+    _pushAction(InsertAction(
+        parent: layoutModel.root, snapshot: copy, index: index));
+    applyInsertDirect(layoutModel.root, copy, index: index);
+    switchPage(copy);
+  }
+
+  String _uniqueCopyName(String base) {
+    final Set<String> used = layoutModel.componentPages
+        .map((ComponentPage p) => (p['name'] ?? '').toString().trim())
+        .toSet();
+    if (!used.contains('$base copy')) return '$base copy';
+    for (int i = 2;; i++) {
+      final String candidate = '$base copy $i';
+      if (!used.contains(candidate)) return candidate;
+    }
+  }
+
+  /// Renames [page] and refreshes the properties panel.
+  void renamePage(ComponentPage page, String name) {
+    final String trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    page.properties['name']?.value = trimmed;
+    select(page.id);
+    eventBus.emit(AttributeChangeEvent(
+      id: const Uuid().v4(),
+      itemId: page.id,
+      changes: <String, dynamic>{'name': trimmed},
+    ));
+  }
+
+  /// Deletes [page] (undoable) and switches to its neighbour.
+  ///
+  /// Keeps at least one component page in the layout.
+  void deletePage(ComponentPage page) {
+    final List<ComponentPage> pages = layoutModel.componentPages;
+    if (pages.length <= 1) return;
+    final int index = pages.indexOf(page);
+    if (index < 0) return;
+    final ComponentPage neighbor = index + 1 < pages.length
+        ? pages[index + 1]
+        : pages[index - 1];
+    select(page.id);
+    deleteSelected();
+    if (layoutModel.curPage == page) {
+      layoutModel.curPage = neighbor;
+    }
+    select(neighbor.id);
+  }
+
   /// This method is used to dispose of the node editor controller and all of its resources, subsystems and members.
   void dispose() {
     eventBus.close();

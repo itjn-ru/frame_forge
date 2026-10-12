@@ -13,6 +13,15 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - build/**
+<<<<<<< HEAD
+=======
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+>>>>>>> 9eee6ec0f3224b3600263687601b65c939b3fbbf
   plugins:
     - dart_code_metrics
 linter:

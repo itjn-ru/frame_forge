@@ -90,6 +90,57 @@ class LayoutModel with FromMapToMap {
     return root.items.whereType<ProcessPage>().first;
   }
 
+  /// Gets all component pages of the layout, in their current order.
+  ///
+  /// Layouts may contain dozens of pages; this getter is the single
+  /// source of truth for page navigation widgets.
+  List<ComponentPage> get componentPages =>
+      root.items.whereType<ComponentPage>().toList();
+
+  /// Generates the next free page name, like 'page', 'page 2', 'page 3'...
+  ///
+  /// Skips names already used by existing component pages so new pages
+  /// are always distinguishable in the page list.
+  String nextPageName() {
+    final Set<String> used = componentPages
+        .map((ComponentPage page) => (page['name'] ?? '').toString().trim())
+        .toSet();
+    for (int i = 1;; i++) {
+      final String candidate = i == 1 ? 'page' : 'page ' + i.toString();
+      if (!used.contains(candidate)) return candidate;
+    }
+  }
+
+  /// Creates a deep copy of [page] with fresh unique identifiers.
+  ///
+  /// Used for page duplication: the copy keeps all child components and
+  /// properties, but every item receives a new id so the copy can safely
+  /// live beside the original. An optional [name] overrides the copy's name.
+  ComponentPage copyPage(ComponentPage page, {String? name}) {
+    final Map<String, dynamic> map = <String, dynamic>{
+      'type': page.type,
+      'properties': propertiesToMap(page),
+      'items': itemsToMap(page),
+    };
+    final List<Item> copies = _itemsFromMap(root, <dynamic>[map]);
+    final Item copy =
+        copies.isEmpty ? ComponentPage(name ?? 'page') : copies.first;
+    _assignNewIds(copy);
+    _setPageForItem(copy as ComponentAndSourcePage, copy);
+    if (name != null && name.trim().isNotEmpty) {
+      copy.properties['name']?.value = name.trim();
+    }
+    return copy as ComponentPage;
+  }
+
+  /// Recursively assigns fresh uuids to [item] and all its children.
+  void _assignNewIds(Item item) {
+    item.properties['id']?.value = const Uuid().v4();
+    for (final Item child in item.items) {
+      _assignNewIds(child);
+    }
+  }
+
   /// Gets all available styles
   ///
   /// Returns a list of [Style] objects extracted from the style page.

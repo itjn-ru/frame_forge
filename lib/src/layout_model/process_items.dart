@@ -161,7 +161,7 @@ class _ItemWrapperState extends State<ItemWrapper> {
           createAndShowContextMenu(
             context,
             entries: menuItems,
-            position: position!,
+            position: position ?? Offset.zero,
           );
           if (widget.item == widget.controller.layoutModel.curItem) {
             return;

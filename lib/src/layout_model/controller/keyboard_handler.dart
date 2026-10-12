@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../item.dart';
+import '../page_quick_switcher.dart';
+import 'helpers/constants.dart';
 import 'layout_model_controller.dart';
 
 /// Global keyboard handler that processes shortcuts at the application level.
@@ -33,6 +35,16 @@ class GlobalKeyboardHandler {
     if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyY) {
       controller.redo();
       return true;
+    }
+
+    // Quick page switcher (Ctrl+K). Needs a host context to open the
+    // dialog: the editor Scaffold must use kNodeEditorWidgetKey.
+    if (isCtrl && event.physicalKey == PhysicalKeyboardKey.keyK) {
+      final BuildContext? editorContext = kNodeEditorWidgetKey.currentContext;
+      if (editorContext != null) {
+        showPageQuickSwitcher(editorContext, controller);
+        return true;
+      }
     }
 
     // Copy / Paste / Cut (only if not editing a text field)
