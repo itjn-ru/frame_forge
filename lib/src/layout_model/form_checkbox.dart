@@ -11,5 +11,6 @@ class FormCheckbox extends LayoutComponent {
         Property('source', SourceReference(), type: SourceReference);
     properties['caption'] = Property('caption', '');
     properties['style'] = Property('style', Style.basic, type: Style);
+    properties['required'] = Property('isRequired', false, type: bool);
   }
 }

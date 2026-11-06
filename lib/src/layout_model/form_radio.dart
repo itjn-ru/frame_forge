@@ -8,5 +8,6 @@ class FormRadio extends LayoutComponent {
     properties['source'] = Property('source', '');
     properties['sourceV2'] =
         Property('source', SourceReference(), type: SourceReference);
+    properties['required'] = Property('isRequired', false, type: bool);
   }
 }

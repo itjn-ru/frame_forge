@@ -35,5 +35,6 @@ class FormSliderButton extends LayoutComponent {
       0,
       type: int,
     );
+    properties['required'] = Property('isRequired', false, type: bool);
   }
 }
