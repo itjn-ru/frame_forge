@@ -35,7 +35,7 @@ void main() {
   }
 
   group('Items collapsible tree', () {
-    testWidgets('shows only the first level by default', (tester) async {
+    testWidgets('shows only the first level by default', (WidgetTester tester) async {
       await pumpTree(tester);
 
       expect(find.text('page'), findsOneWidget);
@@ -45,7 +45,7 @@ void main() {
     });
 
     testWidgets('expands a branch when its chevron is tapped',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
 
       // The collapsed 'group1' node is the only right-pointing chevron:
@@ -60,7 +60,7 @@ void main() {
     });
 
     testWidgets('collapses an expanded branch on chevron tap',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
       await tester.tap(find.byIcon(Icons.keyboard_arrow_right));
       await tester.pumpAndSettle();
@@ -72,7 +72,7 @@ void main() {
       expect(find.text('text1'), findsNothing);
     });
 
-    testWidgets('expand all reveals the whole tree', (tester) async {
+    testWidgets('expand all reveals the whole tree', (WidgetTester tester) async {
       await pumpTree(tester);
       expect(find.text('text1'), findsNothing);
 
@@ -84,7 +84,7 @@ void main() {
       expect(find.text('text1'), findsOneWidget);
     });
 
-    testWidgets('collapse all returns to the first level', (tester) async {
+    testWidgets('collapse all returns to the first level', (WidgetTester tester) async {
       await pumpTree(tester);
       await tester.tap(find.byIcon(Icons.unfold_more));
       await tester.pumpAndSettle();
@@ -97,7 +97,7 @@ void main() {
       expect(find.text('text1'), findsNothing);
     });
 
-    testWidgets('search shows matches and their ancestors', (tester) async {
+    testWidgets('search shows matches and their ancestors', (WidgetTester tester) async {
       await pumpTree(tester);
       expect(find.text('text1'), findsNothing);
 
@@ -123,7 +123,7 @@ void main() {
     });
 
     testWidgets('search without matches shows an empty state',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
 
       await tester.enterText(find.byType(TextField), 'does-not-exist');
@@ -134,7 +134,7 @@ void main() {
     });
 
     testWidgets('clearing search restores the filtered-out tree',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
 
       await tester.enterText(find.byType(TextField), 'text1');
@@ -148,7 +148,7 @@ void main() {
     });
 
     testWidgets('selecting a nested item on the canvas reveals its branch',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
       expect(find.text('text1'), findsNothing);
 
@@ -160,7 +160,7 @@ void main() {
       expect(controller.selectedId, childText.id);
     });
 
-    testWidgets('tapping a row selects the item', (tester) async {
+    testWidgets('tapping a row selects the item', (WidgetTester tester) async {
       await pumpTree(tester);
       await tester.tap(find.byIcon(Icons.keyboard_arrow_right));
       await tester.pumpAndSettle();
@@ -172,7 +172,7 @@ void main() {
     });
 
     testWidgets('tapping a page row switches the editor page',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
       controller.addPage(name: 'second');
       await tester.pumpAndSettle();
@@ -185,7 +185,7 @@ void main() {
     });
 
     testWidgets('expansion survives widget rebuilds (session memory)',
-        (tester) async {
+        (WidgetTester tester) async {
       await pumpTree(tester);
       await tester.tap(find.byIcon(Icons.keyboard_arrow_right));
       await tester.pumpAndSettle();
