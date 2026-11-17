@@ -1,5 +1,5 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:frame_forge/frame_forge.dart';
+import 'package:material_ui/material_ui.dart';
 
 class MaketPageComponentsColumn extends StatefulWidget {
   final LayoutModelController controller;
@@ -64,29 +64,14 @@ class _MaketPageComponentsColumnState extends State<MaketPageComponentsColumn>
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Pages tab: master-detail. The master is a searchable,
-                // virtualized list of pages (PageList); the detail is the
-                // component tree of the currently open page only. This
-                // keeps the panel usable with dozens of pages.
-                Column(
-                  children: [
-                    Flexible(
-                      flex: 3,
-                      child: PageList(widget.controller,
-                          showSearchBar: true, showQuickSwitcher: false),
-                    ),
-                    const Divider(height: 1),
-                    Flexible(
-                      flex: 4,
-                      // Items is a self-contained collapsible tree:
-                      // search field, expand/collapse-all buttons and
-                      // scrolling are built in.
-                      child: Items(
-                        widget.controller.currentComponentPage,
-                        widget.controller,
-                      ),
-                    ),
-                  ],
+                // Pages tab: one unified expandable tree. The top level
+                // lists the component pages; expanding a page reveals its
+                // component tree (search, expand/collapse-all and the page
+                // menus are built in).
+                PageList(
+                  widget.controller,
+                  showSearchBar: true,
+                  showQuickSwitcher: false,
                 ),
                 // Data sources: collapsible tree with search and
                 // expand/collapse-all controls.
