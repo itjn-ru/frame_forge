@@ -18,7 +18,7 @@ At its core, it uses XML to define the UI structure, making it ideal for applica
 - **Real-time Preview** - See changes instantly as you design
 - **Multi-screen Support** - Design for mobile, tablet, and desktop simultaneously
 - **Grid-based Layout** - Precise positioning with snap-to-grid functionality
-- **Page navigation (master-detail)** - Searchable page list for layouts with 50+ pages: `PageList`, quick switcher **Ctrl+K**, rename/duplicate/delete pages (all undoable)
+- **Unified page/component tree** - `PageList` renders pages and their components as one expandable tree: pages start collapsed, per-node expand/collapse, search across pages and components with auto-revealed matching branches, expand-all/collapse-all buttons, selection reveal (canvas picks scroll the tree to the item), quick switcher **Ctrl+K**, rename/duplicate/delete pages (all undoable), expansion memory per session
 - **Collapsible component tree** - `Items` renders components and nested items as an expandable/collapsible list: first level visible by default, per-node expand/collapse, search with auto-revealed matching branches, expand-all/collapse-all buttons, selection reveal (canvas picks scroll the tree to the item), expansion memory per session
 
 ### Architecture & Integration
@@ -62,21 +62,29 @@ dependencies:
 
 ## Usage
 
-### Page navigation (layouts with many ComponentPages)
+### Unified page/component tree (PageList)
 
-For layouts with dozens of pages use master-detail: a page list on top
-(`PageList`: search, virtualization, context menu) and the component tree of the
-current page only below it.
+`PageList` renders the whole component pages structure in one widget: the top
+level lists the component pages, and expanding a page reveals its component
+tree (nested groups expand the same way).
+
+- every page starts collapsed, so the widget opens as a compact list of pages,
+- tapping a page row makes it current; tapping a component row selects it —
+  when the component lives on another page, the editor first switches to that
+  page,
+- a search field filters pages and items by name and auto-reveals matching
+  branches,
+- toolbar buttons expand/collapse the whole tree,
+- expanded nodes are remembered per session, including across page switches,
+- selecting an item on the canvas auto-expands the branch up to it, highlights
+  it and scrolls it into view,
+- page rows keep double-tap rename and the right-click page menu
+  (rename / duplicate / delete); component rows keep the standard component
+  context menu.
 
 ```dart
-Column(
-  children: [
-    Flexible(flex: 3, child: PageList(controller)),
-    Flexible(
-      flex: 4,
-      child: Items(controller.currentComponentPage, controller),
-    ),
-  ],
+Scaffold(
+  body: PageList(controller, showQuickSwitcher: false),
 )
 ```
 
@@ -101,16 +109,11 @@ Both panels are optional: `Items(item, controller, showSearchBar: false)` hides
 the search field, `showToolbar: false` hides the expand/collapse-all buttons.
 
 ```dart
-Column(
-  children: [
-    Flexible(flex: 3, child: PageList(controller)),
-    Flexible(
-      flex: 4,
-      child: Items(controller.currentComponentPage, controller),
-    ),
-  ],
-)
+Items(controller.layoutModel.root.items.whereType<SourcePage>().first, controller)
 ```
+
+The same switches exist on `PageList`: `showSearchBar`, `showToolbar` and
+`showQuickSwitcher`.
 
 ### Create DSL Model
 - Add required screen sizes for LayoutModel.

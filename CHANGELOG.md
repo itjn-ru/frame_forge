@@ -1,5 +1,30 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- `PageList` is now a unified expandable tree of component pages and their
+  items, replacing the previous master-detail pair (pages-only list plus a
+  separate `Items` tree of the current page):
+  - the top level lists the component pages, every page starts collapsed,
+  - tapping a page chevron reveals its component tree (nested groups expand
+    the same way),
+  - tapping a page row makes it current; tapping a component row selects it —
+    when the component lives on another page, the editor first switches to
+    that page,
+  - search filters pages and items by name and auto-reveals matching branches,
+  - expand-all / collapse-all toolbar buttons (`showToolbar`, on by default);
+    collapse-all restores the default all-collapsed view,
+  - selecting an item on the canvas auto-expands the branch up to it,
+    highlights the row and scrolls it into view,
+  - page rows keep double-tap rename and the right-click page menu
+    (rename / duplicate / delete); component rows keep the standard component
+    context menu,
+  - expanded nodes are remembered per session and survive page switches and
+    tab changes; new params `showToolbar` alongside the existing
+    `showSearchBar` and `showQuickSwitcher`.
+
 ## [1.4.0] - 2026-11-17
 
 ### Added
