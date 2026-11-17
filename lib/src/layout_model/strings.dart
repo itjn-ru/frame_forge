@@ -37,4 +37,12 @@ class FrameForgeStrings {
   static String quickSwitcherTitle = 'Go to page';
   static String quickSwitcherHint = 'Type a page name...';
   static String quickSwitcherEmpty = 'No matching pages';
+
+  // Items tree (collapsible component navigation)
+  static String itemsSearchHint = 'Search items';
+  static String itemsSearchClear = 'Clear search';
+  static String itemsExpandAllTooltip = 'Expand all';
+  static String itemsCollapseAllTooltip = 'Collapse all';
+  static String itemsNoMatch = 'No matching items';
+  static String itemsEmpty = 'No items';
 }

@@ -78,44 +78,31 @@ class _MaketPageComponentsColumnState extends State<MaketPageComponentsColumn>
                     const Divider(height: 1),
                     Flexible(
                       flex: 4,
-                      child: ValueListenableBuilder<String?>(
-                        valueListenable: widget.controller.selectedIdNotifier,
-                        builder: (BuildContext context, String? _, __) {
-                          return ListView(
-                            shrinkWrap: true,
-                            children: [
-                              Items(
-                                widget.controller.currentComponentPage,
-                                widget.controller,
-                              ),
-                            ],
-                          );
-                        },
+                      // Items is a self-contained collapsible tree:
+                      // search field, expand/collapse-all buttons and
+                      // scrolling are built in.
+                      child: Items(
+                        widget.controller.currentComponentPage,
+                        widget.controller,
                       ),
                     ),
                   ],
                 ),
-                ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Items(
-                      widget.controller.layoutModel.root.items
-                          .whereType<SourcePage>()
-                          .first,
-                      widget.controller,
-                    ),
-                  ],
+                // Data sources: collapsible tree with search and
+                // expand/collapse-all controls.
+                Items(
+                  widget.controller.layoutModel.root.items
+                      .whereType<SourcePage>()
+                      .first,
+                  widget.controller,
                 ),
-                ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Items(
-                      widget.controller.layoutModel.root.items
-                          .whereType<StylePage>()
-                          .first,
-                      widget.controller,
-                    ),
-                  ],
+                // Styles: collapsible tree with search and
+                // expand/collapse-all controls.
+                Items(
+                  widget.controller.layoutModel.root.items
+                      .whereType<StylePage>()
+                      .first,
+                  widget.controller,
                 ),
               ],
             ),

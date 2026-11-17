@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.4.0] - 2026-11-17
+
+### Added
+
+- Collapsible component/item navigation tree — `Items` now renders the
+  hierarchy as an expandable list instead of the always-expanded nested tree:
+  - per-node expand/collapse chevrons; the first level is visible by default,
+  - search field filters items by name and auto-reveals matching branches
+    (`showSearchBar`, on by default),
+  - expand-all / collapse-all toolbar buttons (`showToolbar`, on by default);
+    collapse-all restores the default first-level view,
+  - expansion state is remembered per session and survives page switches and
+    tab changes,
+  - selecting an item on the canvas auto-expands the branch up to it,
+    highlights the row and scrolls it into view,
+  - the visible tree is flattened into a virtualized fixed-extent list,
+  - the tree refreshes on structural events, including undo/redo,
+  - tap selects a row, right-click opens the context menu (unchanged),
+  - `ItemWidget` is kept unchanged for API compatibility.
+- `FrameForgeStrings.itemsSearchHint`, `itemsSearchClear`,
+  `itemsExpandAllTooltip`, `itemsCollapseAllTooltip`, `itemsNoMatch`,
+  `itemsEmpty` — user-facing strings of the new tree UI (mutable for
+  localization like the rest).
+- Example app: Pages/Data/Styles tabs use the built-in collapsible tree
+  (outer `ListView(shrinkWrap)` wrappers removed — `Items` scrolls itself).
+- Widget tests for the collapsible tree (`test/items_tree_test.dart`).
+
 ## [1.3.0] - 2026-10-08
 
 ### Added

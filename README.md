@@ -19,6 +19,7 @@ At its core, it uses XML to define the UI structure, making it ideal for applica
 - **Multi-screen Support** - Design for mobile, tablet, and desktop simultaneously
 - **Grid-based Layout** - Precise positioning with snap-to-grid functionality
 - **Page navigation (master-detail)** - Searchable page list for layouts with 50+ pages: `PageList`, quick switcher **Ctrl+K**, rename/duplicate/delete pages (all undoable)
+- **Collapsible component tree** - `Items` renders components and nested items as an expandable/collapsible list: first level visible by default, per-node expand/collapse, search with auto-revealed matching branches, expand-all/collapse-all buttons, selection reveal (canvas picks scroll the tree to the item), expansion memory per session
 
 ### Architecture & Integration
 - **XML-based Structure** - Clean, readable markup defines UI components and properties
@@ -82,6 +83,34 @@ Column(
 Programmatic page management: `controller.switchPage(page)`, `addPage()`,
 `duplicatePage(page)`, `renamePage(page, name)`, `deletePage(page)` — all undoable.
 Quick switcher: **Ctrl+K** (the editor Scaffold must use `kNodeEditorWidgetKey`).
+
+### Collapsible component tree (Items)
+
+`Items` renders the component/item hierarchy as a compact expandable list:
+
+- the first level is visible by default, deeper levels expand per node via the
+  chevron toggle,
+- a search field filters items by name and auto-reveals matching branches,
+- toolbar buttons expand/collapse the whole tree,
+- expanded nodes are remembered per session, including across page switches,
+- selecting an item on the canvas auto-expands the branch up to it, highlights
+  it and scrolls it into view,
+- tap selects a row, right-click opens the context menu (unchanged behavior).
+
+Both panels are optional: `Items(item, controller, showSearchBar: false)` hides
+the search field, `showToolbar: false` hides the expand/collapse-all buttons.
+
+```dart
+Column(
+  children: [
+    Flexible(flex: 3, child: PageList(controller)),
+    Flexible(
+      flex: 4,
+      child: Items(controller.currentComponentPage, controller),
+    ),
+  ],
+)
+```
 
 ### Create DSL Model
 - Add required screen sizes for LayoutModel.
