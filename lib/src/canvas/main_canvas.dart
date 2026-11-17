@@ -2,7 +2,7 @@ import 'package:vector_math/vector_math_64.dart' as quad;
 
 import '../layout_model/page.dart';
 import 'screensize_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:collection/collection.dart' show DeepCollectionEquality;
 import 'dart:async';
 import 'package:uuid/uuid.dart';

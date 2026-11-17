@@ -9,10 +9,10 @@ import 'package:example/template_appbar_export_button.dart';
 import 'package:example/template_appbar_import_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:frame_forge/frame_forge.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,30 +52,30 @@ class _MyHomePageState extends State<MyHomePage> {
   );
   late final LayoutModelController _layoutModelController =
       LayoutModelController(
-        layoutModel: layoutModel,
-        projectSaver: (map) async {
-          await WebDownloadService.save(
-            body: saveMap(map),
-            filename: '${layoutModel.root["name"]} - ${screenSize.title}',
-          );
-          return true;
-        },
-        projectLoader: (isSaved) async {
-          final FilePickerResult? result = await FilePicker.platform
-              .pickFiles();
-          if (result == null) {
-            return null;
-          }
-          final PlatformFile file = result.files.first;
-          return utf8.decode(file.bytes! as List<int>);
-        },
+    layoutModel: layoutModel,
+    projectSaver: (map) async {
+      await WebDownloadService.save(
+        body: saveMap(map),
+        filename: '${layoutModel.root["name"]} - ${screenSize.title}',
       );
+      return true;
+    },
+    projectLoader: (isSaved) async {
+      final FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result == null) {
+        return null;
+      }
+      final PlatformFile file = result.files.first;
+      return utf8.decode(file.bytes! as List<int>);
+    },
+  );
   @override
   void initState() {
     //listen to controller events to update UI
     _layoutModelController.eventBus.events.listen(_handleControllerEvents);
     // Register global keyboard handler
-    HardwareKeyboard.instance.addHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
+    HardwareKeyboard.instance
+        .addHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
     super.initState();
   }
 
@@ -88,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     // Remove global keyboard handler
-    HardwareKeyboard.instance.removeHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
+    HardwareKeyboard.instance
+        .removeHandler(_layoutModelController.keyboardHandler.handleKeyEvent);
     _layoutModelController.dispose();
     super.dispose();
   }

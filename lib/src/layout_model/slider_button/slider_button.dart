@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'animated_toggle_switch.dart';
 import 'properties.dart';
 

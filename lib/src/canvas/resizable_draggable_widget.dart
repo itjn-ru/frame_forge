@@ -1,6 +1,6 @@
 import '../layout_model/controller/layout_model_controller.dart';
 import 'layout_model_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import '../layout_model/component.dart';
 import 'controller/resizable_draggable_controller.dart';

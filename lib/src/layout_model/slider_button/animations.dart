@@ -1,7 +1,7 @@
 // this Animation is not covered because it does not contain logic but
 // forwards all methods to its parent Animation.
 // coverage:ignore-start
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// This class is a proxy for another animation.
 ///

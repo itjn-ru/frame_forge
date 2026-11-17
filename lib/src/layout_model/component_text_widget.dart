@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:frame_forge/src/layout_model/component_decoration_widget.dart';
 
 import '../canvas/layout_model_provider.dart';

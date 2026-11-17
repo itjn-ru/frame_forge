@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../interfaces/transformation_service.dart';
 import '../interfaces/canvas_view_service.dart';
 import '../layout_model_controller.dart';

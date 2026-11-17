@@ -1,5 +1,5 @@
 import '../layout_model/screen_size_enum.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ScreenSizeProvider extends InheritedWidget {
   final ScreenSizeEnum screenSize;

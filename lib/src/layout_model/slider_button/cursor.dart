@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ToggleCursors {
   /// [MouseCursor] to show when not hovering an indicator or a tappable icon.

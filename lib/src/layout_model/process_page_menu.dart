@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:frame_forge/src/layout_model/process_group.dart';
 
 import '../../frame_forge.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:frame_forge/src/layout_model/property.dart';
 import 'package:uuid/uuid.dart';
 

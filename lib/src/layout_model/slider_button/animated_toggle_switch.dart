@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'animation_type_builder.dart';
 import 'cursor.dart';
 import 'custom_indicator_builder.dart';
