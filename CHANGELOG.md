@@ -30,6 +30,11 @@
   to two lines with the type on a separate line, both dropdowns render as
   compact bordered fields with a height-limited menu, and the map key
   items wrap the same way.
+- Source dropdown no longer throws `RenderFlex overflowed by N pixels on
+  the bottom` when a long variable name wraps inside the menu: the two
+  dropdowns now use `itemHeight: null` so menu items size themselves to
+  their content, and the closed field renders a compact one-line selected
+  entry via `selectedItemBuilder`.
 - The properties panel no longer squeezes widgets into a 100px column:
   `Properties` now uses flexible column widths (label ~40% / widget ~60%)
   with a subtle grid and small grey labels.

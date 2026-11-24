@@ -159,7 +159,8 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
         selectedHere ? sourceRef.variableName : '';
 
     // Build dropdown items for variables only. Long names wrap to two
-    // lines instead of being cut off, the type sits on its own small line
+    // lines inside the menu (the button itself shows a compact one-line
+    // row via selectedItemBuilder), the type sits on its own small line
     // and the full text is available in a tooltip.
     final List<DropdownMenuItem<String>> variableDropdownItems =
         <DropdownMenuItem<String>>[
@@ -199,6 +200,38 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
                     ),
                   ],
                 ),
+              ),
+            ),
+          );
+        },
+      ),
+    ];
+
+    // Compact one-line display of the selected item inside the field: the
+    // menu keeps the two-line layout, the closed field never overflows.
+    final List<Widget> variableSelectedItems = <Widget>[
+      const SizedBox(
+        width: double.infinity,
+        child: Text(
+          '—',
+          style: TextStyle(color: Colors.grey, fontSize: 12),
+        ),
+      ),
+      ...variables.map(
+        (SourceVariable v) {
+          final String name =
+              v.properties['name']?.value?.toString() ?? '';
+          final String type =
+              v.properties['type']?.value?.toString() ?? '';
+          return Tooltip(
+            message: '$name ($type)',
+            child: SizedBox(
+              width: double.infinity,
+              child: Text(
+                '$name ($type)',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12),
               ),
             ),
           );
@@ -318,7 +351,7 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
         // Variable dropdown
         if (variables.isNotEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               border: Border.all(
                 color: Theme.of(context).colorScheme.outline,
@@ -330,7 +363,12 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
                 value: dropdownValue,
                 isExpanded: true,
                 isDense: true,
+                // Menu items size themselves to their content: two-line
+                // entries never hit the fixed 48px item height.
+                itemHeight: null,
                 menuMaxHeight: 300,
+                selectedItemBuilder: (BuildContext context) =>
+                    variableSelectedItems,
                 icon: const Icon(
                   Icons.arrow_drop_down,
                   size: 18,
@@ -369,7 +407,35 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
                         value: _getValidMapKey(sourceRef.mapKey, mapKeys),
                         isExpanded: true,
                         isDense: true,
+                        // Two-line key entries size themselves freely in
+                        // the menu instead of the fixed 48px item height.
+                        itemHeight: null,
                         menuMaxHeight: 220,
+                        selectedItemBuilder: (BuildContext context) =>
+                            <Widget>[
+                          const SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              '(whole Map)',
+                              style: TextStyle(
+                                  color: Colors.grey, fontSize: 12),
+                            ),
+                          ),
+                          ...mapKeys.map(
+                            (String key) => Tooltip(
+                              message: key,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Text(
+                                  key,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                         icon: const Icon(
                           Icons.arrow_drop_down,
                           size: 18,
