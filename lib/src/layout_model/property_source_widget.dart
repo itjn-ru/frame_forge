@@ -158,7 +158,9 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
     final String dropdownValue =
         selectedHere ? sourceRef.variableName : '';
 
-    // Build dropdown items for variables only
+    // Build dropdown items for variables only. Long names wrap to two
+    // lines instead of being cut off, the type sits on its own small line
+    // and the full text is available in a tooltip.
     final List<DropdownMenuItem<String>> variableDropdownItems =
         <DropdownMenuItem<String>>[
       const DropdownMenuItem<String>(
@@ -173,7 +175,32 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
               v.properties['type']?.value?.toString() ?? '';
           return DropdownMenuItem<String>(
             value: name,
-            child: Text('$name ($type)'),
+            child: Tooltip(
+              message: '$name ($type)',
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      name,
+                      maxLines: 2,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      type,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
@@ -193,38 +220,59 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        // Show current selection if not visible at this level
-        if (sourceRef.variableName.isNotEmpty && !selectedHere)
+        // Current selection, always visible and wrapping to two lines so
+        // long source names are never cut off; the tooltip and selectable
+        // text expose the full "variable.key" value.
+        if (sourceRef.variableName.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(bottom: 2),
-            child: Row(
-              children: <Widget>[
-                const Icon(Icons.check, size: 12, color: Colors.green),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    sourceRef.variableName,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.green,
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6,
+                vertical: 3,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.08),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: Icon(Icons.check, size: 12, color: Colors.green),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Tooltip(
+                      message: sourceRef.toString(),
+                      child: SelectableText(
+                        sourceRef.toString(),
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.green,
+                        ),
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                InkWell(
-                  onTap: () {
-                    sourceRef.variableName = '';
-                    sourceRef.mapKey = '';
-                    widget.property.value = sourceRef;
-                    _emitChange();
-                  },
-                  child: const Icon(
-                    Icons.close,
-                    size: 14,
-                    color: Colors.grey,
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () {
+                      sourceRef.variableName = '';
+                      sourceRef.mapKey = '';
+                      widget.property.value = sourceRef;
+                      _emitChange();
+                    },
+                    child: const Icon(
+                      Icons.close,
+                      size: 14,
+                      color: Colors.grey,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -269,22 +317,34 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
 
         // Variable dropdown
         if (variables.isNotEmpty)
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: DropdownButton<String>(
-                  value: dropdownValue,
-                  isExpanded: true,
-                  items: variableDropdownItems,
-                  onChanged: (String? value) {
-                    sourceRef.variableName = value ?? '';
-                    sourceRef.mapKey = '';
-                    widget.property.value = sourceRef;
-                    _emitChange();
-                  },
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
               ),
-            ],
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: dropdownValue,
+                isExpanded: true,
+                isDense: true,
+                menuMaxHeight: 300,
+                icon: const Icon(
+                  Icons.arrow_drop_down,
+                  size: 18,
+                  color: Colors.grey,
+                ),
+                items: variableDropdownItems,
+                onChanged: (String? value) {
+                  sourceRef.variableName = value ?? '';
+                  sourceRef.mapKey = '';
+                  widget.property.value = sourceRef;
+                  _emitChange();
+                },
+              ),
+            ),
           ),
 
         // Map key dropdown (shown only when source is a Map type)
@@ -296,29 +356,58 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
                 const Text('key: ',
                     style: TextStyle(fontSize: 11, color: Colors.grey)),
                 Expanded(
-                  child: DropdownButton<String>(
-                    value: _getValidMapKey(sourceRef.mapKey, mapKeys),
-                    isExpanded: true,
-                    items: <DropdownMenuItem<String>>[
-                      const DropdownMenuItem<String>(
-                        value: '',
-                        child: Text('(whole Map)',
-                            style:
-                                TextStyle(color: Colors.grey, fontSize: 12)),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline,
                       ),
-                      ...mapKeys.map(
-                        (String key) => DropdownMenuItem<String>(
-                          value: key,
-                          child: Text(key,
-                              style: const TextStyle(fontSize: 12)),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _getValidMapKey(sourceRef.mapKey, mapKeys),
+                        isExpanded: true,
+                        isDense: true,
+                        menuMaxHeight: 220,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          size: 18,
+                          color: Colors.grey,
                         ),
+                        items: <DropdownMenuItem<String>>[
+                          const DropdownMenuItem<String>(
+                            value: '',
+                            child: Text('(whole Map)',
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12)),
+                          ),
+                          ...mapKeys.map(
+                            (String key) => DropdownMenuItem<String>(
+                              value: key,
+                              child: Tooltip(
+                                message: key,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: Text(
+                                    key,
+                                    maxLines: 2,
+                                    softWrap: true,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (String? value) {
+                          sourceRef.mapKey = value ?? '';
+                          widget.property.value = sourceRef;
+                          _emitChange();
+                        },
                       ),
-                    ],
-                    onChanged: (String? value) {
-                      sourceRef.mapKey = value ?? '';
-                      widget.property.value = sourceRef;
-                      _emitChange();
-                    },
+                    ),
                   ),
                 ),
               ],

@@ -11,6 +11,7 @@ class Properties extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return ValueListenableBuilder<String?>(
       valueListenable: controller.selectedIdNotifier,
       builder: (BuildContext context, String? selectedId, _) {
@@ -25,23 +26,47 @@ class Properties extends StatelessWidget {
             final List<String> keys = properties.keys.toList();
 
             return Table(
+              // Flexible widths: the label column takes about a third of the
+              // panel, the rest goes to the property widget itself. Long
+              // source names and dropdowns finally get enough space.
               columnWidths: const <int, TableColumnWidth>{
-                0: FixedColumnWidth(50),
-                1: FixedColumnWidth(100),
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(3),
               },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: List<TableRow>.generate(keys.length, (int index) {
                 final String key = keys[index];
                 final dynamic prop = properties[key];
 
                 return TableRow(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.black, width: 1),
+                      bottom: BorderSide(
+                        color: colorScheme.outlineVariant,
+                        width: 0.5,
+                      ),
                     ),
                   ),
                   children: <Widget>[
-                    Text("${prop?.title ?? ""}:"),
-                    PropertyWidget.create(controller, key),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 2,
+                        right: 6,
+                        top: 4,
+                        bottom: 4,
+                      ),
+                      child: Text(
+                        "${prop?.title ?? ""}:",
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: PropertyWidget.create(controller, key),
+                    ),
                   ],
                 );
               }),

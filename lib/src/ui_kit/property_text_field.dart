@@ -9,10 +9,12 @@ class PropertyTextField extends StatefulWidget {
   final VoidCallback? onTapOutside;
   final VoidCallback? onTabPressed;
   final VoidCallback? onFocusLost;
+  final VoidCallback? onFocusGained;
   final String? hintText;
   final String? labelText;
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
+  final TextStyle? style;
   final bool enabled;
   final bool selectAllOnFocus;
 
@@ -24,10 +26,12 @@ class PropertyTextField extends StatefulWidget {
     this.onTapOutside,
     this.onTabPressed,
     this.onFocusLost,
+    this.onFocusGained,
     this.hintText,
     this.labelText,
     this.decoration,
     this.keyboardType,
+    this.style,
     this.enabled = true,
     this.selectAllOnFocus = true,
   });
@@ -63,6 +67,7 @@ class _PropertyTextFieldState extends State<PropertyTextField> {
             extentOffset: controller.text.length,
           );
         }
+        widget.onFocusGained?.call();
       } else {
         // When losing focus, call the callback
         widget.onFocusLost?.call();
@@ -99,6 +104,7 @@ class _PropertyTextFieldState extends State<PropertyTextField> {
       focusNode: focusNode,
       enabled: widget.enabled,
       keyboardType: widget.keyboardType,
+      style: widget.style,
       decoration:
           widget.decoration ??
           InputDecoration(

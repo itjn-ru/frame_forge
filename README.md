@@ -20,6 +20,7 @@ At its core, it uses XML to define the UI structure, making it ideal for applica
 - **Grid-based Layout** - Precise positioning with snap-to-grid functionality
 - **Unified page/component tree** - `PageList` renders pages and their components as one expandable tree: pages start collapsed, per-node expand/collapse, search across pages and components with auto-revealed matching branches, expand-all/collapse-all buttons, selection reveal (canvas picks scroll the tree to the item), quick switcher **Ctrl+K**, rename/duplicate/delete pages (all undoable), expansion memory per session
 - **Collapsible component tree** - `Items` renders components and nested items as an expandable/collapsible list: first level visible by default, per-node expand/collapse, search with auto-revealed matching branches, expand-all/collapse-all buttons, selection reveal (canvas picks scroll the tree to the item), expansion memory per session
+- **Data page as a table** - fullscreen Excel-like editor for sourcePage variables: inline cell editing (name/type/nullable/possible values), collapsible group sections, search and type filter, TSV copy/paste with Excel, rename with source-reference sync, all structural changes undoable
 
 ### Architecture & Integration
 - **XML-based Structure** - Clean, readable markup defines UI components and properties
@@ -114,6 +115,26 @@ Items(controller.layoutModel.root.items.whereType<SourcePage>().first, controlle
 
 The same switches exist on `PageList`: `showSearchBar`, `showToolbar` and
 `showQuickSwitcher`.
+
+### Data page as a table (Source Table)
+
+Long variable names do not fit well into a narrow tree, so the data page can
+be opened as a fullscreen Excel-like table: a table button appears in the Data
+tab toolbar (the `Items` tree of a `SourcePage`), or call
+`showSourceTableEditor(context, controller)` programmatically.
+
+- inline cell editing: name, type, nullable, possible values,
+- collapsible group sections (nesting preserved), adding variables and groups,
+  deleting rows — all undoable (Ctrl+Z),
+- search by name and type filter, expand/collapse all groups,
+- copy the visible rows to Excel (TSV: name, type, nullable, possible values)
+  and paste rows from Excel back as variables,
+- renaming a variable updates every component source reference pointing at the
+  old name; duplicate names are rejected.
+
+```dart
+await showSourceTableEditor(context, controller);
+```
 
 ### Create DSL Model
 - Add required screen sizes for LayoutModel.

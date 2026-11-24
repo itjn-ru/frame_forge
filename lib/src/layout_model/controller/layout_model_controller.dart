@@ -473,6 +473,41 @@ class LayoutModelController {
     applyDelete(id);
   }
 
+  /// Deletes [item] together with its subtree (undoable).
+  ///
+  /// The removed item is stored as a snapshot so Ctrl+Z restores it at the
+  /// exact position. Emits [RemoveItemEvent]. Unlike [deleteSelected] this
+  /// works for any item, not only the selected one — used by editors such
+  /// as the source page table.
+  void deleteItemUndoable(Item item) {
+    final Item? parent = layoutModel.findParentById(layoutModel.root, item.id);
+    if (parent == null) return;
+    final int index = parent.items.indexOf(item);
+    _pushAction(DeleteAction(
+      itemId: item.id,
+      parent: parent,
+      index: index,
+      snapshot: item,
+    ));
+    applyDelete(item.id);
+  }
+
+  /// Inserts [item] as a child of [parent] (undoable) and emits
+  /// [AddItemEvent].
+  ///
+  /// Unlike [pasteItem] it always appends to [parent] itself (or inserts at
+  /// [index]) without looking for a "real" parent — for editors that already
+  /// know the exact target, e.g. the source page table.
+  void insertItemUndoable(Item parent, Item item, {int? index}) {
+    final int insertIndex = index ?? parent.items.length;
+    _pushAction(InsertAction(
+      parent: parent,
+      snapshot: item,
+      index: insertIndex,
+    ));
+    applyInsertDirect(parent, item, index: insertIndex);
+  }
+
   void applyDelete(String itemId) {
     final Item? item = getItemById(itemId);
     if (item == null) return;

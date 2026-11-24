@@ -12,6 +12,7 @@ import 'item.dart';
 import 'menu.dart';
 import 'page.dart';
 import 'root.dart';
+import 'source_table_editor.dart';
 import 'strings.dart';
 
 /// Session-level memory of expanded tree nodes, shared by all [Items] trees.
@@ -371,6 +372,15 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
               icon: const Icon(Icons.unfold_less),
               color: colorScheme.onSurfaceVariant,
             ),
+            // Source pages can also be edited as a fullscreen table.
+            if (widget._item is SourcePage)
+              IconButton(
+                tooltip: FrameForgeStrings.sourceTableOpenTooltip,
+                onPressed: () =>
+                    showSourceTableEditor(context, widget.controller),
+                icon: const Icon(Icons.grid_on),
+                color: colorScheme.onSurfaceVariant,
+              ),
           ] else if (widget.showSearchBar && filtering)
             // Without a toolbar the clear button lives in the text field,
             // nothing extra is needed here.

@@ -421,6 +421,46 @@ class LayoutModel with FromMapToMap {
     }
   }
 
+  /// Keeps component bindings consistent after renaming a source variable.
+  ///
+  /// A top-level rename ([parentName] omitted) updates every source
+  /// reference whose [variableName] equals [oldName]. A child (map key)
+  /// rename updates the [mapKey] of references like `parentName.oldName`.
+  void renameSourceVariable(
+    String oldName,
+    String newName, {
+    String? parentName,
+  }) {
+    if (oldName.isEmpty || oldName == newName) return;
+    if (parentName != null && parentName.isEmpty) return;
+    for (final Item page in root.items.whereType<ComponentPage>()) {
+      _renameSourceReferences(page, oldName, newName, parentName);
+    }
+  }
+
+  void _renameSourceReferences(
+    Item item,
+    String oldName,
+    String newName,
+    String? parentName,
+  ) {
+    final Property? sourceProp = item.properties['source'];
+    if (sourceProp != null && sourceProp.value is SourceReference) {
+      final SourceReference reference = sourceProp.value as SourceReference;
+      if (parentName == null) {
+        if (reference.variableName == oldName) {
+          reference.variableName = newName;
+        }
+      } else if (reference.variableName == parentName &&
+          reference.mapKey == oldName) {
+        reference.mapKey = newName;
+      }
+    }
+    for (final Item child in item.items) {
+      _renameSourceReferences(child, oldName, newName, parentName);
+    }
+  }
+
   /// Recursively collects existing variable names, including inside groups.
   void _collectExistingVariableNames(List<Item> items, Set<String> names) {
     for (final Item item in items) {

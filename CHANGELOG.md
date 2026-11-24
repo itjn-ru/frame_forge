@@ -2,6 +2,38 @@
 
 ## [Unreleased]
 
+### Added
+
+- Fullscreen spreadsheet-style editor for the data (source) page, opened
+  with a new table button in the Data tab toolbar (`Items` tree of a
+  `SourcePage`) or programmatically via `showSourceTableEditor`:
+  - inline cell editing of name, type, nullable and possible values, the
+    same model properties the properties panel edits,
+  - collapsible group sections (nested groups are indented), per-section
+    add-variable and delete-group buttons, add-variable / add-group in the
+    toolbar — all structural changes are undoable (Ctrl+Z),
+  - search by name and type filter, group expand-all / collapse-all,
+  - Excel-style TSV copy of the visible rows and paste back into new
+    variables (columns: name, type, nullable, possible values),
+  - renaming a variable updates every component source reference pointing
+    at the old name (`LayoutModel.renameSourceVariable`); duplicate names
+    are rejected with a snackbar,
+  - new undoable controller helpers `insertItemUndoable` and
+    `deleteItemUndoable` for arbitrary items.
+- `PropertyTextField` gained optional `style` and `onFocusGained` params.
+
+### Fixed
+
+- Editing the `source` property of components: long variable names no
+  longer get cut off. The current selection is now a wrapped two-line
+  selectable chip with a full-text tooltip, dropdown items wrap their name
+  to two lines with the type on a separate line, both dropdowns render as
+  compact bordered fields with a height-limited menu, and the map key
+  items wrap the same way.
+- The properties panel no longer squeezes widgets into a 100px column:
+  `Properties` now uses flexible column widths (label ~40% / widget ~60%)
+  with a subtle grid and small grey labels.
+
 ### Changed
 
 - `PageList` is now a unified expandable tree of component pages and their
