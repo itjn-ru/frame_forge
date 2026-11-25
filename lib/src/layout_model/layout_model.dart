@@ -354,10 +354,34 @@ class LayoutModel with FromMapToMap {
       _setPageForItem(stylePage, basicElement);
     }
 
-    // Auto-fill: bind empty sourceV2 references to the variables that
-    // already exist in the file (word matching). The model never spawns
-    // variables from legacy source texts on its own.
+    // Legacy cleanup: a sourceV2 variableName written as a human phrase
+    // ("Состояние кабины тягача {вложение}" — spaces or `{hint}` inside)
+    // is not a real variable, so it is cleared first; the word-matching
+    // auto-fill then binds the component to the actual CamelCase variable.
+    _clearTextNamedSourceReferences();
     autoFillSourceReferences();
+  }
+
+  /// Clears sourceV2 variable names written as human phrases: they contain
+  /// spaces or `{hint}` segments — the shape the removed auto-creation used
+  /// to produce from legacy `source` texts. Real (CamelCase, no spaces)
+  /// bindings are kept untouched.
+  void _clearTextNamedSourceReferences() {
+    _clearTextNamedInItems(root.items);
+  }
+
+  void _clearTextNamedInItems(List<Item> items) {
+    for (final Item item in items) {
+      final Property? typed = item.properties['sourceV2'];
+      if (typed?.value is SourceReference) {
+        final SourceReference reference = typed!.value as SourceReference;
+        final String name = reference.variableName;
+        if (name.contains(' ') || name.contains('{') || name.contains('}')) {
+          reference.variableName = '';
+        }
+      }
+      _clearTextNamedInItems(item.items);
+    }
   }
 
   /// Fills empty typed source references (`sourceV2`) from the legacy

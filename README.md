@@ -134,9 +134,16 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   every word of the text (`source.split(' ').length`) must be covered —
   case-insensitive, case-ending prefixes of 4+ letters, the `{…}` widget
   hint is excluded from the count; an exact string match is always accepted.
-  The same auto-fill runs automatically on XML import. The model no longer
+  The same algorithm runs automatically on XML import — after stripping
+  "human phrase" bindings out of sourceV2 (see below). The model no longer
   spawns variables from legacy texts: when no match is found the binding
   stays empty (the runtime reads `json[source]` by the text).
+- import repairs sourceV2 bindings: a variableName written as a human
+  phrase — containing spaces or a `{hint}` (e.g.
+  `Состояние кабины тягача {вложение}`) — is cleared, and the component is
+  re-bound automatically to the actual variable by words
+  (`СостояниеКабиныТягачаВложение`). Proper concatenated CamelCase
+  bindings are never touched.
 - search by name and type filter, expand/collapse all groups,
 - copy the visible rows to Excel (TSV: name, type, nullable, possible values)
   and paste rows from Excel back as variables,
