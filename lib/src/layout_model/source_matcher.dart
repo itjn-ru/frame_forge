@@ -17,11 +17,6 @@ library;
 /// meaningful (`тягач` ↔ `тягача`) without short-noise hits (`тяг`).
 const int kSourceMatchMinPrefixLength = 4;
 
-/// Default threshold: a candidate must match at least this many words of
-/// the legacy text. An exact (case-trim-equal) full match always wins and
-/// ignores the threshold.
-const int kSourceMatchMinWords = 2;
-
 /// Splits a variable name or legacy source text into lowercase words.
 ///
 /// `ТягачДвигательСостояние` -> `[тягач, двигатель, состояние]`
@@ -93,20 +88,35 @@ int countSourceWordMatches(
   return matched;
 }
 
+/// Strips `{…}` segments from a legacy source text.
+///
+/// The braces hold a widget hint (`Двигатель тягача {радиокнопка}`) and
+/// must not participate in word matching or the match threshold.
+String stripBraceSegments(String text) {
+  final RegExp pattern = RegExp(r'\{[^}]*\}');
+  return text.replaceAll(pattern, ' ');
+}
+
 /// Finds the best matching variable name for a legacy source text.
 ///
 /// - An exact (trim + case-insensitive) full match always wins.
-/// - Otherwise the variable with the most matched words wins; ties keep
-///   the first candidate in [variableNames] order.
-/// - Returns null when no candidate reaches [minWords] matched words.
+/// - Otherwise the `{…}` hint segments are stripped and **every**
+///   remaining word of the text must be represented in the variable name
+///   (the threshold equals the number of words: `source.split(' ').length`).
+///   Ties keep the first candidate in [variableNames] order.
+/// - Returns null when no candidate covers all the words.
 String? findBestSourceVariableMatch(
   String legacyText,
-  Iterable<String> variableNames, {
-  int minWords = kSourceMatchMinWords,
-}) {
+  Iterable<String> variableNames,
+) {
   final String normalizedText = legacyText.trim();
   if (normalizedText.isEmpty) return null;
-  final List<String> textWords = sourceTextWords(normalizedText);
+
+  final List<String> textWords = sourceTextWords(
+    stripBraceSegments(normalizedText),
+  );
+  // A text that carries no matchable words (only a `{hint}`) never binds.
+  if (textWords.isEmpty) return null;
 
   String? best;
   int bestScore = 0;
@@ -124,6 +134,6 @@ String? findBestSourceVariableMatch(
       bestScore = score;
     }
   }
-  if (bestScore < minWords) return null;
+  if (bestScore < textWords.length) return null;
   return best;
 }

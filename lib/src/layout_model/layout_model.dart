@@ -354,12 +354,10 @@ class LayoutModel with FromMapToMap {
       _setPageForItem(stylePage, basicElement);
     }
 
-    // Auto-fill first: bind empty sourceV2 references to the variables
-    // that already exist in the file, so the sync step below does not
-    // create text-named duplicates for components that just got bound.
+    // Auto-fill: bind empty sourceV2 references to the variables that
+    // already exist in the file (word matching). The model never spawns
+    // variables from legacy source texts on its own.
     autoFillSourceReferences();
-    // Auto-sync: add missing source variables from component pages
-    _syncSourceVariables();
   }
 
   /// Fills empty typed source references (`sourceV2`) from the legacy
@@ -407,76 +405,6 @@ class LayoutModel with FromMapToMap {
     }
     for (final Item child in item.items) {
       _autoFillSourceInItem(child, variableNames, updatedIds);
-    }
-  }
-
-  /// Scans all component pages for source references and creates
-  /// missing SourceVariable entries in the SourcePage.
-  /// Also removes root-level duplicate variables that already exist in groups.
-  void _syncSourceVariables() {
-    final SourcePage sourcePage = root.items.whereType<SourcePage>().first;
-
-    // First, remove root-level duplicates: if a variable with the same name
-    // already exists inside a group, remove the root-level copy.
-    final Set<String> namesInGroups = <String>{};
-    for (final Item item in sourcePage.items) {
-      if (item is SourceVariableGroup) {
-        _collectExistingVariableNames(item.items, namesInGroups);
-      }
-    }
-    if (namesInGroups.isNotEmpty) {
-      sourcePage.items.removeWhere(
-        (Item item) =>
-            item is SourceVariable &&
-            namesInGroups.contains(
-              item.properties['name']?.value?.toString() ?? '',
-            ),
-      );
-    }
-
-    // Collect existing variable names (including those inside groups)
-    final Set<String> existingNames = <String>{};
-    _collectExistingVariableNames(sourcePage.items, existingNames);
-
-    // Collect all referenced source variable names from components
-    final Set<String> referencedNames = <String>{};
-    for (final Item page in root.items.whereType<ComponentPage>()) {
-      _collectSourceReferences(page, referencedNames);
-    }
-
-    // Create missing variables with default type String
-    for (final String name in referencedNames) {
-      if (name.isNotEmpty && !existingNames.contains(name)) {
-        final SourceVariable newVar = SourceVariable(name);
-        newVar.properties['name'] = Property('Name', name);
-        sourcePage.items.add(newVar);
-        _setPageForItem(sourcePage, newVar);
-      }
-    }
-  }
-
-  /// Recursively collects source variable names from items.
-  void _collectSourceReferences(Item item, Set<String> names) {
-    final Property? sourceProp = item.properties['source'];
-    final Property? typedProp = item.properties['sourceV2'];
-    // A component already bound through sourceV2 reads its value by the
-    // typed variable name — the legacy text is just a label and must not
-    // spawn a text-named variable.
-    final bool typedBound = typedProp?.value is SourceReference &&
-        (typedProp!.value as SourceReference).variableName.isNotEmpty;
-    if (sourceProp != null && !typedBound) {
-      if (sourceProp.value is SourceReference) {
-        final String varName =
-            (sourceProp.value as SourceReference).variableName;
-        if (varName.isNotEmpty) names.add(varName);
-      } else if (sourceProp.value is String &&
-          (sourceProp.value as String).isNotEmpty) {
-        names.add(sourceProp.value as String);
-      }
-    }
-
-    for (final Item child in item.items) {
-      _collectSourceReferences(child, names);
     }
   }
 

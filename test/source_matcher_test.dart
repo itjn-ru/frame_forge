@@ -55,8 +55,9 @@ void main() {
       'Состояние кабины тягача {комментарий}',
     ];
 
-    test('matches by words across case endings', () {
-      // The user case: 2 of 3 text words hit the variable.
+    test('matches when every non-brace word hits the variable', () {
+      // The user case: both meaningful words hit the variable, the
+      // {радиокнопка} hint is excluded from the threshold.
       final String? match = findBestSourceVariableMatch(
         'Двигатель тягача {радиокнопка}',
         variables,
@@ -72,9 +73,26 @@ void main() {
       expect(match, 'Состояние кабины тягача {комментарий}');
     });
 
-    test('single word match stays below the threshold', () {
+    test('one-word text binds to a variable containing the word', () {
+      // Threshold = the number of text words (here: 1).
       expect(
         findBestSourceVariableMatch('Насос', <String>['НасосДатчик']),
+        'НасосДатчик',
+      );
+    });
+
+    test('a word missing from the variable fails the all-words threshold',
+        () {
+      // 'насос' matches, 'труба' does not: not every word is covered.
+      expect(
+        findBestSourceVariableMatch('НасосТруба', <String>['НасосДатчик']),
+        isNull,
+      );
+    });
+
+    test('text made only of a brace hint never binds', () {
+      expect(
+        findBestSourceVariableMatch('{радиокнопка}', variables),
         isNull,
       );
     });

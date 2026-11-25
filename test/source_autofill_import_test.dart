@@ -74,8 +74,9 @@ void main() {
     expect(sourceVariableNames(fresh), contains('ТягачДвигательСостояние'));
   });
 
-  test('import keeps the legacy fallback when no variable matches', () {
-    // A text no variable can match: all three words are unrelated.
+  test('import never spawns variables from unmatched legacy texts', () {
+    // A text no variable can match: the binding stays empty and, since the
+    // sync step was removed, no text-named variable is created either.
     legacyComponent.properties['source']?.value = 'ПолнаяВысотаКабины';
     legacyComponent.properties['sourceV2']?.value = SourceReference();
 
@@ -85,10 +86,7 @@ void main() {
     final SourceReference reference =
         component.properties['sourceV2']!.value as SourceReference;
     expect(reference.variableName, isEmpty);
-
-    // The legacy binding stays effective, so the matching text-named
-    // variable is still created for it.
-    expect(sourceVariableNames(fresh), contains('ПолнаяВысотаКабины'));
+    expect(sourceVariableNames(fresh), isNot(contains('ПолнаяВысотаКабины')));
   });
 
   test('import does not re-add text variables for already bound components',

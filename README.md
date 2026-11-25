@@ -130,10 +130,13 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   "Delete selected (N)" toolbar button with confirmation — one Ctrl+Z
   restores the whole batch,
 - "fill empty sourceV2" toolbar button: picks variables for components whose
-  legacy `source` text is filled but typed `sourceV2` is empty — by word
-  matching (case-insensitive, case-ending prefixes of 4+ letters, a threshold
-  of two matched words; an exact string match is always accepted). The same
-  auto-fill runs automatically on XML import,
+  legacy `source` text is filled but typed `sourceV2` is empty. The rule:
+  every word of the text (`source.split(' ').length`) must be covered —
+  case-insensitive, case-ending prefixes of 4+ letters, the `{…}` widget
+  hint is excluded from the count; an exact string match is always accepted.
+  The same auto-fill runs automatically on XML import. The model no longer
+  spawns variables from legacy texts: when no match is found the binding
+  stays empty (the runtime reads `json[source]` by the text).
 - search by name and type filter, expand/collapse all groups,
 - copy the visible rows to Excel (TSV: name, type, nullable, possible values)
   and paste rows from Excel back as variables,
