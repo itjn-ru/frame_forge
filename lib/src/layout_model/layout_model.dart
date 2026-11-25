@@ -10,6 +10,7 @@ import 'page.dart';
 import 'property.dart';
 import 'root.dart';
 import 'screen_size_enum.dart';
+import 'source_matcher.dart';
 import 'source_reference.dart';
 import 'source_variable.dart';
 import 'source_variable_group.dart';
@@ -355,6 +356,56 @@ class LayoutModel with FromMapToMap {
 
     // Auto-sync: add missing source variables from component pages
     _syncSourceVariables();
+    // Auto-fill: bind empty sourceV2 references from legacy source texts.
+    autoFillSourceReferences();
+  }
+
+  /// Fills empty typed source references (`sourceV2`) from the legacy
+  /// `source` text by word matching against the source page variables.
+  ///
+  /// Returns the ids of the updated items so callers can refresh views.
+  /// The legacy `source` text is kept as is — only the empty `variableName`
+  /// of the typed reference is filled.
+  List<String> autoFillSourceReferences() {
+    final List<String> updatedIds = <String>[];
+    final Set<String> names = <String>{};
+    _collectExistingVariableNames(
+      root.items.whereType<SourcePage>().first.items,
+      names,
+    );
+    final List<String> variableNames = names.toList();
+    for (final Item page in root.items.whereType<ComponentPage>()) {
+      _autoFillSourceInItem(page, variableNames, updatedIds);
+    }
+    return updatedIds;
+  }
+
+  void _autoFillSourceInItem(
+    Item item,
+    List<String> variableNames,
+    List<String> updatedIds,
+  ) {
+    final Property? legacy = item.properties['source'];
+    final Property? typed = item.properties['sourceV2'];
+    if (typed != null && typed.value is SourceReference) {
+      final SourceReference reference = typed.value as SourceReference;
+      if (reference.variableName.isEmpty) {
+        final String legacyText = legacy?.value?.toString() ?? '';
+        if (legacyText.trim().isNotEmpty) {
+          final String? match = findBestSourceVariableMatch(
+            legacyText,
+            variableNames,
+          );
+          if (match != null) {
+            reference.variableName = match;
+            updatedIds.add(item.id);
+          }
+        }
+      }
+    }
+    for (final Item child in item.items) {
+      _autoFillSourceInItem(child, variableNames, updatedIds);
+    }
   }
 
   /// Scans all component pages for source references and creates

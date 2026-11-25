@@ -36,6 +36,7 @@ Future<void> showSourceTableEditor(
 
 /// Column widths of the table, computed from the available viewport width.
 class _Columns {
+  final double checkbox;
   final double name;
   final double type;
   final double nullable;
@@ -43,6 +44,7 @@ class _Columns {
   final double actions;
 
   const _Columns({
+    required this.checkbox,
     required this.name,
     required this.type,
     required this.nullable,
@@ -51,11 +53,14 @@ class _Columns {
   });
 
   factory _Columns.forWidth(double width) {
+    const double checkboxW = 44;
     const double typeW = 120;
     const double nullableW = 90;
     const double actionsW = 56;
-    final double free = math.max(0, width - (typeW + nullableW + actionsW));
+    final double free =
+        math.max(0, width - (checkboxW + typeW + nullableW + actionsW));
     return _Columns(
+      checkbox: checkboxW,
       name: math.max(240, free * 0.55),
       type: typeW,
       nullable: nullableW,
@@ -64,7 +69,8 @@ class _Columns {
     );
   }
 
-  double get total => name + type + nullable + possibleValues + actions;
+  double get total =>
+      checkbox + name + type + nullable + possibleValues + actions;
 }
 
 /// One flattened row of the source table: either a group section header or
@@ -117,6 +123,9 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
 
   /// Ids of collapsed group sections; the root section uses the empty id.
   final Set<String> _collapsed = <String>{};
+
+  /// Ids of variables checked for mass deletion.
+  final Set<String> _selectedIds = <String>{};
 
   /// Variable name captured when its cell gains focus. [onChanged] writes
   /// into the property on every keystroke, so the original name must be
@@ -326,6 +335,98 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
     });
   }
 
+  // --- Mass selection ----------------------------------------------------
+
+  void _toggleSelected(SourceVariable variable) {
+    setState(() {
+      if (_selectedIds.remove(variable.id)) return;
+      _selectedIds.add(variable.id);
+    });
+  }
+
+  /// Selects or deselects every currently visible variable row.
+  void _selectAllVisible(List<_Row> rows, {required bool select}) {
+    setState(() {
+      for (final _Row row in rows) {
+        if (row.isSection) continue;
+        if (select) {
+          _selectedIds.add(row.variable!.id);
+        } else {
+          _selectedIds.remove(row.variable!.id);
+        }
+      }
+    });
+  }
+
+  /// Whether every visible variable row is selected.
+  bool _allVisibleSelected(List<_Row> rows) {
+    final List<SourceVariable> visible = rows
+        .where((_Row row) => !row.isSection)
+        .map((_Row row) => row.variable!)
+        .toList();
+    if (visible.isEmpty) return false;
+    return visible.every(
+      (SourceVariable v) => _selectedIds.contains(v.id),
+    );
+  }
+
+  /// Deletes every checked variable after a confirmation dialog; the whole
+  /// batch is a single undo step.
+  Future<void> _deleteSelected(List<_Row> rows) async {
+    final List<SourceVariable> selected = rows
+        .where((_Row row) => !row.isSection)
+        .map((_Row row) => row.variable!)
+        .where((SourceVariable v) => _selectedIds.contains(v.id))
+        .toList();
+    if (selected.isEmpty) return;
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          FrameForgeStrings.sourceTableDeleteSelectedTitle(selected.length),
+        ),
+        content: Text(FrameForgeStrings.sourceTableDeleteSelectedBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(FrameForgeStrings.sourceTableConfirmCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(FrameForgeStrings.sourceTableConfirmDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    widget.controller.deleteItemsUndoable(selected);
+    setState(() {
+      for (final SourceVariable variable in selected) {
+        _selectedIds.remove(variable.id);
+      }
+    });
+    _showSnackBar(
+      FrameForgeStrings.sourceTableDeletedBatch(selected.length),
+    );
+  }
+
+  /// Fills empty sourceV2 bindings of all components from their legacy
+  /// source texts (word matching) and reports the result.
+  void _autoFillBindings() {
+    final List<String> updatedIds =
+        widget.controller.layoutModel.autoFillSourceReferences();
+    for (final String itemId in updatedIds) {
+      _emitChange(itemId);
+    }
+    _showSnackBar(
+      updatedIds.isEmpty
+          ? FrameForgeStrings.sourceTableAutoFillEmpty
+          : FrameForgeStrings.sourceTableAutoFillResult(updatedIds.length),
+    );
+  }
+
   void _onNameFocusGained(SourceVariable variable) {
     _editingNames[variable.id] =
         variable.properties['name']?.value?.toString() ?? '';
@@ -490,7 +591,7 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: <Widget>[
-                                _buildHeader(columns, colorScheme),
+                                _buildHeader(rows, columns, colorScheme),
                                 Expanded(
                                   child: rows.isEmpty || treeEmpty
                                       ? _buildEmptyState(
@@ -666,6 +767,34 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
             onPressed: _pasteRows,
           ),
           IconButton(
+            tooltip: FrameForgeStrings.sourceTableAutoFillTooltip,
+            icon: const Icon(Icons.auto_fix_high),
+            color: colorScheme.onSurfaceVariant,
+            onPressed: _autoFillBindings,
+          ),
+          IconButton(
+            tooltip: _selectedIds.isEmpty
+                ? FrameForgeStrings.sourceTableDeleteSelectedTooltip
+                : FrameForgeStrings.sourceTableDeleteSelected(
+                    _selectedIds.length),
+            icon: const Icon(Icons.delete_sweep),
+            color: _selectedIds.isEmpty
+                ? colorScheme.onSurfaceVariant
+                : colorScheme.error,
+            onPressed: _selectedIds.isEmpty
+                ? null
+                : () => _deleteSelected(rows),
+          ),
+          if (_selectedIds.isNotEmpty)
+            Text(
+              '${_selectedIds.length}',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.error,
+              ),
+            ),
+          IconButton(
             tooltip: FrameForgeStrings.sourceTableAddVariableTooltip,
             icon: const Icon(Icons.add),
             color: colorScheme.onSurfaceVariant,
@@ -682,7 +811,11 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
     );
   }
 
-  Widget _buildHeader(_Columns columns, ColorScheme colorScheme) {
+  Widget _buildHeader(
+    List<_Row> rows,
+    _Columns columns,
+    ColorScheme colorScheme,
+  ) {
     final Color background = colorScheme.surfaceContainerHigh;
     BorderSide grid() => BorderSide(
           color: colorScheme.outlineVariant,
@@ -719,6 +852,30 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
       ),
       child: Row(
         children: <Widget>[
+          Container(
+            width: columns.checkbox,
+            height: 42,
+            decoration: BoxDecoration(
+              color: background,
+              border: Border(right: grid()),
+            ),
+            child: Checkbox(
+              key: const ValueKey<String>('sourceTableSelectAll'),
+              tristate: true,
+              value: _allVisibleSelected(rows)
+                  ? true
+                  : _selectedIds.isEmpty
+                      ? false
+                      : null,
+              visualDensity: VisualDensity.compact,
+              // tristate cycle: false -> null -> true; a partial selection
+              // (null) selects everything, true clears the selection.
+              onChanged: (bool? value) => _selectAllVisible(
+                rows,
+                select: value != false,
+              ),
+            ),
+          ),
           cell(columns.name, FrameForgeStrings.sourceTableColumnName),
           cell(columns.type, FrameForgeStrings.sourceTableColumnType),
           cell(
@@ -950,6 +1107,17 @@ class _VariableRowState extends State<_VariableRow> {
         ),
         child: Row(
           children: <Widget>[
+            cell(
+              width: widget.columns.checkbox,
+              alignment: Alignment.center,
+              child: Checkbox(
+                key: ValueKey<String>('check:${variable.id}'),
+                value: widget.state._selectedIds.contains(variable.id),
+                visualDensity: VisualDensity.compact,
+                onChanged: (bool? value) =>
+                    widget.state._toggleSelected(variable),
+              ),
+            ),
             cell(
               width: widget.columns.name,
               child: Row(

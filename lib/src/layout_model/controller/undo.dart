@@ -123,3 +123,25 @@ class InsertAction implements UndoableAction {
     controller.applyDelete(snapshot.id);
   }
 }
+
+/// Composite action for batch deletions: the whole batch is one undo step,
+/// a single Ctrl+Z restores every deleted item at its original position.
+class MultiDeleteAction implements UndoableAction {
+  final List<DeleteAction> deletions;
+
+  MultiDeleteAction({required this.deletions});
+
+  @override
+  void apply(LayoutModelController controller) {
+    for (final DeleteAction deletion in deletions) {
+      deletion.apply(controller);
+    }
+  }
+
+  @override
+  void revert(LayoutModelController controller) {
+    for (final DeleteAction deletion in deletions.reversed) {
+      deletion.revert(controller);
+    }
+  }
+}

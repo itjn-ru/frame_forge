@@ -47,6 +47,7 @@ export 'src/layout_model/process_items.dart';
 export 'src/layout_model/properties.dart';
 export 'src/layout_model/required_fields.dart';
 export 'src/layout_model/screen_size_enum.dart';
+export 'src/layout_model/source_matcher.dart';
 export 'src/layout_model/source_reference.dart';
 export 'src/layout_model/source_table_editor.dart';
 export 'src/layout_model/source_variable.dart';

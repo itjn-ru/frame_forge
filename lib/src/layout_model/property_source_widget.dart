@@ -10,6 +10,7 @@ import 'property_widget.dart';
 import 'source_reference.dart';
 import 'source_variable.dart';
 import 'source_variable_group.dart';
+import 'strings.dart';
 
 /// A property widget that shows a hierarchical navigator for selecting
 /// source variables from the SourcePage. Groups can be drilled into;
@@ -61,6 +62,64 @@ class _SourceNavigator extends StatefulWidget {
 class _SourceNavigatorState extends State<_SourceNavigator> {
   /// Stack of group IDs representing the current navigation path.
   final List<String> _path = <String>[];
+
+  /// Query field of the autocomplete: shows the current selection when
+  /// idle, the typed query while searching.
+  final TextEditingController _queryController = TextEditingController();
+
+  /// Focus of the autocomplete field; RawAutocomplete requires the focus
+  /// node and the text controller to be passed together.
+  final FocusNode _queryFocus = FocusNode();
+
+  /// Returns every variable name of the source page, including variables
+  /// nested inside groups.
+  List<String> _allVariableNames() {
+    final List<String> names = <String>[];
+    void walk(List<Item> items) {
+      for (final Item item in items) {
+        if (item is SourceVariable) {
+          final String name =
+              item.properties['name']?.value?.toString() ?? '';
+          if (name.isNotEmpty) names.add(name);
+        }
+        if (item is SourceVariableGroup) walk(item.items);
+      }
+    }
+
+    walk(widget.controller.layoutModel.root.items
+        .whereType<SourcePage>()
+        .first
+        .items);
+    return names;
+  }
+
+  String _variableType(String name) {
+    final SourceVariable? variable = _findVariableByName(name);
+    return variable?.properties['type']?.value?.toString() ?? '';
+  }
+
+  /// Applies a variable selection from any picker and refreshes the field.
+  void _selectVariable(String name) {
+    widget.sourceRef.variableName = name;
+    widget.sourceRef.mapKey = '';
+    widget.property.value = widget.sourceRef;
+    _queryController.text = name;
+    _emitChange();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // The field mirrors the current selection until the user edits it.
+    _queryController.text = widget.sourceRef.variableName;
+  }
+
+  @override
+  void dispose() {
+    _queryController.dispose();
+    _queryFocus.dispose();
+    super.dispose();
+  }
 
   /// Returns items at the current navigation level.
   List<Item> _currentLevelItems() {
@@ -296,6 +355,7 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
                       sourceRef.variableName = '';
                       sourceRef.mapKey = '';
                       widget.property.value = sourceRef;
+                      _queryController.clear();
                       _emitChange();
                     },
                     child: const Icon(
@@ -308,6 +368,11 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
               ),
             ),
           ),
+
+        // Autocomplete: type part of a variable name to pick from the
+        // filtered list of every variable, including those nested in
+        // groups. The group navigator below stays for visual browsing.
+        _buildAutocompleteField(),
 
         // Breadcrumb navigation
         if (_path.isNotEmpty) _buildBreadcrumbRow(),
@@ -376,10 +441,7 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
                 ),
                 items: variableDropdownItems,
                 onChanged: (String? value) {
-                  sourceRef.variableName = value ?? '';
-                  sourceRef.mapKey = '';
-                  widget.property.value = sourceRef;
-                  _emitChange();
+                  _selectVariable(value ?? '');
                 },
               ),
             ),
@@ -496,6 +558,141 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
           ],
         ),
       ],
+    );
+  }
+
+  /// The autocomplete field above the group navigator: filters all
+  /// variables by the typed substring and offers them in a dropdown list.
+  Widget _buildAutocompleteField() {
+    final List<String> allNames = _allVariableNames();
+
+    Iterable<String> buildOptions(TextEditingValue value) {
+      final String query = value.text.toLowerCase().trim();
+      if (query.isEmpty) return allNames;
+      return allNames
+          .where((String name) => name.toLowerCase().contains(query));
+    }
+
+    return RawAutocomplete<String>(
+      textEditingController: _queryController,
+      focusNode: _queryFocus,
+      optionsBuilder: buildOptions,
+      displayStringForOption: (String option) => option,
+      onSelected: _selectVariable,
+      fieldViewBuilder: (
+        BuildContext context,
+        TextEditingController textController,
+        FocusNode focusNode,
+        VoidCallback onFieldSubmitted,
+      ) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: TextField(
+            key: const ValueKey<String>('sourceAutocomplete'),
+            controller: textController,
+            focusNode: focusNode,
+            style: const TextStyle(fontSize: 12),
+            decoration: InputDecoration(
+              isDense: true,
+              border: InputBorder.none,
+              hintText: FrameForgeStrings.sourceAutocompleteHint,
+              hintStyle: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              prefixIcon: const Icon(Icons.search, size: 16),
+              prefixIconConstraints: const BoxConstraints(
+                minWidth: 24,
+                minHeight: 24,
+              ),
+              contentPadding: EdgeInsets.zero,
+            ),
+            onSubmitted: (String text) {
+              // Enter without matching options binds the typed name as is —
+              // a missing variable is recreated by the model on next load.
+              final String trimmed = text.trim();
+              if (trimmed.isNotEmpty &&
+                  !allNames.any(
+                    (String name) =>
+                        name.toLowerCase().contains(trimmed.toLowerCase()),
+                  )) {
+                _selectVariable(trimmed);
+              }
+              onFieldSubmitted();
+            },
+          ),
+        );
+      },
+      optionsViewBuilder: (
+        BuildContext context,
+        AutocompleteOnSelected<String> onSelected,
+        Iterable<String> options,
+      ) {
+        // Anchored to the right edge: the properties panel sits at the
+        // right side of the window, so the list must grow to the left.
+        return Align(
+          alignment: Alignment.topRight,
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(4),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 320, maxHeight: 220),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                shrinkWrap: true,
+                itemCount: options.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final String name = options.elementAt(index);
+                  final String type = _variableType(name);
+                  return InkWell(
+                    onTap: () => onSelected(name),
+                    child: Tooltip(
+                      message: '$name ($type)',
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                name,
+                                maxLines: 2,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              if (type.isNotEmpty)
+                                Text(
+                                  type,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

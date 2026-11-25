@@ -266,5 +266,82 @@ void main() {
       expect(find.text('client_name'), findsOneWidget);
       expect(sourcePage.items, contains(clientName));
     });
+
+    testWidgets('mass deletes checked variables with a single undo',
+        (WidgetTester tester) async {
+      await openEditor(tester);
+
+      // Check two of the three visible variables (email is collapsed).
+      await tester.tap(find.byKey(ValueKey<String>('check:${clientName.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey<String>('check:${config.id}')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byTooltip(
+          FrameForgeStrings.sourceTableDeleteSelected(2),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Confirmation dialog.
+      expect(
+        find.text(FrameForgeStrings.sourceTableDeleteSelectedTitle(2)),
+        findsOneWidget,
+      );
+      await tester.tap(
+        find.text(FrameForgeStrings.sourceTableConfirmDelete).last,
+      );
+      await tester.pumpAndSettle();
+
+      expect(sourcePage.items, isNot(contains(clientName)));
+      expect(sourcePage.items, isNot(contains(config)));
+
+      // One Ctrl+Z restores the whole batch.
+      controller.undo();
+      await tester.pumpAndSettle();
+      expect(sourcePage.items, contains(clientName));
+      expect(sourcePage.items, contains(config));
+    });
+
+    testWidgets('select-all checkbox checks every visible row',
+        (WidgetTester tester) async {
+      await openEditor(tester);
+
+      await tester.tap(
+        find.byKey(const ValueKey<String>('sourceTableSelectAll')),
+      );
+      await tester.pumpAndSettle();
+
+      // Sections start expanded, so all three variables are visible and
+      // the delete button shows the full count.
+      expect(
+        find.byTooltip(FrameForgeStrings.sourceTableDeleteSelected(3)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('auto-fill binds empty sourceV2 from legacy source text',
+        (WidgetTester tester) async {
+      // A component with a legacy source text and an empty typed binding.
+      final ComponentText legacyText = ComponentText('legacy');
+      legacyText.properties['source']?.value =
+          'Двигатель тягача {радиокнопка}';
+      layoutModel.addItem(componentPage, legacyText);
+      final SourceVariable engine =
+          SourceVariable('ТягачДвигательСостояние');
+      layoutModel.addItem(sourcePage, engine);
+
+      await openEditor(tester);
+
+      await tester.tap(
+        find.byTooltip(FrameForgeStrings.sourceTableAutoFillTooltip),
+      );
+      await tester.pumpAndSettle();
+
+      final SourceReference reference =
+          legacyText.properties['sourceV2']!.value as SourceReference;
+      expect(reference.variableName, 'ТягачДвигательСостояние');
+    });
   });
 }

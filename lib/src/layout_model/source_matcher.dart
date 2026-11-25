@@ -1,0 +1,129 @@
+/// Word-level matching between legacy `source` texts and typed
+/// `sourceV2` variable names.
+///
+/// The legacy `source` property holds a human text like
+/// `Двигатель тягача {радиокнопка}` while variables are named
+/// `ТягачДвигательСостояние` (CamelCase) or
+/// `Состояние кабины тягача {комментарий}` (spaces). Matching splits both
+/// into lowercase words — CamelCase names split on uppercase boundaries —
+/// and counts how many text words are represented in a variable name.
+/// A text word matches a variable word when they are equal or one is a
+/// prefix of the other (case endings: `тягач` matches `тягача`), with a
+/// minimum prefix length to avoid false positives.
+library;
+
+/// Minimum number of characters for a prefix-style word match. Case
+/// endings are short (а/ы/ов…), so four characters keep the match
+/// meaningful (`тягач` ↔ `тягача`) without short-noise hits (`тяг`).
+const int kSourceMatchMinPrefixLength = 4;
+
+/// Default threshold: a candidate must match at least this many words of
+/// the legacy text. An exact (case-trim-equal) full match always wins and
+/// ignores the threshold.
+const int kSourceMatchMinWords = 2;
+
+/// Splits a variable name or legacy source text into lowercase words.
+///
+/// `ТягачДвигательСостояние` -> `[тягач, двигатель, состояние]`
+/// `Состояние кабины тягача {комментарий}` ->
+/// `[состояние, кабины, тягача, комментарий]`
+List<String> sourceTextWords(String value) {
+  final List<String> words = <String>[];
+  final StringBuffer current = StringBuffer();
+
+  void flush() {
+    if (current.isNotEmpty) {
+      words.add(current.toString().toLowerCase());
+      current.clear();
+    }
+  }
+
+  for (int i = 0; i < value.length; i++) {
+    final String ch = value[i];
+    final bool isUpper = ch.toUpperCase() == ch && ch.toLowerCase() != ch;
+    if (isUpper && current.isNotEmpty) {
+      // CamelCase boundary: `ТягачДвигатель` splits before `Д`.
+      flush();
+    }
+    if (_isWordCharacter(ch)) {
+      current.write(ch);
+    } else {
+      flush();
+    }
+  }
+  flush();
+  return words;
+}
+
+bool _isWordCharacter(String ch) {
+  final String lower = ch.toLowerCase();
+  final bool isLetter = lower != ch.toUpperCase();
+  final bool isDigit = ch.codeUnitAt(0) >= 0x30 && ch.codeUnitAt(0) <= 0x39;
+  return isLetter || isDigit;
+}
+
+/// Whether a legacy text word matches a variable name word.
+///
+/// Equal words always match; otherwise one word must be a prefix of the
+/// other with at least [kSourceMatchMinPrefixLength] characters so that
+/// case endings (`тягач` ↔ `тягача`) count but short noise does not.
+bool sourceWordsMatch(String textWord, String variableWord) {
+  if (textWord == variableWord) return true;
+  if (textWord.length < kSourceMatchMinPrefixLength ||
+      variableWord.length < kSourceMatchMinPrefixLength) {
+    return false;
+  }
+  if (variableWord.startsWith(textWord)) return true;
+  if (textWord.startsWith(variableWord)) return true;
+  return false;
+}
+
+/// How many of [textWords] are represented in [variableWords].
+int countSourceWordMatches(
+  List<String> textWords,
+  List<String> variableWords,
+) {
+  int matched = 0;
+  for (final String textWord in textWords) {
+    final bool hits = variableWords.any(
+      (String variableWord) => sourceWordsMatch(textWord, variableWord),
+    );
+    if (hits) matched++;
+  }
+  return matched;
+}
+
+/// Finds the best matching variable name for a legacy source text.
+///
+/// - An exact (trim + case-insensitive) full match always wins.
+/// - Otherwise the variable with the most matched words wins; ties keep
+///   the first candidate in [variableNames] order.
+/// - Returns null when no candidate reaches [minWords] matched words.
+String? findBestSourceVariableMatch(
+  String legacyText,
+  Iterable<String> variableNames, {
+  int minWords = kSourceMatchMinWords,
+}) {
+  final String normalizedText = legacyText.trim();
+  if (normalizedText.isEmpty) return null;
+  final List<String> textWords = sourceTextWords(normalizedText);
+
+  String? best;
+  int bestScore = 0;
+  for (final String variableName in variableNames) {
+    if (variableName.trim().toLowerCase() ==
+        normalizedText.toLowerCase()) {
+      return variableName;
+    }
+    final int score = countSourceWordMatches(
+      textWords,
+      sourceTextWords(variableName),
+    );
+    if (score > bestScore) {
+      best = variableName;
+      bestScore = score;
+    }
+  }
+  if (bestScore < minWords) return null;
+  return best;
+}

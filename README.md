@@ -126,6 +126,14 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
 - inline cell editing: name, type, nullable, possible values,
 - collapsible group sections (nesting preserved), adding variables and groups,
   deleting rows — all undoable (Ctrl+Z),
+- mass deletion: row checkboxes, a select-all header checkbox and a
+  "Delete selected (N)" toolbar button with confirmation — one Ctrl+Z
+  restores the whole batch,
+- "fill empty sourceV2" toolbar button: picks variables for components whose
+  legacy `source` text is filled but typed `sourceV2` is empty — by word
+  matching (case-insensitive, case-ending prefixes of 4+ letters, a threshold
+  of two matched words; an exact string match is always accepted). The same
+  auto-fill runs automatically on XML import,
 - search by name and type filter, expand/collapse all groups,
 - copy the visible rows to Excel (TSV: name, type, nullable, possible values)
   and paste rows from Excel back as variables,
@@ -135,6 +143,15 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
 ```dart
 await showSourceTableEditor(context, controller);
 ```
+
+### Source autocomplete (sourceV2)
+
+The properties panel gained a search field above the group navigator: start
+typing part of a name and the list filters across all data page variables
+(including those nested in groups); click or Enter selects the variable. The
+group navigator and the dropdown stay in place; Enter with no matching
+options binds the typed name as a new reference (the variable is recreated
+automatically on the next save/load).
 
 ### Create DSL Model
 - Add required screen sizes for LayoutModel.

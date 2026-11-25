@@ -492,6 +492,30 @@ class LayoutModelController {
     applyDelete(item.id);
   }
 
+  /// Deletes several items in one undoable operation: a single undo step
+  /// restores the whole batch. Items missing from the tree are skipped.
+  /// Emits [RemoveItemEvent] for every deleted item.
+  void deleteItemsUndoable(Iterable<Item> items) {
+    final List<DeleteAction> actions = <DeleteAction>[];
+    for (final Item item in items) {
+      final Item? parent =
+          layoutModel.findParentById(layoutModel.root, item.id);
+      if (parent == null) continue;
+      final int index = parent.items.indexOf(item);
+      actions.add(DeleteAction(
+        itemId: item.id,
+        parent: parent,
+        index: index,
+        snapshot: item,
+      ));
+    }
+    if (actions.isEmpty) return;
+    _pushAction(MultiDeleteAction(deletions: actions));
+    for (final DeleteAction action in actions) {
+      applyDelete(action.itemId);
+    }
+  }
+
   /// Inserts [item] as a child of [parent] (undoable) and emits
   /// [AddItemEvent].
   ///

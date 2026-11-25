@@ -84,4 +84,29 @@ class FrameForgeStrings {
   static String sourceTablePasteResult(int added, int skipped) =>
       'Added $added, skipped $skipped (duplicate or empty names)';
   static String sourceTableDuplicateName = 'A variable with this name already exists';
+
+  // Mass selection in the source table
+  static String sourceTableDeleteSelectedTooltip = 'Delete selected';
+  static String sourceTableDeleteSelected(int count) =>
+      'Delete selected ($count)';
+  static String sourceTableDeleteSelectedTitle(int count) =>
+      'Delete $count ${count == 1 ? 'variable' : 'variables'}?';
+  static String sourceTableDeleteSelectedBody =
+      'The variables are removed together with their values. '
+      'Ctrl+Z restores everything.';
+  static String sourceTableConfirmDelete = 'Delete';
+  static String sourceTableConfirmCancel = 'Cancel';
+  static String sourceTableDeletedBatch(int count) =>
+      'Deleted $count ${count == 1 ? 'variable' : 'variables'} (Ctrl+Z restores)';
+
+  // Auto-fill of empty sourceV2 references from legacy source texts
+  static String sourceTableAutoFillTooltip =
+      'Fill empty sourceV2 bindings from source text (match by words)';
+  static String sourceTableAutoFillResult(int count) =>
+      'Updated $count ${count == 1 ? 'binding' : 'bindings'}';
+  static String sourceTableAutoFillEmpty =
+      'No empty sourceV2 bindings to fill';
+
+  // Autocomplete field of the source property editor
+  static String sourceAutocompleteHint = 'Find variable…';
 }

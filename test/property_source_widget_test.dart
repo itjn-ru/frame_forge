@@ -93,4 +93,34 @@ void main() {
         boundText.properties['sourceV2']!.value as SourceReference;
     expect(reference.variableName, 'very_long_client_variable_name_for_testing');
   });
+
+  testWidgets('autocomplete filters variables and applies selection',
+      (WidgetTester tester) async {
+    await pumpProperties(tester);
+
+    // Type part of the long name into the autocomplete field.
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('sourceAutocomplete')),
+      'very_long',
+    );
+    await tester.pumpAndSettle();
+
+    // The filtered option list shows the long variable (two-line entry:
+    // name and type are separate texts).
+    expect(
+      find.text('very_long_client_variable_name_for_testing'),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.text('very_long_client_variable_name_for_testing'),
+    );
+    await tester.pumpAndSettle();
+
+    final SourceReference reference =
+        boundText.properties['sourceV2']!.value as SourceReference;
+    expect(
+      reference.variableName,
+      'very_long_client_variable_name_for_testing',
+    );
+  });
 }

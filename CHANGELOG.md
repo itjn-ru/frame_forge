@@ -4,6 +4,23 @@
 
 ### Added
 
+- Autocomplete field in the source property editor (`sourceV2`): typing a
+  part of a variable name filters every variable — including those nested
+  in groups — in a dropdown list next to the existing group navigator;
+  Enter with no matching options binds the typed name as a new reference.
+- Auto-fill of empty `sourceV2` bindings from the legacy `source` text:
+  `LayoutModel.autoFillSourceReferences()` runs on project load and a new
+  "fill empty sourceV2" toolbar button in the source table runs it on
+  demand. Matching splits both texts into words (CamelCase names split on
+  uppercase boundaries), ignores case, tolerates case endings through
+  4+ character prefixes (`тягач` ↔ `тягача`) and requires at least two
+  matched words; an exact full-text match always wins
+  (`source_matcher.dart`, `findBestSourceVariableMatch`).
+- Mass deletion in the source table: a checkbox column with a select-all
+  header checkbox (respecting the current search/type filter) and a
+  "Delete selected (N)" toolbar button with a confirmation dialog; the
+  whole batch is one undo step (`MultiDeleteAction`,
+  `LayoutModelController.deleteItemsUndoable`).
 - Fullscreen spreadsheet-style editor for the data (source) page, opened
   with a new table button in the Data tab toolbar (`Items` tree of a
   `SourcePage`) or programmatically via `showSourceTableEditor`:
