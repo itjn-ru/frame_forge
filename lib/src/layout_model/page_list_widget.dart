@@ -8,9 +8,11 @@ import '../flutter_context_menu/flutter_context_menu.dart';
 import 'controller/events.dart';
 import 'controller/layout_model_controller.dart';
 import 'item.dart';
+import 'layout_component_source.dart';
 import 'menu.dart';
 import 'page.dart';
 import 'page_quick_switcher.dart';
+import 'source_reference.dart';
 import 'strings.dart';
 
 /// Session-level memory of expanded nodes of [PageList] trees.
@@ -26,6 +28,10 @@ final Map<String, bool> _pageTreeExpansionState = <String, bool>{};
 /// Height of a single tree row and indentation step per depth level.
 const double _kTreeRowHeight = 34.0;
 const double _kTreeIndentWidth = 16.0;
+
+/// Color of rows whose sourceV2 binding is empty (the row itself or any
+/// descendant): Material orange 800 — readable on light backgrounds.
+const Color kUnboundSourceColor = Color(0xFFEF6C00);
 
 /// Unified expandable tree of component pages and their items.
 ///
@@ -225,9 +231,22 @@ class _PageListState extends State<PageList> {
       final int index = _rows.indexWhere((_TreeRow row) => row.item.id == id);
       if (index < 0) return; // Hidden by an active filter.
       final double target = index * _kTreeRowHeight;
+      final double offset = _scrollController.offset;
+      final double viewport = _scrollController.position.viewportDimension;
       final double max = _scrollController.position.maxScrollExtent;
+
+      // Keep the tree in place when the row is already fully visible:
+      // scrolling it to the viewport top "carries the tree upwards" every
+      // time a row is tapped. Scroll only the minimum needed.
+      double? destination;
+      if (target < offset) {
+        destination = target;
+      } else if (target + _kTreeRowHeight > offset + viewport) {
+        destination = target + _kTreeRowHeight - viewport;
+      }
+      if (destination == null) return;
       _scrollController.animateTo(
-        target.clamp(0.0, max),
+        destination.clamp(0.0, max),
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
       );
@@ -312,6 +331,13 @@ class _PageListState extends State<PageList> {
         builder: (BuildContext context, String? selectedId, _) {
           _rows = _buildRows();
           final bool filtering = _query.isNotEmpty;
+          // Components whose sourceV2 binding is empty (but a legacy source
+          // text exists) render orange together with all their ancestors,
+          // so an unbound branch is visible at a glance.
+          final Set<String> orangeIds = <String>{};
+          for (final _TreeRow row in _rows) {
+            if (row.isPage) _collectUnboundSource(row.item, orangeIds);
+          }
 
           final Widget list = _rows.isEmpty
               ? Center(
@@ -324,7 +350,7 @@ class _PageListState extends State<PageList> {
                   itemExtent: _kTreeRowHeight,
                   itemCount: _rows.length,
                   itemBuilder: (BuildContext context, int index) =>
-                      _buildRow(_rows[index], selectedId, filtering),
+                      _buildRow(_rows[index], selectedId, filtering, orangeIds),
                 );
 
           return Column(
@@ -400,7 +426,36 @@ class _PageListState extends State<PageList> {
     );
   }
 
-  Widget _buildRow(_TreeRow row, String? selectedId, bool filtering) {
+  /// Marks [item] and, recursively, every ancestor branch that contains a
+  /// component with an empty sourceV2 binding in [orangeIds].
+  bool _collectUnboundSource(Item item, Set<String> orangeIds) {
+    final bool selfUnbound = _isUnboundSourceItem(item);
+    bool childrenUnbound = false;
+    for (final Item child in item.items) {
+      if (_collectUnboundSource(child, orangeIds)) childrenUnbound = true;
+    }
+    if (selfUnbound || childrenUnbound) {
+      orangeIds.add(item.id);
+      return true;
+    }
+    return false;
+  }
+
+  /// A component with source intent (a legacy source text or a typed
+  /// reference) whose sourceV2 binding is empty.
+  bool _isUnboundSourceItem(Item item) {
+    if (!item.hasSource) return false;
+    final dynamic typed = item.properties['sourceV2']?.value;
+    final bool bound = typed is SourceReference && typed.variableName.isNotEmpty;
+    return !bound;
+  }
+
+  Widget _buildRow(
+    _TreeRow row,
+    String? selectedId,
+    bool filtering,
+    Set<String> orangeIds,
+  ) {
     final Item item = row.item;
     final bool isPage = row.isPage;
     final bool selected = item.id == selectedId;
@@ -413,6 +468,10 @@ class _PageListState extends State<PageList> {
     final Color foreground = selected || isCurrent
         ? colorScheme.onSecondaryContainer
         : colorScheme.onSurface;
+    // Unbound source bindings (the item itself or any descendant) paint the
+    // row orange — even on top of the selection background.
+    final bool orange = orangeIds.contains(item.id);
+    final Color textColor = orange ? kUnboundSourceColor : foreground;
 
     return InkWell(
       onTap: () => _onRowTap(item),
@@ -450,7 +509,7 @@ class _PageListState extends State<PageList> {
                 (item['name'] ?? '').toString(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: foreground),
+                style: TextStyle(color: textColor),
               ),
             ),
             if (isPage)

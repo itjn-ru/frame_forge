@@ -217,9 +217,21 @@ class ItemsState extends State<Items> with AutomaticKeepAliveClientMixin {
       final int index = _rows.indexWhere((_TreeRow row) => row.item.id == id);
       if (index < 0) return; // Hidden by an active filter.
       final double target = index * _kTreeRowHeight;
+      final double offset = _scrollController.offset;
+      final double viewport = _scrollController.position.viewportDimension;
       final double max = _scrollController.position.maxScrollExtent;
+
+      // Keep the tree in place when the row is already fully visible;
+      // scroll only the minimum needed (see PageList._scrollToId).
+      double? destination;
+      if (target < offset) {
+        destination = target;
+      } else if (target + _kTreeRowHeight > offset + viewport) {
+        destination = target + _kTreeRowHeight - viewport;
+      }
+      if (destination == null) return;
       _scrollController.animateTo(
-        target.clamp(0.0, max),
+        destination.clamp(0.0, max),
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
       );

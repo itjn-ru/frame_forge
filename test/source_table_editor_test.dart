@@ -6,6 +6,8 @@ import 'package:frame_forge/frame_forge.dart';
 // (the same way the example app does) or showDialog fails its debug check.
 import 'package:material_ui/material_ui.dart';
 import 'package:frame_forge/src/layout_model/component_text.dart';
+import 'package:frame_forge/src/layout_model/property_source_widget.dart'
+    show kSourceAutocompleteDebounce;
 
 void main() {
   late LayoutModel layoutModel;
@@ -213,6 +215,8 @@ void main() {
         find.byKey(const ValueKey<String>('sourceTableSearch')),
         'client',
       );
+      // The list refreshes on a debounced query.
+      await tester.pump(kSourceAutocompleteDebounce);
       await tester.pumpAndSettle();
 
       expect(find.text('client_name'), findsOneWidget);

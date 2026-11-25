@@ -5,6 +5,8 @@ import 'package:frame_forge/frame_forge.dart';
 // MaterialLocalizations) for showDialog/debug checks to pass.
 import 'package:material_ui/material_ui.dart';
 import 'package:frame_forge/src/layout_model/component_text.dart';
+import 'package:frame_forge/src/layout_model/property_source_widget.dart'
+    show kSourceAutocompleteDebounce;
 
 void main() {
   late LayoutModel layoutModel;
@@ -109,6 +111,8 @@ void main() {
       find.byKey(const ValueKey<String>('sourceAutocomplete')),
       'long_client',
     );
+    // The suggestion list refreshes on a debounced query.
+    await tester.pump(kSourceAutocompleteDebounce);
     await tester.pumpAndSettle();
 
     // The filtered option list shows the long variable (two-line entry:

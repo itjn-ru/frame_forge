@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:uuid/uuid.dart';
 
@@ -11,6 +13,9 @@ import 'source_reference.dart';
 import 'source_variable.dart';
 import 'source_variable_group.dart';
 import 'strings.dart';
+
+/// Delay between the last keystroke and the suggestion list refresh.
+const Duration kSourceAutocompleteDebounce = Duration(milliseconds: 300);
 
 /// A property widget that shows a hierarchical navigator for selecting
 /// source variables from the SourcePage. Groups can be drilled into;
@@ -67,9 +72,15 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
   /// idle, the typed query while searching.
   final TextEditingController _queryController = TextEditingController();
 
-  /// Focus of the autocomplete field; RawAutocomplete requires the focus
-  /// node and the text controller to be passed together.
+  /// Focus of the autocomplete field; the suggestion list filters on the
+  /// debounced query, not on every keystroke.
   final FocusNode _queryFocus = FocusNode();
+
+  /// Pending query debounce timer.
+  Timer? _queryDebounce;
+
+  /// The query the suggestion list is currently filtered by.
+  String _appliedQuery = '';
 
   /// Returns every variable name of the source page, including variables
   /// nested inside groups.
@@ -100,10 +111,12 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
 
   /// Applies a variable selection from any picker and refreshes the field.
   void _selectVariable(String name) {
+    _queryDebounce?.cancel();
     widget.sourceRef.variableName = name;
     widget.sourceRef.mapKey = '';
     widget.property.value = widget.sourceRef;
     _queryController.text = name;
+    _appliedQuery = '';
     // Collapse the suggestion list: the selection is done.
     if (_queryFocus.hasFocus) {
       _queryFocus.unfocus();
@@ -121,15 +134,32 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
     _queryFocus.addListener(_handleQueryFocus);
   }
 
+  /// Debounces the query: the suggestion list refreshes after the user
+  /// pauses typing, not on every keystroke.
+  void _handleQueryChanged(String value) {
+    _queryDebounce?.cancel();
+    _queryDebounce = Timer(kSourceAutocompleteDebounce, () {
+      if (mounted) {
+        setState(() {
+          _appliedQuery = value.toLowerCase().trim();
+        });
+      }
+    });
+    if (mounted) setState(() {});
+  }
+
   void _handleQueryFocus() {
+    _queryDebounce?.cancel();
     if (!_queryFocus.hasFocus) {
       _queryController.text = widget.sourceRef.variableName;
+      _appliedQuery = '';
     }
     if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _queryDebounce?.cancel();
     _queryFocus.removeListener(_handleQueryFocus);
     _queryController.dispose();
     _queryFocus.dispose();
@@ -577,19 +607,27 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
   }
 
   /// The autocomplete field above the group navigator: typing filters all
-  /// variables by a `%query%` substring (case-insensitive) and the matched
-  /// names are offered in an inline list right below the field — no overlay,
-  /// so nothing can be positioned off-screen in a narrow side panel.
+  /// variables by a `%query%` substring (case-insensitive, debounced) and
+  /// the matched names are offered in an inline list right below the field
+  /// — no overlay, so nothing can be positioned off-screen in a narrow
+  /// side panel.
   Widget _buildAutocompleteField() {
     final List<String> allNames = _allVariableNames();
-    final String query = _queryController.text.toLowerCase().trim();
-    final List<String> filtered = query.isEmpty
+    final String applied = _appliedQuery;
+    final List<String> filtered = applied.isEmpty
         ? <String>[]
         : allNames
-            .where((String name) => name.toLowerCase().contains(query))
+            .where((String name) => name.toLowerCase().contains(applied))
             .toList();
     final bool showOptions =
-        _queryFocus.hasFocus && query.isNotEmpty && filtered.isNotEmpty;
+        _queryFocus.hasFocus && applied.isNotEmpty && filtered.isNotEmpty;
+    // The live list for Enter handling (not debounced).
+    final String liveQuery = _queryController.text.toLowerCase().trim();
+    final List<String> liveFiltered = liveQuery.isEmpty
+        ? <String>[]
+        : allNames
+            .where((String name) => name.toLowerCase().contains(liveQuery))
+            .toList();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -608,7 +646,7 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
             controller: _queryController,
             focusNode: _queryFocus,
             style: const TextStyle(fontSize: 12),
-            onChanged: (String value) => setState(() {}),
+            onChanged: _handleQueryChanged,
             decoration: InputDecoration(
               isDense: true,
               border: InputBorder.none,
@@ -626,9 +664,9 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
             ),
             onSubmitted: (String text) {
               final String trimmed = text.trim();
-              if (filtered.isNotEmpty) {
+              if (liveFiltered.isNotEmpty) {
                 // Enter picks the first matching variable.
-                _selectVariable(filtered.first);
+                _selectVariable(liveFiltered.first);
               } else if (trimmed.isNotEmpty) {
                 // No matching options: bind the typed name as is — a
                 // missing variable is recreated by the model on next load.

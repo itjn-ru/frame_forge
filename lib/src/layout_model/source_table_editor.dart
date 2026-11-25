@@ -12,6 +12,7 @@ import 'page.dart';
 import 'property.dart';
 import 'source_variable.dart';
 import 'source_variable_group.dart';
+import 'property_source_widget.dart' show kSourceAutocompleteDebounce;
 import 'strings.dart';
 import '../ui_kit/property_text_field.dart';
 
@@ -121,6 +122,10 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
   String _query = '';
   String _typeFilter = '';
 
+  /// Pending search debounce timer: with hundreds of variables the list
+  /// refreshes after the user pauses typing, not on every keystroke.
+  Timer? _searchDebounce;
+
   /// Ids of collapsed group sections; the root section uses the empty id.
   final Set<String> _collapsed = <String>{};
 
@@ -158,6 +163,7 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _eventsSubscription?.cancel();
     _searchController.dispose();
     super.dispose();
@@ -658,19 +664,28 @@ class _SourceTableEditorState extends State<SourceTableEditor> {
             child: TextField(
               key: const ValueKey<String>('sourceTableSearch'),
               controller: _searchController,
-              onChanged: (String value) => setState(() {
-                _query = value.toLowerCase().trim();
-              }),
+              onChanged: (String value) {
+                // The clear button reacts immediately; the list itself
+                // refreshes on the debounced query.
+                setState(() {});
+                _searchDebounce?.cancel();
+                _searchDebounce = Timer(kSourceAutocompleteDebounce, () {
+                  if (mounted) {
+                    setState(() => _query = value.toLowerCase().trim());
+                  }
+                });
+              },
               decoration: InputDecoration(
                 isDense: true,
                 hintText: FrameForgeStrings.sourceTableSearchHint,
                 prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: _query.isEmpty
+                suffixIcon: _searchController.text.isEmpty
                     ? null
                     : IconButton(
                         tooltip: FrameForgeStrings.itemsSearchClear,
                         icon: const Icon(Icons.close, size: 18),
                         onPressed: () {
+                          _searchDebounce?.cancel();
                           _searchController.clear();
                           setState(() => _query = '');
                         },

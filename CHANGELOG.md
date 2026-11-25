@@ -73,6 +73,17 @@
 
 ### Changed
 
+- Source autocomplete (properties panel) and the source table search now
+  refresh on a 300 ms debounce instead of every keystroke — comfortable
+  with 150+ variables. The clear button still reacts immediately.
+- Tree selection no longer "carries the tree upwards": `PageList` and
+  `Items` scroll only the minimum needed to bring the selected row into
+  view; rows that are already fully visible keep their position, so
+  expanding a branch grows it downwards instead of jumping the viewport.
+- Components with an empty `sourceV2` binding (a legacy `source` text
+  present, typed reference empty) render orange in the `PageList` tree —
+  the component itself and all its ancestor rows up to the page. The flag
+  clears as soon as the component gets bound (auto-fill or manual).
 - `PageList` is now a unified expandable tree of component pages and their
   items, replacing the previous master-detail pair (pages-only list plus a
   separate `Items` tree of the current page):
