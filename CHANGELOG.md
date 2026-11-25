@@ -16,6 +16,16 @@
   4+ character prefixes (`тягач` ↔ `тягача`) and requires at least two
   matched words; an exact full-text match always wins
   (`source_matcher.dart`, `findBestSourceVariableMatch`).
+- Import order fix: auto-fill now runs before the source variable sync, so
+  an empty `sourceV2` binds to the variables that already exist in the file
+  (word matching, e.g. `Двигатель тягача {радиокнопка}` →
+  `ТягачДвигательСостояние`) instead of latching onto the text-named
+  variable the sync step would otherwise create first. Components already
+  bound through `sourceV2` no longer spawn text-named variables from their
+  legacy `source` label; components with no matching variable keep the
+  legacy runtime binding (the text-named variable is still created for
+  them, since the runtime reads `json[source]` by that key when `sourceV2`
+  is empty).
 - Mass deletion in the source table: a checkbox column with a select-all
   header checkbox (respecting the current search/type filter) and a
   "Delete selected (N)" toolbar button with a confirmation dialog; the

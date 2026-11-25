@@ -354,10 +354,12 @@ class LayoutModel with FromMapToMap {
       _setPageForItem(stylePage, basicElement);
     }
 
+    // Auto-fill first: bind empty sourceV2 references to the variables
+    // that already exist in the file, so the sync step below does not
+    // create text-named duplicates for components that just got bound.
+    autoFillSourceReferences();
     // Auto-sync: add missing source variables from component pages
     _syncSourceVariables();
-    // Auto-fill: bind empty sourceV2 references from legacy source texts.
-    autoFillSourceReferences();
   }
 
   /// Fills empty typed source references (`sourceV2`) from the legacy
@@ -456,7 +458,13 @@ class LayoutModel with FromMapToMap {
   /// Recursively collects source variable names from items.
   void _collectSourceReferences(Item item, Set<String> names) {
     final Property? sourceProp = item.properties['source'];
-    if (sourceProp != null) {
+    final Property? typedProp = item.properties['sourceV2'];
+    // A component already bound through sourceV2 reads its value by the
+    // typed variable name — the legacy text is just a label and must not
+    // spawn a text-named variable.
+    final bool typedBound = typedProp?.value is SourceReference &&
+        (typedProp!.value as SourceReference).variableName.isNotEmpty;
+    if (sourceProp != null && !typedBound) {
       if (sourceProp.value is SourceReference) {
         final String varName =
             (sourceProp.value as SourceReference).variableName;
