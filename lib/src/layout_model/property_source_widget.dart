@@ -104,6 +104,10 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
     widget.sourceRef.mapKey = '';
     widget.property.value = widget.sourceRef;
     _queryController.text = name;
+    // Collapse the suggestion list: the selection is done.
+    if (_queryFocus.hasFocus) {
+      _queryFocus.unfocus();
+    }
     _emitChange();
   }
 
@@ -112,10 +116,21 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
     super.initState();
     // The field mirrors the current selection until the user edits it.
     _queryController.text = widget.sourceRef.variableName;
+    // Losing focus collapses the suggestion list and restores the field
+    // text to the current selection (a half-typed query is discarded).
+    _queryFocus.addListener(_handleQueryFocus);
+  }
+
+  void _handleQueryFocus() {
+    if (!_queryFocus.hasFocus) {
+      _queryController.text = widget.sourceRef.variableName;
+    }
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _queryFocus.removeListener(_handleQueryFocus);
     _queryController.dispose();
     _queryFocus.dispose();
     super.dispose();
@@ -561,32 +576,26 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
     );
   }
 
-  /// The autocomplete field above the group navigator: filters all
-  /// variables by the typed substring and offers them in a dropdown list.
+  /// The autocomplete field above the group navigator: typing filters all
+  /// variables by a `%query%` substring (case-insensitive) and the matched
+  /// names are offered in an inline list right below the field — no overlay,
+  /// so nothing can be positioned off-screen in a narrow side panel.
   Widget _buildAutocompleteField() {
     final List<String> allNames = _allVariableNames();
+    final String query = _queryController.text.toLowerCase().trim();
+    final List<String> filtered = query.isEmpty
+        ? <String>[]
+        : allNames
+            .where((String name) => name.toLowerCase().contains(query))
+            .toList();
+    final bool showOptions =
+        _queryFocus.hasFocus && query.isNotEmpty && filtered.isNotEmpty;
 
-    Iterable<String> buildOptions(TextEditingValue value) {
-      final String query = value.text.toLowerCase().trim();
-      if (query.isEmpty) return allNames;
-      return allNames
-          .where((String name) => name.toLowerCase().contains(query));
-    }
-
-    return RawAutocomplete<String>(
-      textEditingController: _queryController,
-      focusNode: _queryFocus,
-      optionsBuilder: buildOptions,
-      displayStringForOption: (String option) => option,
-      onSelected: _selectVariable,
-      fieldViewBuilder: (
-        BuildContext context,
-        TextEditingController textController,
-        FocusNode focusNode,
-        VoidCallback onFieldSubmitted,
-      ) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 4),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             border: Border.all(
@@ -596,9 +605,10 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
           ),
           child: TextField(
             key: const ValueKey<String>('sourceAutocomplete'),
-            controller: textController,
-            focusNode: focusNode,
+            controller: _queryController,
+            focusNode: _queryFocus,
             style: const TextStyle(fontSize: 12),
+            onChanged: (String value) => setState(() {}),
             decoration: InputDecoration(
               isDense: true,
               border: InputBorder.none,
@@ -615,84 +625,76 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
               contentPadding: EdgeInsets.zero,
             ),
             onSubmitted: (String text) {
-              // Enter without matching options binds the typed name as is —
-              // a missing variable is recreated by the model on next load.
               final String trimmed = text.trim();
-              if (trimmed.isNotEmpty &&
-                  !allNames.any(
-                    (String name) =>
-                        name.toLowerCase().contains(trimmed.toLowerCase()),
-                  )) {
+              if (filtered.isNotEmpty) {
+                // Enter picks the first matching variable.
+                _selectVariable(filtered.first);
+              } else if (trimmed.isNotEmpty) {
+                // No matching options: bind the typed name as is — a
+                // missing variable is recreated by the model on next load.
                 _selectVariable(trimmed);
               }
-              onFieldSubmitted();
             },
           ),
-        );
-      },
-      optionsViewBuilder: (
-        BuildContext context,
-        AutocompleteOnSelected<String> onSelected,
-        Iterable<String> options,
-      ) {
-        // Anchored to the right edge: the properties panel sits at the
-        // right side of the window, so the list must grow to the left.
-        return Align(
-          alignment: Alignment.topRight,
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(4),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 320, maxHeight: 220),
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                shrinkWrap: true,
-                itemCount: options.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final String name = options.elementAt(index);
-                  final String type = _variableType(name);
-                  return InkWell(
-                    onTap: () => onSelected(name),
-                    child: Tooltip(
-                      message: '$name ($type)',
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
+        ),
+        if (showOptions)
+          Container(
+            margin: const EdgeInsets.only(bottom: 4),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              borderRadius: BorderRadius.circular(4),
+              color: Theme.of(context).colorScheme.surface,
+            ),
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              shrinkWrap: true,
+              itemCount: filtered.length,
+              itemBuilder: (BuildContext context, int index) {
+                final String name = filtered[index];
+                final String type = _variableType(name);
+                return InkWell(
+                  onTap: () => _selectVariable(name),
+                  child: Tooltip(
+                    message: '$name ($type)',
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              name,
+                              maxLines: 2,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            if (type.isNotEmpty)
                               Text(
-                                name,
-                                maxLines: 2,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              if (type.isNotEmpty)
-                                Text(
-                                  type,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                  ),
+                                type,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey,
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
-        );
-      },
+      ],
     );
   }
 

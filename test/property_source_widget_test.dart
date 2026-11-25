@@ -98,10 +98,16 @@ void main() {
       (WidgetTester tester) async {
     await pumpProperties(tester);
 
-    // Type part of the long name into the autocomplete field.
+    // The suggestion list is hidden while nothing is typed.
+    expect(
+      find.text('very_long_client_variable_name_for_testing'),
+      findsNothing,
+    );
+
+    // Type a MIDDLE substring of the name: the search is %input%.
     await tester.enterText(
       find.byKey(const ValueKey<String>('sourceAutocomplete')),
-      'very_long',
+      'long_client',
     );
     await tester.pumpAndSettle();
 
@@ -111,6 +117,10 @@ void main() {
       find.text('very_long_client_variable_name_for_testing'),
       findsOneWidget,
     );
+    // The option list no longer offers the filtered-out variable: bare
+    // 'config' remains visible only in the current-selection chip, the
+    // option list shows 'config (String)' through the dropdown instead.
+
     await tester.tap(
       find.text('very_long_client_variable_name_for_testing'),
     );
@@ -121,6 +131,13 @@ void main() {
     expect(
       reference.variableName,
       'very_long_client_variable_name_for_testing',
+    );
+
+    // The selection collapses the list; the name remains in the field and
+    // in the current-selection chip.
+    expect(
+      find.text('very_long_client_variable_name_for_testing'),
+      findsNWidgets(2),
     );
   });
 }

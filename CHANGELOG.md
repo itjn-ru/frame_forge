@@ -6,8 +6,12 @@
 
 - Autocomplete field in the source property editor (`sourceV2`): typing a
   part of a variable name filters every variable — including those nested
-  in groups — in a dropdown list next to the existing group navigator;
-  Enter with no matching options binds the typed name as a new reference.
+  in groups — with a `%query%` substring match. The suggestions render as
+  an inline list right below the field inside the properties panel (no
+  overlay), so they stay visible in a narrow panel at any window size.
+  Enter picks the first match; Enter with no matching options binds the
+  typed name as a new reference; losing focus collapses the list and
+  restores the field to the current selection.
 - Auto-fill of empty `sourceV2` bindings from the legacy `source` text:
   `LayoutModel.autoFillSourceReferences()` runs on project load and a new
   "fill empty sourceV2" toolbar button in the source table runs it on

@@ -150,10 +150,11 @@ await showSourceTableEditor(context, controller);
 ### Source autocomplete (sourceV2)
 
 The properties panel gained a search field above the group navigator: start
-typing part of a name and the list filters across all data page variables
-(including those nested in groups); click or Enter selects the variable. The
-group navigator and the dropdown stay in place; Enter with no matching
-options binds the typed name as a new reference (the variable is recreated
+typing part of a name and the suggestions appear as an inline list right
+below the field (`%input%`: substring anywhere in the name, case-insensitive,
+covering variables nested in groups); click selects the variable. The group
+navigator and the dropdown stay in place; Enter with no matching options
+binds the typed name as a new reference (the variable is recreated
 automatically on the next save/load).
 
 ### Create DSL Model
