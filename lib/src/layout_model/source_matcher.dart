@@ -97,13 +97,48 @@ String stripBraceSegments(String text) {
   return text.replaceAll(pattern, ' ');
 }
 
+/// Widget-hint synonyms: a `{hint}` in the legacy source text points at
+/// the field word that ends the variable name.
+///
+/// Example: `Состояние кабины тягача {радиокнопка}` binds to
+/// `ТягачСостояниеКабиныСостояние`, `{вложение}` binds to a `…Файл`
+/// variable. Keys and values are lowercase; host apps may extend the map
+/// with their own hints.
+final Map<String, String> sourceHintWordSynonyms = <String, String>{
+  'радиокнопка': 'состояние',
+  'вложение': 'файл',
+  'комментарий': 'комментарий',
+};
+
+/// Preference words for the `{…}` hints of a legacy text: every hint word
+/// itself plus its synonyms from [sourceHintWordSynonyms].
+List<String> sourceHintPreferenceWords(String normalizedText) {
+  final List<String> preference = <String>[];
+  for (final RegExpMatch match
+      in RegExp(r'\{([^}]*)\}').allMatches(normalizedText)) {
+    for (final String word in sourceTextWords(match.group(1) ?? '')) {
+      preference.add(word);
+      final String? synonym = sourceHintWordSynonyms[word];
+      if (synonym != null) preference.add(synonym.toLowerCase());
+    }
+  }
+  return preference;
+}
+
 /// Finds the best matching variable name for a legacy source text.
 ///
 /// - An exact (trim + case-insensitive) full match always wins.
 /// - Otherwise the `{…}` hint segments are stripped and **every**
 ///   remaining word of the text must be represented in the variable name
 ///   (the threshold equals the number of words: `source.split(' ').length`).
-///   Ties keep the first candidate in [variableNames] order.
+///   Word order is irrelevant, so vehicle-first names
+///   (`ТягачСостояниеКабиныСостояние` for `Состояние кабины тягача`)
+///   match naturally.
+/// - Candidates that also match the `{hint}` word — via
+///   [sourceHintWordSynonyms] — against their **last** word win over
+///   candidates that do not: `…{радиокнопка}` prefers `…Состояние`,
+///   `…{вложение}` prefers `…Файл`, `…{комментарий}` prefers
+///   `…Комментарий`. Remaining ties keep the first candidate.
 /// - Returns null when no candidate covers all the words.
 String? findBestSourceVariableMatch(
   String legacyText,
@@ -117,23 +152,30 @@ String? findBestSourceVariableMatch(
   );
   // A text that carries no matchable words (only a `{hint}`) never binds.
   if (textWords.isEmpty) return null;
+  final List<String> hintWords = sourceHintPreferenceWords(normalizedText);
 
-  String? best;
-  int bestScore = 0;
+  String? firstCovering;
+  String? bestHint;
+  int bestHintHits = 0;
   for (final String variableName in variableNames) {
     if (variableName.trim().toLowerCase() ==
         normalizedText.toLowerCase()) {
       return variableName;
     }
-    final int score = countSourceWordMatches(
-      textWords,
-      sourceTextWords(variableName),
-    );
-    if (score > bestScore) {
-      best = variableName;
-      bestScore = score;
+    final List<String> variableWords = sourceTextWords(variableName);
+    if (countSourceWordMatches(textWords, variableWords) < textWords.length) {
+      continue; // Must cover every word of the text.
+    }
+    firstCovering ??= variableName;
+    if (hintWords.isEmpty || variableWords.isEmpty) continue;
+    int hintHits = 0;
+    for (final String hint in hintWords) {
+      if (sourceWordsMatch(hint, variableWords.last)) hintHits++;
+    }
+    if (hintHits > bestHintHits) {
+      bestHint = variableName;
+      bestHintHits = hintHits;
     }
   }
-  if (bestScore < textWords.length) return null;
-  return best;
+  return bestHint ?? firstCovering;
 }

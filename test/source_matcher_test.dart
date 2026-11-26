@@ -97,6 +97,52 @@ void main() {
       );
     });
 
+    test('brace hint disambiguates same-prefix variables (tractor)', () {
+      const List<String> variables = <String>[
+        'ТягачСостояниеКабиныСостояние',
+        'ТягачСостояниеКабиныФайл',
+        'ТягачСостояниеКабиныКомментарий',
+      ];
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины тягача {радиокнопка}',
+          variables,
+        ),
+        'ТягачСостояниеКабиныСостояние',
+      );
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины тягача {вложение}',
+          variables,
+        ),
+        'ТягачСостояниеКабиныФайл',
+      );
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины тягача {комментарий}',
+          variables,
+        ),
+        'ТягачСостояниеКабиныКомментарий',
+      );
+    });
+
+    test('brace hint disambiguates same-prefix variables (trailer)', () {
+      const List<String> variables = <String>[
+        'ПрицепСостояниеКабиныСостояние',
+        'ПрицепСостояниеКабиныФайл',
+        'ПрицепСостояниеКабиныКомментарий',
+      ];
+      // The vehicle word stands at the end of the text with a case ending
+      // and at the beginning of the variable name — order is irrelevant.
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины прицепа {вложение}',
+          variables,
+        ),
+        'ПрицепСостояниеКабиныФайл',
+      );
+    });
+
     test('no match at all returns null', () {
       expect(
         findBestSourceVariableMatch('СовсемДругоеБессмысленно', variables),

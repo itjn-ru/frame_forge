@@ -24,6 +24,15 @@
   case endings through 4+ character prefixes (`тягач` ↔ `тягача`) and
   requires every word of the text to be covered; an exact full-text match
   always wins (`source_matcher.dart`, `findBestSourceVariableMatch`).
+  Among candidates that cover all words, the one whose **last** word
+  matches the `{hint}` wins — via the extensible `sourceHintWordSynonyms`
+  dictionary (`радиокнопка` → `Состояние`, `вложение` → `Файл`,
+  `комментарий` → `Комментарий`): the text
+  `Состояние кабины тягача {радиокнопка}` binds to
+  `ТягачСостояниеКабиныСостояние` rather than the identically-prefixed
+  `…Файл`/`…Комментарий` siblings. Word order is irrelevant, so
+  vehicle-first names (`Тягач…`, `Прицеп…`) match texts where the vehicle
+  word stands at the end with a case ending.
 - `_syncSourceVariables()` removed entirely: importing no longer creates
   variables named after legacy `source` texts. The source page now only
   contains the variables the author actually created; a component whose

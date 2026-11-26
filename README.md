@@ -144,6 +144,15 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   re-bound automatically to the actual variable by words
   (`СостояниеКабиныТягачаВложение`). Proper concatenated CamelCase
   bindings are never touched.
+- the `{hint}` disambiguates candidates sharing the same prefix: its word
+  (and synonyms from the extensible `sourceHintWordSynonyms` dictionary —
+  `радиокнопка` → `Состояние`, `вложение` → `Файл`, `комментарий` →
+  `Комментарий`) must match the **last** word of the variable name:
+  `Состояние кабины тягача {радиокнопка}` → `ТягачСостояниеКабиныСостояние`,
+  `{вложение}` → `ТягачСостояниеКабиныФайл`, `{комментарий}` →
+  `ТягачСостояниеКабиныКомментарий`. Word order is irrelevant: a
+  `Тягач…`/`Прицеп…`-prefixed name matches a text where the vehicle word
+  stands at the end with a case ending.
 - search by name and type filter, expand/collapse all groups,
 - copy the visible rows to Excel (TSV: name, type, nullable, possible values)
   and paste rows from Excel back as variables,
