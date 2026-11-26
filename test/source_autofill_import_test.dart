@@ -13,6 +13,7 @@ void main() {
   late ComponentText phraseComponent;
   late ComponentText camelComponent;
   late ComponentText noMatchComponent;
+  late ComponentText unitComponent;
 
   setUp(() {
     layoutModel = LayoutModel(
@@ -37,13 +38,24 @@ void main() {
     );
     layoutModel.addItem(page, camelComponent);
 
-    // Phrase binding with no candidate variable: cleared, stays empty.
+    // Phrase binding with no candidate variable: cleared, then the
+    // conventional variable is created and bound.
     noMatchComponent = ComponentText('nomatch');
     noMatchComponent.properties['source']?.value = 'Полная высота кабины';
     noMatchComponent.properties['sourceV2']?.value = SourceReference(
       variableName: 'Полная высота кабины',
     );
     layoutModel.addItem(page, noMatchComponent);
+
+    // sourceV2 written with spaces (or &#x20;) plus a unit in the text:
+    // normalized to the concatenated CamelCase name.
+    unitComponent = ComponentText('unit');
+    unitComponent.properties['source']?.value =
+        'Показание моточасов фактическое';
+    unitComponent.properties['sourceV2']?.value = SourceReference(
+      variableName: 'Показание моточасов фактическое',
+    );
+    layoutModel.addItem(page, unitComponent);
 
     // The real variables of the data page.
     layoutModel.addItem(
@@ -116,5 +128,29 @@ void main() {
         .map((SourceVariable v) => v.properties['name']?.value?.toString() ?? '')
         .toList();
     expect(names, contains('ПолнаяВысотаКабины'));
+  });
+
+  test('import normalizes phrase bindings to concatenated CamelCase', () {
+    final LayoutModel fresh = reloadFromMap();
+    final List<ComponentText> texts = fresh.root.items
+        .whereType<ComponentPage>()
+        .expand((ComponentPage p) => p.items)
+        .whereType<ComponentText>()
+        .toList();
+    final ComponentText unit =
+        texts.firstWhere((ComponentText t) => t['name'] == 'unit');
+
+    // The phrase binding (spaces / &#x20;) was cleared and re-bound to the
+    // conventional concatenated name.
+    final SourceReference reference = reloadedReference(unit);
+    expect(reference.variableName, 'ПоказаниеМоточасовФактическое');
+
+    final List<String> names = fresh.root.items
+        .whereType<SourcePage>()
+        .expand((SourcePage p) => p.items)
+        .whereType<SourceVariable>()
+        .map((SourceVariable v) => v.properties['name']?.value?.toString() ?? '')
+        .toList();
+    expect(names, contains('ПоказаниеМоточасовФактическое'));
   });
 }

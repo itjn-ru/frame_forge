@@ -97,6 +97,22 @@ String stripBraceSegments(String text) {
   return text.replaceAll(pattern, ' ');
 }
 
+/// Strips `(…)` segments from a legacy source text.
+///
+/// The parentheses hold measurement units (`Пробег (км)`,
+/// `Остаток топлива в баке (л)`) — they are dropped entirely, they are
+/// not part of the variable name.
+String stripParenthesizedSegments(String text) {
+  final RegExp pattern = RegExp(r'\([^)]*\)');
+  return text.replaceAll(pattern, ' ');
+}
+
+/// Strips both `{hint}` and `(unit)` annotations from a legacy text,
+/// leaving only the words the variable name consists of.
+String stripSourceAnnotations(String text) {
+  return stripParenthesizedSegments(stripBraceSegments(text));
+}
+
 /// Widget-hint synonyms: a `{hint}` in the legacy source text points at
 /// the field word that ends the variable name.
 ///
@@ -129,14 +145,17 @@ final Map<String, String> sourceFrontWordSynonyms = <String, String>{
 ///
 /// Words keep their original spelling (no case normalization: `ходовой`
 /// → `Ходовой`), duplicates are kept (`ТягачСостояниеХодовойСостояние`
-/// contains `Состояние` twice). Returns an empty string when the text
-/// carries no matchable words.
+/// contains `Состояние` twice). Prepositions stay and are capitalized
+/// (`в` → `В` in `ОстатокТопливаВБаке`); `(unit)` annotations are
+/// dropped: `Пробег (км)` → `Пробег`,
+/// `Остаток топлива в баке (л)` → `ОстатокТопливаВБаке`. Returns an
+/// empty string when the text carries no matchable words.
 String generateSourceVariableName(String legacyText) {
   final String normalizedText = legacyText.trim();
   if (normalizedText.isEmpty) return '';
 
   final List<String> textWords = sourceTextWords(
-    stripBraceSegments(normalizedText),
+    stripSourceAnnotations(normalizedText),
   );
   if (textWords.isEmpty) return '';
 
@@ -202,12 +221,13 @@ List<String> sourceHintPreferenceWords(String normalizedText) {
 /// Finds the best matching variable name for a legacy source text.
 ///
 /// - An exact (trim + case-insensitive) full match always wins.
-/// - Otherwise the `{…}` hint segments are stripped and **every**
-///   remaining word of the text must be represented in the variable name
-///   (the threshold equals the number of words: `source.split(' ').length`).
-///   Word order is irrelevant, so vehicle-first names
-///   (`ТягачСостояниеКабиныСостояние` for `Состояние кабины тягача`)
-///   match naturally.
+/// - Otherwise the `{hint}` and `(unit)` annotations are stripped and
+///   **every** remaining word of the text must be represented in the
+///   variable name (the threshold equals the number of words:
+///   `source.split(' ').length`). Word order is irrelevant, so
+///   vehicle-first names (`ТягачСостояниеКабиныСостояние` for
+///   `Состояние кабины тягача`) match naturally. Units like `(км)` are
+///   ignored: `Пробег (км)` matches `Пробег`.
 /// - Candidates that also match the `{hint}` word — via
 ///   [sourceHintWordSynonyms] — against their **last** word win over
 ///   candidates that do not: `…{радиокнопка}` prefers `…Состояние`,
@@ -222,7 +242,7 @@ String? findBestSourceVariableMatch(
   if (normalizedText.isEmpty) return null;
 
   final List<String> textWords = sourceTextWords(
-    stripBraceSegments(normalizedText),
+    stripSourceAnnotations(normalizedText),
   );
   // A text that carries no matchable words (only a `{hint}`) never binds.
   if (textWords.isEmpty) return null;

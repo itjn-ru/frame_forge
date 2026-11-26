@@ -147,6 +147,12 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   empty `sourceV2` participate, valid bindings are never rewritten, and
   when the generated name is already taken the component simply binds to
   the existing variable (no duplicates).
+- plain phrases without a vehicle word normalize to concatenated
+  CamelCase, and `(unit)` annotations are dropped (both in matching and
+  in generation): `Показание моточасов фактическое` →
+  `ПоказаниеМоточасовФактическое`, `Пробег (км)` → `Пробег`,
+  `Остаток топлива в баке (л)` → `ОстатокТопливаВБаке` (prepositions
+  stay and capitalize: `в` → `В`).
 - import repairs sourceV2 bindings: a variableName written as a human
   phrase — containing spaces or a `{hint}` (e.g.
   `Состояние кабины тягача {вложение}`) — is cleared, and the component is

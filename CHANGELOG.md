@@ -47,6 +47,11 @@
   manual "fill empty sourceV2" button keeps binding-only behavior
   (no creation) — call `autoFillSourceReferences(createMissing: true)`
   for the creating pass.
+- `(unit)` annotations in legacy texts are ignored by both matching and
+  name generation, and plain phrases normalize to concatenated CamelCase:
+  `Показание моточасов фактическое` → `ПоказаниеМоточасовФактическое`,
+  `Пробег (км)` → `Пробег`, `Остаток топлива в баке (л)` →
+  `ОстатокТопливаВБаке` (prepositions stay and capitalize: `в` → `В`).
 - `_syncSourceVariables()` removed entirely: importing no longer creates
   variables whose names are the raw legacy `source` texts (human phrases).
   Missing variables are instead created with proper CamelCase names by

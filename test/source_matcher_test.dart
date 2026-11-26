@@ -97,6 +97,21 @@ void main() {
       );
     });
 
+    test('unit segments are ignored when matching', () {
+      // (км)/(л) annotations do not count as words of the text.
+      expect(
+        findBestSourceVariableMatch('Пробег (км)', <String>['Пробег']),
+        'Пробег',
+      );
+      expect(
+        findBestSourceVariableMatch(
+          'Остаток топлива в баке (л)',
+          <String>['ОстатокТопливаВБаке'],
+        ),
+        'ОстатокТопливаВБаке',
+      );
+    });
+
     test('brace hint disambiguates same-prefix variables (tractor)', () {
       const List<String> variables = <String>[
         'ТягачСостояниеКабиныСостояние',
@@ -189,6 +204,24 @@ void main() {
       expect(
         generateSourceVariableName('Двигатель тягача'),
         'ТягачДвигатель',
+      );
+    });
+
+    test('plain phrases concatenate into CamelCase', () {
+      expect(
+        generateSourceVariableName('Показание моточасов фактическое'),
+        'ПоказаниеМоточасовФактическое',
+      );
+    });
+
+    test('unit segments are dropped', () {
+      expect(
+        generateSourceVariableName('Пробег (км)'),
+        'Пробег',
+      );
+      expect(
+        generateSourceVariableName('Остаток топлива в баке (л)'),
+        'ОстатокТопливаВБаке',
       );
     });
 
