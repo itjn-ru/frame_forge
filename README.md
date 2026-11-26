@@ -159,10 +159,12 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   re-bound automatically to the actual variable by words
   (`СостояниеКабиныТягачаВложение`). Proper concatenated CamelCase
   bindings are never touched.
-- the `{hint}` disambiguates candidates sharing the same prefix: its word
-  (and synonyms from the extensible `sourceHintWordSynonyms` dictionary —
+- the `{hint}` is a MANDATORY condition: its word (and synonyms from the
+  extensible `sourceHintWordSynonyms` dictionary —
   `радиокнопка` → `Состояние`, `вложение` → `Файл`, `комментарий` →
-  `Комментарий`) must match the **last** word of the variable name:
+  `Комментарий`) must match the **last** word of the variable name,
+  otherwise the candidate is rejected as a sibling field and the proper
+  name is generated instead:
   `Состояние кабины тягача {радиокнопка}` → `ТягачСостояниеКабиныСостояние`,
   `{вложение}` → `ТягачСостояниеКабиныФайл`, `{комментарий}` →
   `ТягачСостояниеКабиныКомментарий`. Word order is irrelevant: a

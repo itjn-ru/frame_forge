@@ -158,6 +158,36 @@ void main() {
       );
     });
 
+    test('covering candidate with a wrong hint suffix never binds', () {
+      // Only the radio-button variable exists (as after the first import
+      // pass): sibling fields with other hints must NOT latch onto it.
+      const List<String> variables = <String>[
+        'ТягачСостояниеКабиныСостояние',
+      ];
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины тягача {комментарий}',
+          variables,
+        ),
+        isNull,
+      );
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины тягача {вложение}',
+          variables,
+        ),
+        isNull,
+      );
+      // The matching hint still binds.
+      expect(
+        findBestSourceVariableMatch(
+          'Состояние кабины тягача {радиокнопка}',
+          variables,
+        ),
+        'ТягачСостояниеКабиныСостояние',
+      );
+    });
+
     test('no match at all returns null', () {
       expect(
         findBestSourceVariableMatch('СовсемДругоеБессмысленно', variables),

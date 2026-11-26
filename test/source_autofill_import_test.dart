@@ -153,4 +153,53 @@ void main() {
         .toList();
     expect(names, contains('ПоказаниеМоточасовФактическое'));
   });
+
+  test('import creates a distinct variable per hint suffix', () {
+    // The user scenario: one field in three widget variants — the hint
+    // alone distinguishes them; the data page starts empty.
+    final LayoutModel model = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    final ComponentPage modelPage = model.componentPages.first;
+    final Map<String, String> components = <String, String>{
+      'radio': 'Состояние кабины тягача {радиокнопка}',
+      'attach': 'Состояние кабины тягача {вложение}',
+      'comment': 'Состояние кабины тягача {комментарий}',
+    };
+    for (final MapEntry<String, String> entry in components.entries) {
+      final ComponentText component = ComponentText(entry.key);
+      component.properties['source']?.value = entry.value;
+      model.addItem(modelPage, component);
+    }
+
+    final Map<dynamic, dynamic> map = model.toMap();
+    final LayoutModel fresh = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    fresh.fromMap(map);
+
+    // One variable per hinted field word.
+    final List<String> names = fresh.root.items
+        .whereType<SourcePage>()
+        .expand((SourcePage p) => p.items)
+        .whereType<SourceVariable>()
+        .map((SourceVariable v) => v.properties['name']?.value?.toString() ?? '')
+        .toList();
+    expect(names, contains('ТягачСостояниеКабиныСостояние'));
+    expect(names, contains('ТягачСостояниеКабиныФайл'));
+    expect(names, contains('ТягачСостояниеКабиныКомментарий'));
+
+    // Every component is bound to its own variable.
+    final Map<String, String> bindings = <String, String>{
+      for (final ComponentText t in fresh.root.items
+          .whereType<ComponentPage>()
+          .expand((ComponentPage p) => p.items)
+          .whereType<ComponentText>())
+        t['name']?.toString() ?? '':
+            (t.properties['sourceV2']!.value as SourceReference).variableName,
+    };
+    expect(bindings['radio'], 'ТягачСостояниеКабиныСостояние');
+    expect(bindings['attach'], 'ТягачСостояниеКабиныФайл');
+    expect(bindings['comment'], 'ТягачСостояниеКабиныКомментарий');
+  });
 }

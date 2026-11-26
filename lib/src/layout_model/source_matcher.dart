@@ -228,12 +228,15 @@ List<String> sourceHintPreferenceWords(String normalizedText) {
 ///   vehicle-first names (`ТягачСостояниеКабиныСостояние` for
 ///   `Состояние кабины тягача`) match naturally. Units like `(км)` are
 ///   ignored: `Пробег (км)` matches `Пробег`.
-/// - Candidates that also match the `{hint}` word — via
-///   [sourceHintWordSynonyms] — against their **last** word win over
-///   candidates that do not: `…{радиокнопка}` prefers `…Состояние`,
-///   `…{вложение}` prefers `…Файл`, `…{комментарий}` prefers
-///   `…Комментарий`. Remaining ties keep the first candidate.
-/// - Returns null when no candidate covers all the words.
+/// - When the text carries a `{hint}`, it is MANDATORY: a candidate that
+///   covers all the words but does not END with the hinted field word
+///   (via [sourceHintWordSynonyms]) is rejected — `…{радиокнопка}` binds
+///   only to a `…Состояние` variable, `…{вложение}` only to `…Файл`,
+///   `…{комментарий}` only to `…Комментарий`. Without such a candidate
+///   null is returned and the caller generates the proper name instead
+///   of latching onto a sibling variable of another field.
+/// - Texts without hints bind to the first candidate covering all words.
+/// - Returns null when no candidate satisfies the rules.
 String? findBestSourceVariableMatch(
   String legacyText,
   Iterable<String> variableNames,
@@ -249,8 +252,7 @@ String? findBestSourceVariableMatch(
   final List<String> hintWords = sourceHintPreferenceWords(normalizedText);
 
   String? firstCovering;
-  String? bestHint;
-  int bestHintHits = 0;
+  String? hinted;
   for (final String variableName in variableNames) {
     if (variableName.trim().toLowerCase() ==
         normalizedText.toLowerCase()) {
@@ -260,16 +262,18 @@ String? findBestSourceVariableMatch(
     if (countSourceWordMatches(textWords, variableWords) < textWords.length) {
       continue; // Must cover every word of the text.
     }
-    firstCovering ??= variableName;
-    if (hintWords.isEmpty || variableWords.isEmpty) continue;
-    int hintHits = 0;
-    for (final String hint in hintWords) {
-      if (sourceWordsMatch(hint, variableWords.last)) hintHits++;
+    if (hintWords.isEmpty || variableWords.isEmpty) {
+      firstCovering ??= variableName;
+      continue;
     }
-    if (hintHits > bestHintHits) {
-      bestHint = variableName;
-      bestHintHits = hintHits;
+    // The hint is mandatory: the variable must end with the hinted field
+    // word, otherwise it belongs to a different field.
+    for (final String hint in hintWords) {
+      if (sourceWordsMatch(hint, variableWords.last)) {
+        hinted ??= variableName;
+        break;
+      }
     }
   }
-  return bestHint ?? firstCovering;
+  return hinted ?? firstCovering;
 }
