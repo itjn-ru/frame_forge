@@ -135,9 +135,18 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   case-insensitive, case-ending prefixes of 4+ letters, the `{…}` widget
   hint is excluded from the count; an exact string match is always accepted.
   The same algorithm runs automatically on XML import — after stripping
-  "human phrase" bindings out of sourceV2 (see below). The model no longer
-  spawns variables from legacy texts: when no match is found the binding
-  stays empty (the runtime reads `json[source]` by the text).
+  "human phrase" bindings out of sourceV2 (see below) and creating the
+  missing variables (see below). The table button keeps binding-only
+  behavior: no creation.
+- import creates missing variables by the naming convention:
+  `[vehicle word from the extensible sourceFrontWordSynonyms dictionary
+  (тягач/прицеп)] + the remaining text words in order, capitalized + the
+  hint synonym`. `Состояние ходовой тягача {радиокнопка}` produces the
+  variable `ТягачСостояниеХодовойСостояние` in the root of the data page
+  and binds the component to it. Non-aggressive: only components with an
+  empty `sourceV2` participate, valid bindings are never rewritten, and
+  when the generated name is already taken the component simply binds to
+  the existing variable (no duplicates).
 - import repairs sourceV2 bindings: a variableName written as a human
   phrase — containing spaces or a `{hint}` (e.g.
   `Состояние кабины тягача {вложение}`) — is cleared, and the component is

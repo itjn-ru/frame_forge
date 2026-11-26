@@ -93,7 +93,7 @@ void main() {
     expect(reference.variableName, 'ТягачДвигательСостояние');
   });
 
-  test('cleared phrase with no candidate variable stays empty', () {
+  test('import creates the missing variable and binds the component', () {
     final LayoutModel fresh = reloadFromMap();
     final List<ComponentText> texts = fresh.root.items
         .whereType<ComponentPage>()
@@ -103,7 +103,18 @@ void main() {
     final ComponentText noMatch =
         texts.firstWhere((ComponentText t) => t['name'] == 'nomatch');
 
+    // No variable covered the words, so the conventional name was
+    // generated, the variable was created in the source page root and the
+    // component got bound to it.
     final SourceReference reference = reloadedReference(noMatch);
-    expect(reference.variableName, isEmpty);
+    expect(reference.variableName, 'ПолнаяВысотаКабины');
+
+    final List<String> names = fresh.root.items
+        .whereType<SourcePage>()
+        .expand((SourcePage p) => p.items)
+        .whereType<SourceVariable>()
+        .map((SourceVariable v) => v.properties['name']?.value?.toString() ?? '')
+        .toList();
+    expect(names, contains('ПолнаяВысотаКабины'));
   });
 }

@@ -154,4 +154,47 @@ void main() {
       expect(findBestSourceVariableMatch('   ', variables), isNull);
     });
   });
+
+  group('generateSourceVariableName', () {
+    test('vehicle word goes first, hint synonym goes last', () {
+      expect(
+        generateSourceVariableName('Состояние ходовой тягача {радиокнопка}'),
+        'ТягачСостояниеХодовойСостояние',
+      );
+      expect(
+        generateSourceVariableName('Состояние кабины тягача {радиокнопка}'),
+        'ТягачСостояниеКабиныСостояние',
+      );
+      expect(
+        generateSourceVariableName('Состояние кабины тягача {вложение}'),
+        'ТягачСостояниеКабиныФайл',
+      );
+    });
+
+    test('trailer word goes first too', () {
+      expect(
+        generateSourceVariableName('Состояние кабины прицепа {комментарий}'),
+        'ПрицепСостояниеКабиныКомментарий',
+      );
+    });
+
+    test('no vehicle word: words in original order plus hint', () {
+      expect(
+        generateSourceVariableName('Полная высота кабины {комментарий}'),
+        'ПолнаяВысотаКабиныКомментарий',
+      );
+    });
+
+    test('no hint: just the words', () {
+      expect(
+        generateSourceVariableName('Двигатель тягача'),
+        'ТягачДвигатель',
+      );
+    });
+
+    test('empty and hint-only texts generate nothing', () {
+      expect(generateSourceVariableName('   '), isEmpty);
+      expect(generateSourceVariableName('{радиокнопка}'), isEmpty);
+    });
+  });
 }

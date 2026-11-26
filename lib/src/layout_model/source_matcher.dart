@@ -110,6 +110,80 @@ final Map<String, String> sourceHintWordSynonyms = <String, String>{
   'комментарий': 'комментарий',
 };
 
+/// Words carried to the FRONT of generated variable names — the vehicle
+/// the field belongs to. Keys are lowercase stems, values are the
+/// capitalized prefix; host apps may extend the map.
+///
+/// `Состояние ходовой тягача {радиокнопка}` →
+/// `ТягачСостояниеХодовойСостояние`.
+final Map<String, String> sourceFrontWordSynonyms = <String, String>{
+  'тягач': 'Тягач',
+  'прицеп': 'Прицеп',
+};
+
+/// Generates a variable name for a legacy source text by the project
+/// convention:
+///
+/// `[vehicle word from sourceFrontWordSynonyms] + [the remaining text
+/// words in their original order, each capitalized] + [hint synonym]`.
+///
+/// Words keep their original spelling (no case normalization: `ходовой`
+/// → `Ходовой`), duplicates are kept (`ТягачСостояниеХодовойСостояние`
+/// contains `Состояние` twice). Returns an empty string when the text
+/// carries no matchable words.
+String generateSourceVariableName(String legacyText) {
+  final String normalizedText = legacyText.trim();
+  if (normalizedText.isEmpty) return '';
+
+  final List<String> textWords = sourceTextWords(
+    stripBraceSegments(normalizedText),
+  );
+  if (textWords.isEmpty) return '';
+
+  // 1. The vehicle word moves to the front (first match wins).
+  String? front;
+  final List<String> rest = <String>[];
+  for (final String word in textWords) {
+    final String? frontWord = front == null ? _frontWordFor(word) : null;
+    if (frontWord != null) {
+      front = frontWord;
+      continue;
+    }
+    rest.add(word);
+  }
+
+  // 2. The hint synonym (or the bare hint word) ends the name.
+  String? hintSuffix;
+  for (final RegExpMatch match
+      in RegExp(r'\{([^}]*)\}').allMatches(normalizedText)) {
+    for (final String word in sourceTextWords(match.group(1) ?? '')) {
+      hintSuffix ??= sourceHintWordSynonyms[word] ?? word;
+    }
+  }
+
+  final List<String> parts = <String>[
+    if (front != null) front,
+    ...rest.map(_capitalize),
+    if (hintSuffix != null) _capitalize(hintSuffix),
+  ];
+  return parts.join();
+}
+
+String? _frontWordFor(String word) {
+  for (final MapEntry<String, String> entry
+      in sourceFrontWordSynonyms.entries) {
+    if (sourceWordsMatch(word, entry.key)) {
+      return entry.value;
+    }
+  }
+  return null;
+}
+
+String _capitalize(String word) {
+  if (word.isEmpty) return word;
+  return word[0].toUpperCase() + word.substring(1);
+}
+
 /// Preference words for the `{…}` hints of a legacy text: every hint word
 /// itself plus its synonyms from [sourceHintWordSynonyms].
 List<String> sourceHintPreferenceWords(String normalizedText) {
