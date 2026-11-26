@@ -12,12 +12,15 @@
   Enter picks the first match; Enter with no matching options binds the
   typed name as a new reference; losing focus collapses the list and
   restores the field to the current selection.
-- Source binding repair on import: a `sourceV2` variableName written as a
-  human phrase (contains spaces or a `{hint}` segment — the shape the old
-  auto-creation produced, e.g. `Состояние кабины тягача {вложение}`) is
-  cleared on load, and the word-matching auto-fill binds the component to
-  the actual variable (e.g. `СостояниеКабиныТягачаВложение`). Proper
-  CamelCase bindings (no spaces/braces) are never touched. The same
+- Source binding repair on import: a `sourceV2` variableName that is not
+  strict PascalCase (concatenated, starting with an uppercase letter,
+  letters/digits only — `isPascalCaseVariableName`) is cleared on load.
+  This covers human phrases with spaces or `{hint}` segments
+  (e.g. `Состояние кабины тягача {вложение}`), camelCase
+  (`состояниеКабины`), snake_case (`состояние_кабины`), kebab and dotted
+  names; the word-matching auto-fill then binds the component to the
+  actual variable (e.g. `СостояниеКабиныТягачаВложение`). Proper
+  PascalCase bindings are never touched. The same
   matching is available on demand via the "fill empty sourceV2" toolbar
   button in the source table. Matching splits both texts into words
   (CamelCase names split on uppercase boundaries), ignores case, tolerates

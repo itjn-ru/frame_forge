@@ -260,4 +260,25 @@ void main() {
       expect(generateSourceVariableName('{радиокнопка}'), isEmpty);
     });
   });
+
+  group('isPascalCaseVariableName', () {
+    test('accepts concatenated PascalCase names', () {
+      expect(isPascalCaseVariableName('ТягачСостояниеКабиныСостояние'), isTrue);
+      expect(isPascalCaseVariableName('Пробег'), isTrue);
+      expect(isPascalCaseVariableName('ОстатокТопливаВБаке'), isTrue);
+      expect(isPascalCaseVariableName('Тягач2Двигатель'), isTrue);
+      expect(isPascalCaseVariableName('ТягачGPSКоординаты'), isTrue);
+    });
+
+    test('rejects phrases and other conventions', () {
+      expect(isPascalCaseVariableName(''), isFalse);
+      expect(isPascalCaseVariableName('Состояние кабины'), isFalse);
+      expect(isPascalCaseVariableName('Состояние {вложение}'), isFalse);
+      expect(isPascalCaseVariableName('состояниеКабины'), isFalse);
+      expect(isPascalCaseVariableName('состояние_кабины'), isFalse);
+      expect(isPascalCaseVariableName('состояние-кабины'), isFalse);
+      expect(isPascalCaseVariableName('Config.ключ'), isFalse);
+      expect(isPascalCaseVariableName('2Пробег'), isFalse);
+    });
+  });
 }

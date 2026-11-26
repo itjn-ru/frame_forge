@@ -368,6 +368,11 @@ class LayoutModel with FromMapToMap {
   /// spaces or `{hint}` segments — the shape the removed auto-creation used
   /// to produce from legacy `source` texts. Real (CamelCase, no spaces)
   /// bindings are kept untouched.
+  /// Clears sourceV2 variable names that are not strict PascalCase
+  /// (concatenated, starting with an uppercase letter — see
+  /// [isPascalCaseVariableName]): human phrases, camelCase, snake_case,
+  /// kebab-case and dotted names are all treated as garbage the old
+  /// auto-creation produced, while proper bindings are kept untouched.
   void _clearTextNamedSourceReferences() {
     _clearTextNamedInItems(root.items);
   }
@@ -378,7 +383,10 @@ class LayoutModel with FromMapToMap {
       if (typed?.value is SourceReference) {
         final SourceReference reference = typed!.value as SourceReference;
         final String name = reference.variableName;
-        if (name.contains(' ') || name.contains('{') || name.contains('}')) {
+        // Only strict concatenated PascalCase names survive the import;
+        // human phrases and other conventions (camelCase, snake_case,
+        // kebab, dots, braces) are cleared and re-bound by word matching.
+        if (name.isNotEmpty && !isPascalCaseVariableName(name)) {
           reference.variableName = '';
         }
       }

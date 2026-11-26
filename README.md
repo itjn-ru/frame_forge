@@ -153,11 +153,13 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   `ПоказаниеМоточасовФактическое`, `Пробег (км)` → `Пробег`,
   `Остаток топлива в баке (л)` → `ОстатокТопливаВБаке` (prepositions
   stay and capitalize: `в` → `В`).
-- import repairs sourceV2 bindings: a variableName written as a human
-  phrase — containing spaces or a `{hint}` (e.g.
-  `Состояние кабины тягача {вложение}`) — is cleared, and the component is
-  re-bound automatically to the actual variable by words
-  (`СостояниеКабиныТягачаВложение`). Proper concatenated CamelCase
+- import repairs sourceV2 bindings: only strict concatenated PascalCase
+  names (uppercase first letter, letters/digits only) are valid. Anything
+  else — human phrases with spaces or `{hint}` segments
+  (`Состояние кабины тягача {вложение}`), camelCase (`состояниеКабины`),
+  snake/kebab (`состояние_кабины`, `состояние-кабины`), dotted names — is
+  cleared, and the component is re-bound automatically to the actual
+  variable by words (`СостояниеКабиныТягачаВложение`). Proper PascalCase
   bindings are never touched.
 - the `{hint}` is a MANDATORY condition: its word (and synonyms from the
   extensible `sourceHintWordSynonyms` dictionary —

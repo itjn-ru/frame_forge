@@ -113,6 +113,19 @@ String stripSourceAnnotations(String text) {
   return stripParenthesizedSegments(stripBraceSegments(text));
 }
 
+/// A valid sourceV2 variable name: non-empty, starts with an uppercase
+/// letter (Latin or Cyrillic) and contains only letters and digits —
+/// concatenated PascalCase like `ТягачСостояниеКабиныСостояние`.
+///
+/// Anything else — spaces, `{`/`}`, `_`, `-`, `.`, a lowercase first
+/// letter (camelCase `состояниеКабины`, snake_case `состояние_кабины`,
+/// kebab `состояние-кабины`) — is a human phrase or another convention
+/// and is cleared on import, then re-bound by word matching.
+bool isPascalCaseVariableName(String name) {
+  if (name.isEmpty) return false;
+  return RegExp(r'^[A-ZА-ЯЁ][A-Za-zА-ЯЁа-яё0-9]+$').hasMatch(name);
+}
+
 /// Widget-hint synonyms: a `{hint}` in the legacy source text points at
 /// the field word that ends the variable name.
 ///

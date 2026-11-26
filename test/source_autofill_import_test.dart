@@ -14,6 +14,7 @@ void main() {
   late ComponentText camelComponent;
   late ComponentText noMatchComponent;
   late ComponentText unitComponent;
+  late ComponentText camelCaseComponent;
 
   setUp(() {
     layoutModel = LayoutModel(
@@ -56,6 +57,16 @@ void main() {
       variableName: 'Показание моточасов фактическое',
     );
     layoutModel.addItem(page, unitComponent);
+
+    // camelCase binding (lowercase first letter): not PascalCase —
+    // cleared and re-bound by words.
+    camelCaseComponent = ComponentText('camelcase');
+    camelCaseComponent.properties['source']?.value =
+        'Показание моточасов фактическое';
+    camelCaseComponent.properties['sourceV2']?.value = SourceReference(
+      variableName: 'показаниеМоточасов',
+    );
+    layoutModel.addItem(page, camelCaseComponent);
 
     // The real variables of the data page.
     layoutModel.addItem(
@@ -201,5 +212,23 @@ void main() {
     expect(bindings['radio'], 'ТягачСостояниеКабиныСостояние');
     expect(bindings['attach'], 'ТягачСостояниеКабиныФайл');
     expect(bindings['comment'], 'ТягачСостояниеКабиныКомментарий');
+  });
+
+  test('import clears non-PascalCase bindings and re-binds them', () {
+    // 'camelcase' has a camelCase (lowercase first) variableName — not
+    // strict PascalCase, so the import clears it; the component shares
+    // the source text with 'unit', whose conventional variable was
+    // created first, so the binding lands on it.
+    final LayoutModel fresh = reloadFromMap();
+    final List<ComponentText> texts = fresh.root.items
+        .whereType<ComponentPage>()
+        .expand((ComponentPage p) => p.items)
+        .whereType<ComponentText>()
+        .toList();
+    final ComponentText camelCase =
+        texts.firstWhere((ComponentText t) => t['name'] == 'camelcase');
+
+    final SourceReference reference = reloadedReference(camelCase);
+    expect(reference.variableName, 'ПоказаниеМоточасовФактическое');
   });
 }
