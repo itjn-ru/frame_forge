@@ -89,6 +89,20 @@
 
 ### Fixed
 
+- `LayoutModel.renameSourceVariable` updated the wrong property key: it
+  looked for typed references under the legacy `source` (String) key, so
+  renaming a variable in the source table never updated the `sourceV2`
+  bindings of components — the properties panel kept showing the old
+  name. Both keys (`sourceV2` and legacy `source`) are now checked.
+- The sourceV2 property editor no longer shows stale values: the
+  autocomplete field resyncs when the selected component changes (the
+  widget state is reused, not recreated) and follows external changes
+  (renames from the table, auto-fill) through an event-bus subscription.
+- Renaming a source variable through the properties panel now syncs the
+  `sourceV2` bindings exactly like the source table name cells
+  (`PropertySourceVariableNameWidget`): old name captured on focus,
+  duplicate names rejected with a snackbar, map children update the
+  `mapKey` of `parent.key` references.
 - Editing the `source` property of components: long variable names no
   longer get cut off. The current selection is now a wrapped two-line
   selectable chip with a full-text tooltip, dropdown items wrap their name

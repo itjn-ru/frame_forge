@@ -465,6 +465,26 @@ class LayoutModel with FromMapToMap {
     }
   }
 
+  /// Whether a source variable with [name] exists anywhere in the source
+  /// page, including inside groups. [excludingId] skips one variable —
+  /// used by rename flows to check the NEW name of the renamed variable.
+  bool sourceVariableNameExists(String name, {String? excludingId}) {
+    bool check(List<Item> items) {
+      for (final Item item in items) {
+        if (item is SourceVariable) {
+          if (item.id != excludingId &&
+              (item.properties['name']?.value?.toString() ?? '') == name) {
+            return true;
+          }
+        }
+        if (item is SourceVariableGroup && check(item.items)) return true;
+      }
+      return false;
+    }
+
+    return check(root.items.whereType<SourcePage>().first.items);
+  }
+
   /// Keeps component bindings consistent after renaming a source variable.
   ///
   /// A top-level rename ([parentName] omitted) updates every source
@@ -488,16 +508,22 @@ class LayoutModel with FromMapToMap {
     String newName,
     String? parentName,
   ) {
-    final Property? sourceProp = item.properties['source'];
-    if (sourceProp != null && sourceProp.value is SourceReference) {
-      final SourceReference reference = sourceProp.value as SourceReference;
-      if (parentName == null) {
-        if (reference.variableName == oldName) {
-          reference.variableName = newName;
+    // The typed reference lives in 'sourceV2'; the 'source' property is a
+    // legacy String — but very old data could keep a typed reference there
+    // too, so both keys are checked.
+    for (final String key in <String>['sourceV2', 'source']) {
+      final Property? sourceProp = item.properties[key];
+      if (sourceProp != null && sourceProp.value is SourceReference) {
+        final SourceReference reference =
+            sourceProp.value as SourceReference;
+        if (parentName == null) {
+          if (reference.variableName == oldName) {
+            reference.variableName = newName;
+          }
+        } else if (reference.variableName == parentName &&
+            reference.mapKey == oldName) {
+          reference.mapKey = newName;
         }
-      } else if (reference.variableName == parentName &&
-          reference.mapKey == oldName) {
-        reference.mapKey = newName;
       }
     }
     for (final Item child in item.items) {

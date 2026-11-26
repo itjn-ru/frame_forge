@@ -82,6 +82,10 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
   /// The query the suggestion list is currently filtered by.
   String _appliedQuery = '';
 
+  /// Subscription for external attribute changes: keeps the field in sync
+  /// with renames/auto-fill done elsewhere.
+  StreamSubscription<LayoutModelEvent>? _eventsSubscription;
+
   /// Returns every variable name of the source page, including variables
   /// nested inside groups.
   List<String> _allVariableNames() {
@@ -132,6 +136,36 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
     // Losing focus collapses the suggestion list and restores the field
     // text to the current selection (a half-typed query is discarded).
     _queryFocus.addListener(_handleQueryFocus);
+    // External changes (a rename from the source table, the properties
+    // panel or the auto-fill) must refresh the field of the open editor.
+    _eventsSubscription = widget.controller.eventBus.events.listen(
+      (LayoutModelEvent event) {
+        if (event is AttributeChangeEvent) {
+          _resyncQueryField();
+          if (mounted) setState(() {});
+        }
+      },
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _SourceNavigator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The widget state is reused when the selection moves to another
+    // component: resync the field to the (possibly new) binding instead
+    // of showing the previously selected variable.
+    _resyncQueryField();
+  }
+
+  /// Restores the field text to the current selection unless the user is
+  /// typing a query right now.
+  void _resyncQueryField() {
+    if (_queryFocus.hasFocus) return;
+    final String current = widget.sourceRef.variableName;
+    if (_queryController.text != current) {
+      _queryController.text = current;
+      _appliedQuery = '';
+    }
   }
 
   /// Debounces the query: the suggestion list refreshes after the user
@@ -160,6 +194,7 @@ class _SourceNavigatorState extends State<_SourceNavigator> {
   @override
   void dispose() {
     _queryDebounce?.cancel();
+    _eventsSubscription?.cancel();
     _queryFocus.removeListener(_handleQueryFocus);
     _queryController.dispose();
     _queryFocus.dispose();

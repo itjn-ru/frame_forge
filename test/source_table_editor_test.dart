@@ -48,14 +48,16 @@ void main() {
 
     // A component bound to client_name through the built-in source property.
     boundText = ComponentText('text1');
-    boundText.properties['source']?.value = SourceReference(
+    // Components keep the typed reference in 'sourceV2' — the legacy
+    // 'source' property is a plain String label.
+    boundText.properties['sourceV2']?.value = SourceReference(
       variableName: 'client_name',
     );
     layoutModel.addItem(componentPage, boundText);
   });
 
   SourceReference boundReference() =>
-      boundText.properties['source']!.value as SourceReference;
+      boundText.properties['sourceV2']!.value as SourceReference;
 
   group('LayoutModel.renameSourceVariable', () {
     test('updates component source references', () {
@@ -67,7 +69,7 @@ void main() {
     });
 
     test('updates map keys of Map children', () {
-      boundText.properties['source']?.value = SourceReference(
+      boundText.properties['sourceV2']?.value = SourceReference(
         variableName: 'config',
         mapKey: 'api_url',
       );

@@ -144,4 +144,78 @@ void main() {
       findsNWidgets(2),
     );
   });
+
+  testWidgets('autocomplete field follows the selected component',
+      (WidgetTester tester) async {
+    // A second component bound to the long variable.
+    final ComponentText second = ComponentText('text2');
+    second.properties['sourceV2']?.value = SourceReference(
+      variableName: 'very_long_client_variable_name_for_testing',
+    );
+    layoutModel.addItem(layoutModel.componentPages.first, second);
+
+    await pumpProperties(tester);
+    TextField field() => tester
+        .widget<TextField>(find.byKey(const ValueKey<String>('sourceAutocomplete')));
+    expect(field().controller?.text, 'config');
+
+    // Switching the selection to another component resyncs the field
+    // (the widget state is reused, not recreated).
+    controller.select(second.id);
+    await tester.pumpAndSettle();
+    expect(
+      field().controller?.text,
+      'very_long_client_variable_name_for_testing',
+    );
+  });
+
+  testWidgets('external rename updates the open source editor field',
+      (WidgetTester tester) async {
+    await pumpProperties(tester);
+
+    // A rename done elsewhere (the source table) mutates the binding and
+    // emits an event: the open editor must follow.
+    layoutModel.renameSourceVariable('config', 'configuration');
+    controller.eventBus.emit(
+      AttributeChangeEvent(id: 'external', itemId: boundText.id),
+    );
+    await tester.pumpAndSettle();
+
+    final TextField field = tester.widget<TextField>(
+      find.byKey(const ValueKey<String>('sourceAutocomplete')),
+    );
+    expect(field.controller?.text, 'configuration');
+    // The chip shows the updated binding too.
+    expect(find.text('configuration'), findsWidgets);
+  });
+
+  testWidgets('renaming a variable from the properties panel syncs sourceV2',
+      (WidgetTester tester) async {
+    // Select the variable itself — its name field edits the model.
+    final SourceVariable configVariable = sourcePage.items
+        .whereType<SourceVariable>()
+        .firstWhere(
+          (SourceVariable v) => v['name'] == 'config',
+        );
+    controller.select(configVariable.id);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(width: 600, child: Properties(controller)),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The variable's name field shows 'config'.
+    await tester.enterText(find.text('config'), 'configuration');
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+
+    // The bound component now references the renamed variable.
+    final SourceReference reference =
+        boundText.properties['sourceV2']!.value as SourceReference;
+    expect(reference.variableName, 'configuration');
+    expect(configVariable['name'], 'configuration');
+  });
 }

@@ -8,6 +8,7 @@ import 'controller/events.dart';
 import 'controller/layout_model_controller.dart';
 import 'custom_border_radius.dart';
 import 'custom_margin.dart';
+import 'item.dart';
 import 'property.dart';
 import 'property_alignment_widget.dart';
 import 'property_bool_widget.dart';
@@ -24,6 +25,7 @@ import 'property_offset_widget.dart';
 import 'property_padding_widget.dart';
 import 'property_size_widget.dart';
 import 'property_source_variable_type_widget.dart';
+import 'property_source_variable_name_widget.dart';
 import 'property_source_widget.dart';
 import 'property_style_widget.dart';
 import 'property_uuid_widget.dart';
@@ -43,6 +45,13 @@ class PropertyWidget extends StatelessWidget {
     LayoutModelController controller,
     String propertyKey,
   ) {
+    // Renaming a source variable from the properties panel is
+    // reference-safe, exactly like the name cells of the source table.
+    final Item? currentItem = controller.getCurrentItem();
+    if (currentItem is SourceVariable && propertyKey == 'name') {
+      return PropertySourceVariableNameWidget(controller, propertyKey)
+          as PropertyWidget;
+    }
     switch (controller.getCurrentItem()?.properties[propertyKey]?.type) {
       case const (CustomBorderRadius):
         return PropertyBorderRadiusWidget(controller, propertyKey)
