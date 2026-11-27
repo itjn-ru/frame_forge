@@ -354,12 +354,19 @@ class LayoutModel with FromMapToMap {
       _setPageForItem(stylePage, basicElement);
     }
 
-    // Legacy cleanup: a sourceV2 variableName written as a human phrase
-    // ("Состояние кабины тягача {вложение}" — spaces or `{hint}` inside)
-    // is not a real variable, so it is cleared first; the word-matching
-    // auto-fill then binds the component to the actual CamelCase variable,
-    // creating the missing ones by the naming convention
-    // (ТягачСостояниеХодовойСостояние).
+    // Legacy cleanup: source variables themselves may carry phrase-shaped
+    // names produced by the old auto-creation ("Состояние кабины тягача
+    // {вложение}", "дата", "Пробег (км)") — every binding pointing at such
+    // a phrase keeps it alive, so the variables are renamed by the project
+    // convention first ([generateSourceVariableName]), and
+    // [renameSourceVariable] moves the bindings with them.
+    _renamePhraseNamedSourceVariables();
+    // A sourceV2 variableName written as a human phrase ("Состояние кабины
+    // тягача {вложение}" — spaces or `{hint}` inside) is not a real
+    // variable either; the remaining ones are cleared, and the
+    // word-matching auto-fill then binds the component to the actual
+    // CamelCase variable, creating the missing ones by the naming
+    // convention (ТягачСостояниеХодовойСостояние).
     _clearTextNamedSourceReferences();
     autoFillSourceReferences(createMissing: true);
   }
@@ -391,6 +398,60 @@ class LayoutModel with FromMapToMap {
         }
       }
       _clearTextNamedInItems(item.items);
+    }
+  }
+
+  /// Renames source variables whose names are not strict PascalCase
+  /// (concatenated, starting with an uppercase letter — see
+  /// [isPascalCaseVariableName]).
+  ///
+  /// The removed auto-creation used to write phrase-shaped variable names
+  /// right into the data page ("Состояние кабины тягача {радиокнопка}",
+  /// "дата", "Пробег (км)"). Bindings pointing at such a variable keep the
+  /// phrase alive: the binding repair clears the name, the auto-fill then
+  /// finds the very same phrase-named variable and binds it back, so
+  /// nothing changes. Renaming the variable by the naming convention
+  /// (see [generateSourceVariableName]) and moving the bindings with
+  /// [renameSourceVariable] breaks that loop without losing links.
+  ///
+  /// A numeric suffix is appended when the conventional name is already
+  /// taken by another variable. Map keys (children of a Map variable:
+  /// their name is a key of the parent, not a standalone variable name)
+  /// are left as is; so are names that yield no conventional variant.
+  void _renamePhraseNamedSourceVariables() {
+    final SourcePage sourcePage = root.items.whereType<SourcePage>().first;
+    final List<SourceVariable> candidates = <SourceVariable>[];
+    _collectRenameableVariables(sourcePage.items, candidates);
+    for (final SourceVariable variable in candidates) {
+      final String oldName =
+          variable.properties['name']?.value?.toString() ?? '';
+      if (oldName.isEmpty || isPascalCaseVariableName(oldName)) continue;
+      final String generated = generateSourceVariableName(oldName);
+      if (generated.isEmpty || !isPascalCaseVariableName(generated)) continue;
+      String target = generated;
+      int suffix = 2;
+      while (sourceVariableNameExists(target, excludingId: variable.id)) {
+        target = '$generated${suffix++}';
+      }
+      variable.properties['name']?.value = target;
+      renameSourceVariable(oldName, target);
+    }
+  }
+
+  /// Collects the variables that may take part in the import rename:
+  /// every [SourceVariable] reachable from the source page through
+  /// groups. Children of a variable (map keys of a Map parent) are not
+  /// collected: renaming a key is a different operation.
+  void _collectRenameableVariables(
+    List<Item> items,
+    List<SourceVariable> out,
+  ) {
+    for (final Item item in items) {
+      if (item is SourceVariable) {
+        out.add(item);
+      } else if (item is SourceVariableGroup) {
+        _collectRenameableVariables(item.items, out);
+      }
     }
   }
 

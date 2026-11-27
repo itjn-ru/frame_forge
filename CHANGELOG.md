@@ -93,6 +93,19 @@
 
 ### Fixed
 
+- Import repair of sourceV2 bindings was a no-op on real legacy files: the
+  data page itself carried variables named with whole phrases
+  (`дата`, `Пробег (км)`, `Состояние кабины тягача {радиокнопка}`) by the
+  old auto-creation. The repair cleared a phrase binding, the auto-fill
+  then found the same phrase-named variable by the exact-match rule and
+  bound it right back — nothing changed. On load such variables are now
+  renamed by the naming convention (`generateSourceVariableName`) BEFORE
+  the binding cleanup, and every binding moves with its variable via
+  `renameSourceVariable` (`дата` → `Дата` + bindings follow,
+  `Состояние кабины тягача {радиокнопка}` →
+  `ТягачСостояниеКабиныСостояние`). A numeric suffix is appended when the
+  conventional name is taken (`Пробег` exists → `Пробег (км)` becomes
+  `Пробег2`); map keys (children of a Map variable) are left as is.
 - `LayoutModel.renameSourceVariable` updated the wrong property key: it
   looked for typed references under the legacy `source` (String) key, so
   renaming a variable in the source table never updated the `sourceV2`

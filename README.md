@@ -161,6 +161,17 @@ tab toolbar (the `Items` tree of a `SourcePage`), or call
   cleared, and the component is re-bound automatically to the actual
   variable by words (`СостояниеКабиныТягачаВложение`). Proper PascalCase
   bindings are never touched.
+- import also repairs the variables themselves: the old auto-creation
+  wrote phrase-shaped names right into the data page (`дата`,
+  `Пробег (км)`, `Состояние кабины тягача {радиокнопка}`), and as long as
+  such a variable exists, a cleared binding finds it again by the
+  exact-match rule and the phrase survives the repair. On load those
+  variables are renamed by the same naming convention (`дата` → `Дата`,
+  `Пробег (км)` → `Пробег`, `Состояние кабины тягача {радиокнопка}` →
+  `ТягачСостояниеКабиныСостояние`) and every binding moves with its
+  variable (`renameSourceVariable`), so no links are lost. When the
+  conventional name is already taken, a numeric suffix is appended
+  (`Пробег2`); map keys (children of a Map variable) are left as is.
 - the `{hint}` is a MANDATORY condition: its word (and synonyms from the
   extensible `sourceHintWordSynonyms` dictionary —
   `радиокнопка` → `Состояние`, `вложение` → `Файл`, `комментарий` →

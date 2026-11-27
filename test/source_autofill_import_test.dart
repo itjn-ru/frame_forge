@@ -231,4 +231,152 @@ void main() {
     final SourceReference reference = reloadedReference(camelCase);
     expect(reference.variableName, 'ПоказаниеМоточасовФактическое');
   });
+
+  test('import renames phrase-named variables and moves the bindings', () {
+    // The legacy-file scenario: the data page itself carries variables
+    // named by the old auto-creation with whole phrases, and the
+    // components are bound to those phrases. Clearing the bindings alone
+    // changes nothing (the auto-fill finds the same phrase variable and
+    // binds it back), so the variables are renamed by the convention and
+    // the bindings follow.
+    final LayoutModel model = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    final SourcePage modelSourcePage =
+        model.root.items.whereType<SourcePage>().first;
+    final ComponentPage modelPage = model.componentPages.first;
+
+    final ComponentText radio = ComponentText('radio');
+    radio.properties['source']?.value =
+        'Состояние кабины тягача {радиокнопка}';
+    radio.properties['sourceV2']?.value = SourceReference(
+      variableName: 'Состояние кабины тягача {радиокнопка}',
+    );
+    model.addItem(modelPage, radio);
+
+    final ComponentText date = ComponentText('date');
+    date.properties['source']?.value = 'дата';
+    date.properties['sourceV2']?.value = SourceReference(
+      variableName: 'дата',
+    );
+    model.addItem(modelPage, date);
+
+    model.addItem(
+      modelSourcePage,
+      SourceVariable('Состояние кабины тягача {радиокнопка}'),
+    );
+    model.addItem(modelSourcePage, SourceVariable('дата'));
+    model.addItem(modelSourcePage, SourceVariable('ФИО'));
+
+    final Map<dynamic, dynamic> map = model.toMap();
+    final LayoutModel fresh = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    fresh.fromMap(map);
+
+    // The phrase variables are renamed by the convention; the proper
+    // PascalCase one is untouched.
+    final List<String> names = fresh.root.items
+        .whereType<SourcePage>()
+        .expand((SourcePage p) => p.items)
+        .whereType<SourceVariable>()
+        .map((SourceVariable v) => v.properties['name']?.value?.toString() ?? '')
+        .toList();
+    expect(names, contains('ТягачСостояниеКабиныСостояние'));
+    expect(names, contains('Дата'));
+    expect(names, contains('ФИО'));
+    expect(names, isNot(contains('Состояние кабины тягача {радиокнопка}')));
+    expect(names, isNot(contains('дата')));
+
+    // The bindings follow the renamed variables.
+    final Map<String, String> bindings = <String, String>{
+      for (final ComponentText t in fresh.root.items
+          .whereType<ComponentPage>()
+          .expand((ComponentPage p) => p.items)
+          .whereType<ComponentText>())
+        t['name']?.toString() ?? '':
+            (t.properties['sourceV2']!.value as SourceReference).variableName,
+    };
+    expect(bindings['radio'], 'ТягачСостояниеКабиныСостояние');
+    expect(bindings['date'], 'Дата');
+  });
+
+  test('import suffixes a phrase rename that collides with a proper name',
+      () {
+    // The conventional name for 'Пробег (км)' is 'Пробег', which is
+    // already taken by a proper variable: the renamed one gets a numeric
+    // suffix instead of shadowing it.
+    final LayoutModel model = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    final SourcePage modelSourcePage =
+        model.root.items.whereType<SourcePage>().first;
+    final ComponentPage modelPage = model.componentPages.first;
+
+    final ComponentText mileage = ComponentText('mileage');
+    mileage.properties['source']?.value = 'Пробег (км)';
+    mileage.properties['sourceV2']?.value = SourceReference(
+      variableName: 'Пробег (км)',
+    );
+    model.addItem(modelPage, mileage);
+
+    model.addItem(modelSourcePage, SourceVariable('Пробег'));
+    model.addItem(modelSourcePage, SourceVariable('Пробег (км)'));
+
+    final Map<dynamic, dynamic> map = model.toMap();
+    final LayoutModel fresh = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    fresh.fromMap(map);
+
+    final List<String> names = fresh.root.items
+        .whereType<SourcePage>()
+        .expand((SourcePage p) => p.items)
+        .whereType<SourceVariable>()
+        .map((SourceVariable v) => v.properties['name']?.value?.toString() ?? '')
+        .toList();
+    expect(names, contains('Пробег'));
+    expect(names, contains('Пробег2'));
+    expect(names, isNot(contains('Пробег (км)')));
+
+    final ComponentText reloaded = fresh.root.items
+        .whereType<ComponentPage>()
+        .expand((ComponentPage p) => p.items)
+        .whereType<ComponentText>()
+        .firstWhere((ComponentText t) => t['name'] == 'mileage');
+    expect(reloadedReference(reloaded).variableName, 'Пробег2');
+  });
+
+  test('import leaves map keys of a Map variable as is', () {
+    // Children of a Map variable are map keys, not standalone variables:
+    // a phrase-shaped key is not renamed on import.
+    final LayoutModel model = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    final SourcePage modelSourcePage =
+        model.root.items.whereType<SourcePage>().first;
+
+    final SourceVariable mapVariable = SourceVariable('Настройки');
+    mapVariable.properties['type']?.value =
+        const SourceVariableType('Map');
+    final SourceVariable key = SourceVariable('ключ фраза');
+    model.addItem(modelSourcePage, mapVariable);
+    model.addItem(mapVariable, key);
+
+    final Map<dynamic, dynamic> map = model.toMap();
+    final LayoutModel fresh = LayoutModel(
+      screenSizes: <ScreenSizeEnum>[ScreenSizeEnum.mobile],
+    );
+    fresh.fromMap(map);
+
+    final SourceVariable reloadedMap = fresh.root.items
+        .whereType<SourcePage>()
+        .expand((SourcePage p) => p.items)
+        .whereType<SourceVariable>()
+        .firstWhere(
+          (SourceVariable v) => v['name'] == 'Настройки',
+        );
+    expect(reloadedMap.items, hasLength(1));
+    expect(reloadedMap.items.first['name'], 'ключ фраза');
+  });
 }
